@@ -7,6 +7,9 @@ export default {
 				primary: '#8F2A2B',
 				secondary: '#FAA21B',
 				fadeblack: '#282828'
+			},
+			fontFamily: {
+				optima: ['Optima Itallic', 'sans-serif']	
 			}
 		}
 	},
