@@ -4,5 +4,8 @@
 	let { children } = $props();
 </script>
 
-{@render children?.()}
+<div class="font-sans"> 
+	<!-- TODO: Fix Optima font -->
+	{@render children?.()}
+</div>
 <footer class=""></footer>
