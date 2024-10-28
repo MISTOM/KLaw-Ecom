@@ -1,6 +1,6 @@
 class cart {
-    cartItems = $state<any[]>([]);  
-    cartopen = $state(false);
+	cartItems = $state<any[]>([]);
+	cartopen = $state(false);
 
 	cartStats = $derived.by(() => {
 		let quantity = 0,
@@ -10,7 +10,7 @@ class cart {
 			quantity += item.quantity;
 			total += item.product.price * item.quantity;
 		}
-        
+
 		return {
 			total,
 			quantity
@@ -19,13 +19,13 @@ class cart {
 
 	removeItem(id: string) {
 		this.cartItems = this.cartItems.filter((item) => item.id !== id);
-        if(this.cartStats.quantity === 0) this.cartopen = false
+		if (this.cartStats.quantity === 0) this.cartopen = false;
 	}
 
-    // save(){
-    //     localStorage.setItem('cart', JSON.stringify(this.cartItems));
-    // }
-    constructor(){}
+	// save(){
+	//     localStorage.setItem('cart', JSON.stringify(this.cartItems));
+	// }
+	constructor() {}
 }
 const newcart = new cart();
 export default newcart;
