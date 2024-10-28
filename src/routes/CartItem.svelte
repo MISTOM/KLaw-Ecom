@@ -6,7 +6,7 @@
 </script>
 
 <div
-	class="flex items-center justify-between border-b border-gray-200 py-2"
+	class="flex items-center justify-between border-b border-fadeblack py-2"
 	in:fade={{ duration: 100 }}
 	out:fade={{ duration: 100 }}
 >
@@ -14,7 +14,7 @@
 		<img src={item.product.thumbnail} alt="Product" class="mr-4 size-12 rounded object-cover" />
 		<div>
 			<h4>{item.product.title}</h4>
-			<span class="text-sm">Ksh {item.product.price} each</span>
+			<span class="text-sm">KES {item.product.price} each</span>
 		</div>
 	</div>
 
