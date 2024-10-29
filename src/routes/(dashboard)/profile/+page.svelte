@@ -1,10 +1,14 @@
 <script lang="ts">
-
 </script>
+
 <!-- Profile Page -->
-<div class="grid grid-cols-2 m-1">
+<div class="m-1 grid grid-cols-2">
 	<div>
-		<img src="/kenyaLawFavicon.png" alt="Profile" class="rounded-full object-cover size-24 m-auto shadow-lg" >
+		<img
+			src="/kenyaLawFavicon.png"
+			alt="Profile"
+			class="m-auto size-24 rounded-full object-cover shadow-lg"
+		/>
 		<h2 class="text-center text-2xl font-semibold">Welcome, Henry Clyde</h2>
 	</div>
 	<div class="p-4">
@@ -25,7 +29,11 @@
 				<label for="password" class="block text-sm font-semibold">New Password</label>
 				<input type="password" id="password" class="w-full rounded-md border p-2" />
 			</div>
-			<button type="submit" class="w-full rounded-md border p-2 transition-colors hover:bg-primary hover:text-white">Update</button>
+			<button
+				type="submit"
+				class="w-full rounded-md border p-2 transition-colors hover:bg-primary hover:text-white"
+				>Update</button
+			>
 		</form>
 	</div>
 </div>
