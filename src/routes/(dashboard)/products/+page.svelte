@@ -3,7 +3,7 @@
 	const { data } = $props();
 </script>
 
-<main class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+<main class="grid grid-cols-1 gap-4 font-optima sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 	{#each data.products as product, i}
 		<div class=" m-3 overflow-hidden rounded-md border border-gray-300 p-4">
 			<img src={product.thumbnail} alt={product.title} class="m-auto h-36 object-cover" />

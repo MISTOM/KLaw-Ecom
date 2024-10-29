@@ -2,6 +2,7 @@
 	import cart from '$lib/Cart.svelte';
 	import { fade } from 'svelte/transition';
 	import CartItem from '../../lib/components/CartItem.svelte';
+	import { goto } from '$app/navigation';
 
 	const { children } = $props();
 </script>
@@ -30,7 +31,9 @@
 		>
 		<button
 			class="mx-3 rounded border border-transparent p-1 transition-colors hover:border-primary"
-			>Log out</button
+			onclick={() => {
+				goto('/login');
+			}}>Log out</button
 		>
 	</div>
 </header>
@@ -60,7 +63,7 @@
 				<button
 					class="rounded-md border border-gray-300 px-2 py-1 transition-colors hover:bg-primary hover:text-white"
 				>
-					Proceed to checkout
+					<a href="/checkout">Proceed to checkout</a>
 				</button>
 			{:else}
 				<div>

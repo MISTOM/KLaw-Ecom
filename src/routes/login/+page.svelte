@@ -21,7 +21,9 @@
 
 			<div class="flex justify-between">
 				<span class="text-sm hover:text-secondary"><a href="/register">Register</a></span>
-				<span class="text-sm hover:text-secondary"><a href="/forgotPassword">Forgot Passowrd</a></span>
+				<span class="text-sm hover:text-secondary"
+					><a href="/forgotPassword">Forgot Passowrd</a></span
+				>
 			</div>
 		</form>
 	</div>

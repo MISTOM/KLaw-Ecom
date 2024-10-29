@@ -9,7 +9,7 @@ export default {
 				fadeblack: '#282828'
 			},
 			fontFamily: {
-				optima: ['Optima Itallic', 'sans-serif']	
+				optima: ['Optima', 'sans-serif']
 			}
 		}
 	},

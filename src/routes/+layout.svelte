@@ -4,7 +4,7 @@
 	let { children } = $props();
 </script>
 
-<div class="font-sans"> 
+<div class="font-sans">
 	<!-- TODO: Fix Optima font -->
 	{@render children?.()}
 </div>
