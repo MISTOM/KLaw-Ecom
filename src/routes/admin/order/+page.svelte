@@ -15,8 +15,6 @@
 			published: false
 		}
 	];
-
-
 </script>
 
 <main class="m-2 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
@@ -34,9 +32,7 @@
 					</div>
 
 					<div class="flex space-x-2">
-						<button
-							class="rounded-md border px-2 py-1 hover:border-primary">Issue</button
-						>
+						<button class="rounded-md border px-2 py-1 hover:border-primary">Issue</button>
 					</div>
 				</div>
 			</a>
@@ -48,8 +44,9 @@
 			<input
 				type="text"
 				placeholder="Search for a purchase"
-				class="w-full p-2 border border-gray-300 rounded-md"
+				class="w-full rounded-md border border-gray-300 p-2"
 			/>
 			<button class="rounded-md border px-2 py-1 hover:border-primary">Search</button>
+		</div>
 	</div>
 </main>

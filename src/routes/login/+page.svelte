@@ -1,6 +1,6 @@
 <script lang="ts">
 	const { form } = $props();
-	console.log()
+	console.log();
 </script>
 
 <div class="loginbg flex min-h-screen items-center justify-center bg-gray-100 lg:bg-contain">
@@ -9,7 +9,14 @@
 		<form class="mt-4" method="POST">
 			<div class="mb-4">
 				<label for="email" class="block text-sm font-semibold">Email</label>
-				<input type="email" id="email" name="email" class="w-full rounded-md border p-2" value = {form?.data?.email ?? ''} required/>
+				<input
+					type="email"
+					id="email"
+					name="email"
+					class="w-full rounded-md border p-2"
+					value={form?.data?.email ?? ''}
+					required
+				/>
 				<label for="email" class="label">
 					{#if form?.errors}
 						<span class="text-sm text-red-600">{form?.errors}</span>
@@ -18,7 +25,13 @@
 			</div>
 			<div class="mb-4">
 				<label for="password" class="block text-sm font-semibold">Password</label>
-				<input type="password" id="password" name="password" class="w-full rounded-md border p-2" required />
+				<input
+					type="password"
+					id="password"
+					name="password"
+					class="w-full rounded-md border p-2"
+					required
+				/>
 			</div>
 			<button
 				type="submit"

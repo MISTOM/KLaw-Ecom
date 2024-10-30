@@ -11,11 +11,23 @@
 		<form class="mt-4" method="POST">
 			<div class="mb-4">
 				<label for="email" class="block text-sm font-semibold">Full Name</label>
-				<input type="text" id="name" name="name" class="w-full rounded-md border p-2" value={form?.data?.name} />
+				<input
+					type="text"
+					id="name"
+					name="name"
+					class="w-full rounded-md border p-2"
+					value={form?.data?.name}
+				/>
 			</div>
 			<div class="mb-4">
 				<label for="email" class="block text-sm font-semibold">Email</label>
-				<input type="email" id="email"  name="email" class="w-full rounded-md border p-2" value={form?.data?.email} />
+				<input
+					type="email"
+					id="email"
+					name="email"
+					class="w-full rounded-md border p-2"
+					value={form?.data?.email}
+				/>
 			</div>
 			<div class="mb-4">
 				<label for="password" class="block text-sm font-semibold">Password</label>

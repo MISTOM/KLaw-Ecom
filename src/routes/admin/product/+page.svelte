@@ -69,7 +69,7 @@
 		{/each}
 	</div>
 	<div>
-		<h1 class="text-2xl mb-2">Add Product</h1>
+		<h1 class="mb-2 text-2xl">Add Product</h1>
 		<hr />
 		<form>
 			<div class=" space-y-2">
@@ -83,8 +83,7 @@
 				<input type="test" id="description" name="description" class="w-full border p-2" />
 				<label for="serviceCode" class="block">Service Code</label>
 				<input type="text" id="serviceCode" name="serviceCode" class="w-full border p-2" />
-				<button type="submit" class="rounded-md border p-2 hover:border-primary"
-					>Add Product</button
+				<button type="submit" class="rounded-md border p-2 hover:border-primary">Add Product</button
 				>
 			</div>
 		</form>
