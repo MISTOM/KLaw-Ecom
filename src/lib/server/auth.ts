@@ -4,7 +4,6 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '$lib/server/prisma';
 
-
 let roleCache: import('@prisma/client').Role[];
 
 export default {
@@ -69,7 +68,6 @@ export default {
 	 */
 	async compare(password, hash) {
 		return await bcrypt.compare(password, hash);
-		
 	},
 
 	/**
@@ -96,7 +94,7 @@ export default {
 				});
 		}
 		return roleCache;
-	},
+	}
 
 	// /**
 	//  * Check if user is an admin
@@ -112,5 +110,4 @@ export default {
 	// 	}
 	// 	return true;
 	// },
-
 };
