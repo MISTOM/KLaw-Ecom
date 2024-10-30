@@ -98,7 +98,7 @@ model ProductOnOrder {
 
 model Role {
   id        Int      @id @default(autoincrement())
-  name      Roles
+  name      Roles    @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   User      User[]
