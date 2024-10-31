@@ -3,23 +3,24 @@ import { REFRESH_KEY, SECRET_KEY, RESET_KEY } from '$env/static/private';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '$lib/server/prisma';
+import type { User, Role } from '@prisma/client';
 
-let roleCache: import('@prisma/client').Role[];
+let roleCache: Role[];
 
 export default {
 	/**
 	 * Sign payload
-	 * @param {import('@prisma/client').User} payload
-	 * @returns {String} token
+	 * @param payload
+	 * @returns  token
 	 */
-	sign(payload) {
+	sign(payload: User): string {
 		//maxAge
-		const maxAge = 30 * 60; // 30 minutes
+		//TODO - Extend maxAge
+		const maxAge = 1 * 60; // 1 minute
 		const id = payload.id;
 		const role = payload.roleId;
-		const parentSellerId = payload.parentSellerId;
 
-		return jwt.sign({ id, role, parentSellerId }, SECRET_KEY, {
+		return jwt.sign({ id, role }, SECRET_KEY, {
 			expiresIn: maxAge
 		});
 	},
@@ -27,9 +28,9 @@ export default {
 	/**
 	 * Generate refresh token and save it to the database
 	 * @param {import('@prisma/client').User} user
-	 * @returns {Promise.<String>} refreshToken
+	 * @returns refreshToken
 	 */
-	async generateRefreshToken(user) {
+	async generateRefreshToken(user: User): Promise<string> {
 		const maxAge = 60 * 60 * 24; // 24 hours
 		const id = user.id;
 
@@ -56,7 +57,7 @@ export default {
 	 * Generate reset Password token
 	 * @param {Number} id User Id
 	 */
-	generateResetToken(id) {
+	generateResetToken(id: User['id']) {
 		const maxAge = 60 * 60; // 1 hour
 		return jwt.sign({ id }, RESET_KEY, { expiresIn: maxAge });
 	},
@@ -66,7 +67,7 @@ export default {
 	 * @param {String | Buffer} password
 	 * @param {String} hash
 	 */
-	async compare(password, hash) {
+	async compare(password: string | Buffer, hash: string) {
 		return await bcrypt.compare(password, hash);
 	},
 
