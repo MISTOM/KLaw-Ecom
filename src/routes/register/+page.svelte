@@ -1,5 +1,13 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
+	import { fade } from 'svelte/transition';
 	const { form } = $props();
+
+	let name = $state(form?.data?.name);
+	let email = $state(form?.data?.email);
+	let password = $state('');
+	let confirmPassword = $state('');
+	let passwordMatch = $derived(password === confirmPassword ? true : false);
 </script>
 
 <div class="loginbg flex min-h-screen items-center justify-center bg-gray-100 lg:bg-contain">
@@ -8,7 +16,17 @@
 		{#if form?.errors}
 			<span class="text-sm text-red-600">{form?.errors}</span>
 		{/if}
-		<form class="mt-4" method="POST">
+		<form
+			class="mt-4"
+			method="POST"
+			use:enhance={({ cancel }) => {
+				if (password !== confirmPassword) {
+					console.log('Passwords do not match');
+					//TODO - toast error message
+					cancel();
+				}
+			}}
+		>
 			<div class="mb-4">
 				<label for="email" class="block text-sm font-semibold">Full Name</label>
 				<input
@@ -16,7 +34,7 @@
 					id="name"
 					name="name"
 					class="w-full rounded-md border p-2"
-					value={form?.data?.name}
+					bind:value={name}
 				/>
 			</div>
 			<div class="mb-4">
@@ -26,16 +44,33 @@
 					id="email"
 					name="email"
 					class="w-full rounded-md border p-2"
-					value={form?.data?.email}
+					bind:value={email}
 				/>
 			</div>
 			<div class="mb-4">
 				<label for="password" class="block text-sm font-semibold">Password</label>
-				<input type="password" id="password" name="password" class="w-full rounded-md border p-2" />
+				<input
+					type="password"
+					id="password"
+					name="password"
+					class="w-full rounded-md border p-2"
+					bind:value={password}
+				/>
 			</div>
 			<div class="mb-4">
 				<label for="confirmPassword" class="block text-sm font-semibold">Confirm Password</label>
-				<input type="password" id="confirmPassword" class="w-full rounded-md border p-2" />
+				<input
+					type="password"
+					id="confirmPassword"
+					class="w-full rounded-md border p-2"
+					name="confirmPassword"
+					bind:value={confirmPassword}
+				/>
+				{#if !passwordMatch}
+					<span class="text-xs text-red-600" in:fade={{ duration: 100 }}
+						>Passwords do not match</span
+					>
+				{/if}
 			</div>
 			<button
 				type="submit"
