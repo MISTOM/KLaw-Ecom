@@ -1,4 +1,7 @@
 <script lang="ts">
+	const {data} = $props()
+	
+	
 	let products = [
 		{
 			id: 1,
@@ -35,7 +38,7 @@
 
 <main class="m-2 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3">
 	<div class="col-span-2">
-		<h1 class="text-4xl">All Products</h1>
+		<h1 class="text-4xl">All Products for {data.user?.name}</h1>
 		<hr />
 		{#each products as product, i}
 			<a href={`/admin/product/${product.id}`}>
