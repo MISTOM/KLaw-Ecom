@@ -58,8 +58,8 @@ model Category {
 
 model Cart {
   id        Int        @id @default(autoincrement())
-  userId    Int
-  user      User       @relation(fields: [userId], references: [id])
+  userId    Int        @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   CartItem  CartItem[]
@@ -70,17 +70,21 @@ model CartItem {
   cartId    Int
   productId Int
   quantity  Int
-  cart      Cart     @relation(fields: [cartId], references: [id])
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product   Product  @relation(fields: [productId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  //TODO: Add indexes
+  // @@index([cartId])
+  // @@index([productId])
 }
 
 model Order {
   id             Int              @id @default(autoincrement())
   totalPrice     Float
   userId         Int
-  user           User             @relation(fields: [userId], references: [id])
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   ProductOnOrder ProductOnOrder[]
@@ -89,7 +93,7 @@ model Order {
 model ProductOnOrder {
   orderId   Int
   productId Int
-  order     Order   @relation(fields: [orderId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id])
   isIssued  Boolean @default(false)
 

@@ -35,6 +35,7 @@
 					name="name"
 					class="w-full rounded-md border p-2"
 					bind:value={name}
+					required
 				/>
 			</div>
 			<div class="mb-4">
@@ -45,6 +46,7 @@
 					name="email"
 					class="w-full rounded-md border p-2"
 					bind:value={email}
+					required
 				/>
 			</div>
 			<div class="mb-4">
@@ -55,6 +57,7 @@
 					name="password"
 					class="w-full rounded-md border p-2"
 					bind:value={password}
+					required
 				/>
 			</div>
 			<div class="mb-4">
@@ -65,6 +68,7 @@
 					class="w-full rounded-md border p-2"
 					name="confirmPassword"
 					bind:value={confirmPassword}
+					required
 				/>
 				{#if !passwordMatch}
 					<span class="text-xs text-red-600" in:fade={{ duration: 100 }}
@@ -74,7 +78,8 @@
 			</div>
 			<button
 				type="submit"
-				class="w-full rounded-md border p-2 transition-colors hover:bg-primary hover:text-white"
+				class="w-full rounded-md border p-2 transition-colors hover:bg-primary hover:text-white disabled:opacity-50"
+				disabled={!passwordMatch}
 				>Register
 			</button>
 			<span class="text-sm hover:text-secondary"><a href="/login">Back to login</a></span>

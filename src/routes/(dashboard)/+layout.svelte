@@ -3,8 +3,26 @@
 	import { fade } from 'svelte/transition';
 	import CartItem from '../../lib/components/CartItem.svelte';
 	import { goto } from '$app/navigation';
+	import { getUserState } from '$lib/state.svelte';
 
-	const { children } = $props();
+	// const userstate = getUserState();
+	// console.log('userState', userstate);
+
+	const { children, data } = $props();
+	const user = data.user;
+
+	const handleLogout = async () => {
+		const response = await fetch('/api/logout', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' }
+		});
+
+		if (!response.ok) {
+			console.error('Failed to log out');
+		}
+		console.log(await response.json())
+		goto('/login');
+	};
 </script>
 
 <div class="m-5">
@@ -15,9 +33,10 @@
 	<nav class="flex items-center">
 		<ul class="flex">
 			<li class="mx-4 transition-colors hover:text-secondary"><a href="/">Home</a></li>
-			<li class="mx-4 transition-colors hover:text-secondary"><a href="/products">Products</a></li>
+			<li class="mx-4 transition-colors hover:text-secondary"><a href="/product">Products</a></li>
+
 			<li class="mx-4 transition-colors hover:text-secondary">
-				<a href="/purchases">Purchases</a>
+				<a href="/purchases">Purchases for {user?.name}</a>
 			</li>
 		</ul>
 	</nav>
@@ -32,7 +51,7 @@
 		<button
 			class="mx-3 rounded border border-transparent p-1 transition-colors hover:border-primary"
 			onclick={() => {
-				goto('/login');
+				handleLogout();
 			}}>Log out</button
 		>
 	</div>
