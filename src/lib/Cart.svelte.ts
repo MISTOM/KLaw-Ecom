@@ -1,7 +1,7 @@
 import { getContext, setContext } from "svelte";
 
 class Cart {
-	cartItems = $state<any[]>([]);
+	cartItems = $state<any[]>([]); // {id,  quantity, product: {id, name, price...}}
 	cartopen = $state(false);
 
 	cartStats = $derived.by(() => {
@@ -20,11 +20,17 @@ class Cart {
 	});
 
 	async saveCart() {
+		const cartItems = this.cartItems.map((item) => {
+			return {
+				productId: item.product.id,
+				quantity: item.quantity
+			}
+		})
 		try {
 			const response = await fetch('/api/cart', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(this.cartItems)
+				body: JSON.stringify(cartItems)
 			});
 			if (!response.ok) {
 				throw new Error('Failed to save cart');

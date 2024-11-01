@@ -5,9 +5,7 @@ import auth from '$lib/server/auth';
 import prisma from '$lib/server/prisma';
 
 export const load = (async ({ locals }) => {
-	if (locals.user) {
-		return redirect(301, '/admin/product')
-	} return {};
+	// if (locals.user) { throw redirect(303, '/') }
 }) satisfies PageServerLoad;
 
 export const actions = {
@@ -72,7 +70,7 @@ export const actions = {
 			cookies.set('refreshToken', refreshToken, { httpOnly: true, secure: true, path: '/', maxAge });
 
 			console.log('User created', formData, hashedPassword);
-			redirect(301, '/admin/product')
+			
 		} catch (e) {
 			console.log(e);
 			return fail(500, {
@@ -80,5 +78,6 @@ export const actions = {
 				errors: 'An error occurred'
 			});
 		}
+		throw redirect(303, '/product');
 	}
 } satisfies Actions;

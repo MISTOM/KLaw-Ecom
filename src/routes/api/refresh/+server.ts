@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
-
 import { error, json } from '@sveltejs/kit';
 import { REFRESH_KEY } from '$env/static/private';
+
 import auth from '$lib/server/auth';
 import jwt from 'jsonwebtoken';
 import prisma from '$lib/server/prisma';

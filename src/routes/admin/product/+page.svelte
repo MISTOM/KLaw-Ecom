@@ -1,8 +1,7 @@
 <script lang="ts">
-	const {data} = $props()
-	
-	
-	let products = [
+	const { data } = $props();
+
+	let products = $state([
 		{
 			id: 1,
 			title: 'Book - 2011 Edition',
@@ -18,7 +17,7 @@
 			published: false
 		}
 		// Add more products as needed
-	];
+	]);
 
 	const publishProduct = (id: any) => {
 		products = products.map((product) =>
