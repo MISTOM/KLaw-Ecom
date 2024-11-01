@@ -21,18 +21,20 @@ export const GET = async ({ locals: { user } }) => {
 };
 
 export const POST = async ({ request, locals: { user } }) => {
-    if (!user.id) {
+    if (!user?.id) {
         return error(401, 'Unauthorized');
     }
 
     const cartItems = await request.json(); // [{ productId: 1, quantity: 2 }, { productId: 2, quantity: 3 }]
 
     try {
+
+        // TODO - Review this approach
         await prisma.cart.upsert({
             where: { userId: user.id },
             update: {
                 CartItem: {
-                    deleteMany: {}, // Clear existing items
+                    deleteMany: {}, // Clear existing items 
 
                     create: cartItems.map(item => ({
                         productId: item.productId,

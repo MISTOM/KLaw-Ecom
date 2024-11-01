@@ -3,10 +3,8 @@ import auth from '$lib/server/auth.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types'
 
-export const load = (async ({ locals }) => {
-	if (locals.user) {
-		return redirect(301, '/admin/product');
-	}
+export const load = (async ({ locals: {user} }) => {
+	console.log('user', user);
 }) satisfies PageServerLoad
 
 export const actions = {
@@ -57,6 +55,6 @@ export const actions = {
 		cookies.set('token', token, { httpOnly: true, secure: true, path: '/', maxAge });
 		cookies.set('refreshToken', refreshToken, { httpOnly: true, secure: true, path: '/', maxAge });
 
-		redirect(301, '/product')
+		throw redirect(301, '/product')
 	}
 } satisfies Actions;

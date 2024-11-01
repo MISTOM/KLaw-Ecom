@@ -2,6 +2,19 @@
 	import { goto } from '$app/navigation';
 
 	const { children } = $props();
+
+	const handleLogout = async () => {
+		const response = await fetch('/api/logout', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' }
+		});
+
+		if (!response.ok) {
+			console.error('Failed to log out');
+		}
+		console.log(await response.json());
+		goto('/login');
+	};
 </script>
 
 <div class="m-5">
@@ -18,12 +31,12 @@
 		</ul>
 	</nav>
 	<div class="flex items-center">
-		<a class="mx-4 transition-colors hover:text-secondary" href="/profile">Profile</a>
+		<a class="mx-4 transition-colors hover:text-secondary" href="/admin/profile">Profile</a>
 
 		<button
 			class="mx-3 rounded border border-transparent p-1 transition-colors hover:border-primary"
 			onclick={() => {
-				goto('/login');
+				handleLogout();
 			}}>Log out</button
 		>
 	</div>
