@@ -11,5 +11,6 @@ export const load = (async ({ locals: { user } }) => {
         })
         return { user: loggedInUser };
     }
+    return { user: null };
 
 }) satisfies LayoutServerLoad;

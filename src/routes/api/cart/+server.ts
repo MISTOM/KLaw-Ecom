@@ -4,7 +4,7 @@ import prisma from '$lib/server/prisma';
 
 export const GET = async ({ locals: { user } }) => {
     // TODO 
-    if (!user.id) {
+    if (!user?.id) {
         return error(401, 'Unauthorized');
     }
 
@@ -36,6 +36,7 @@ export const POST = async ({ request, locals: { user } }) => {
                 CartItem: {
                     deleteMany: {}, // Clear existing items 
 
+                    //@ts-ignore
                     create: cartItems.map(item => ({
                         productId: item.productId,
                         quantity: item.quantity
@@ -45,6 +46,7 @@ export const POST = async ({ request, locals: { user } }) => {
             create: {
                 userId: user.id,
                 CartItem: {
+                    //@ts-ignore
                     create: cartItems.map(item => ({
                         productId: item.productId,
                         quantity: item.quantity

@@ -2,8 +2,9 @@ import prisma from '$lib/server/prisma.js';
 import auth from '$lib/server/auth.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types'
+import { invalidateAll } from '$app/navigation';
 
-export const load = (async ({ locals: {user} }) => {
+export const load = (async ({ locals: { user } }) => {
 	console.log('user', user);
 }) satisfies PageServerLoad
 
@@ -54,7 +55,6 @@ export const actions = {
 		const maxAge = 60 * 60 * 24 * 7; // 1 week
 		cookies.set('token', token, { httpOnly: true, secure: true, path: '/', maxAge });
 		cookies.set('refreshToken', refreshToken, { httpOnly: true, secure: true, path: '/', maxAge });
-
-		throw redirect(301, '/product')
+		throw redirect(303, '/product');
 	}
 } satisfies Actions;

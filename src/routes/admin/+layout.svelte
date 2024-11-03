@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { getUserState } from '$lib/state.svelte';
 
 	const { children } = $props();
+
+	const UserState = getUserState();
+	const { user } = UserState;
 
 	const handleLogout = async () => {
 		const response = await fetch('/api/logout', {
@@ -31,7 +35,9 @@
 		</ul>
 	</nav>
 	<div class="flex items-center">
-		<a class="mx-4 transition-colors hover:text-secondary" href="/admin/profile">Profile</a>
+		<a class="mx-4 transition-colors hover:text-secondary" href="/admin/profile"
+			>Your Profile {user?.name}</a
+		>
 
 		<button
 			class="mx-3 rounded border border-transparent p-1 transition-colors hover:border-primary"

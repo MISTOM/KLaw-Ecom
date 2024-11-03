@@ -15,6 +15,9 @@
 			published: false
 		}
 	];
+	const {data} = $props()
+	const orders = 	data.order
+	console.log(orders)
 </script>
 
 <main class="m-2 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">

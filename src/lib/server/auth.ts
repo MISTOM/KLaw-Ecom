@@ -16,7 +16,7 @@ export default {
 	sign(payload: User): string {
 		//maxAge
 		//TODO - Extend maxAge
-		const maxAge = 1 * 60; // 1 minute
+		const maxAge = 2 * 60; // 2 minutes
 		const id = payload.id;
 		const role = payload.roleId;
 
