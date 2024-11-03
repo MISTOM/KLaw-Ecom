@@ -1,10 +1,11 @@
 // src/routes/api/logout/+server.ts
 import { json } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
+import { invalidateAll } from '$app/navigation';
 
 export const POST = async ({ cookies, locals: { user } }) => {
 
-    if (user.id) {
+    if (user?.id) {
         // Remove the refresh token from the database
         await prisma.user.update({
             where: { id: user.id },

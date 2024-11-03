@@ -4,7 +4,7 @@
 
 	let { children, data } = $props();
 
-	// if (data.user) setUserState(data.user);
+	setUserState(data?.user);
 </script>
 
 <div class="font-sans">

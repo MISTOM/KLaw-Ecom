@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { goto, invalidate, invalidateAll } from '$app/navigation';
 
 	const { form } = $props();
 
@@ -10,7 +11,10 @@
 <div class="loginbg flex min-h-screen items-center justify-center bg-gray-100 lg:bg-contain">
 	<div class="w-1/3 min-w-72 rounded-md bg-white p-8 shadow-lg">
 		<h2 class="text-center text-2xl font-bold">Login</h2>
-		<form class="mt-4" method="POST" use:enhance>
+		<form
+			class="mt-4"
+			method="POST"
+			use:enhance >
 			<div class="mb-4">
 				<label for="email" class="block text-sm font-semibold">Email</label>
 				<input
