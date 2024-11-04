@@ -1,13 +1,13 @@
 // See https://kit.svelte.dev/docs/types#app
 
-import type { JwtPayload } from "jsonwebtoken";
+import type { JwtPayload } from 'jsonwebtoken';
 
 // for information about these interfaces
 declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
-			user: JwtPayload | { id; role; } | null
+			user: JwtPayload | { id; roleId } | null;
 		}
 		// interface PageData {}
 		// interface PageState {}
@@ -15,4 +15,4 @@ declare global {
 	}
 }
 
-export { };
+export {};
