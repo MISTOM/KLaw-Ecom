@@ -21,7 +21,7 @@
 			console.error('Failed to log out');
 		}
 		UserState.user = null;
-		console.log(await response.json(), "userState->", UserState);
+		console.log(await response.json(), 'userState->', UserState);
 		goto('/login');
 	};
 </script>

@@ -89,10 +89,7 @@
 					onclick={toggleEditMode}
 					class="rounded bg-green-500 px-4 py-2 text-white transition-colors">Edit</button
 				>
-				<button
-					
-					class="rounded bg-green-500 px-4 py-2 text-white transition-colors">Publish</button
-				>
+				<button class="rounded bg-green-500 px-4 py-2 text-white transition-colors">Publish</button>
 
 				<button
 					onclick={deleteProduct}

@@ -3,7 +3,7 @@ import { REFRESH_KEY, SECRET_KEY, RESET_KEY } from '$env/static/private';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '$lib/server/prisma';
-import type { User, Role } from '@prisma/client';
+import { type User, type Role, Roles } from '@prisma/client';
 
 let roleCache: Role[];
 
@@ -18,9 +18,9 @@ export default {
 		//TODO - Extend maxAge
 		const maxAge = 2 * 60; // 2 minutes
 		const id = payload.id;
-		const role = payload.roleId;
+		const roleId = payload.roleId;
 
-		return jwt.sign({ id, role }, SECRET_KEY, {
+		return jwt.sign({ id, roleId }, SECRET_KEY, {
 			expiresIn: maxAge
 		});
 	},
@@ -95,20 +95,22 @@ export default {
 				});
 		}
 		return roleCache;
-	}
+	},
 
-	// /**
-	//  * Check if user is an admin
-	//  * @param {*} user
-	//  * @returns
-	//  */
-	// async isAdmin(user: any) {
-	// 	if (!user) return error(401, 'Unauthorized');
-	// 	const roles = await this.getRoles();
-	// 	const adminRole = roles.find((role) => role.name === 'ADMIN');
-	// 	if (!adminRole || user.role !== adminRole.id) {
-	// 		throw error(401, 'Unauthorized, you must be an admin');
-	// 	}
-	// 	return true;
-	// },
+	/**
+	 * Check if user is an admin
+	 * @param {*} user
+	 * @returns
+	 */
+	async isAdmin(user: any) {
+		const roles = await this.getRoles();
+		const adminRole = roles.find((role) => role.name === Roles.ADMIN);
+
+		// TODO -  better check
+		if (adminRole && user.roleId === adminRole.id) {
+			return true;
+		}
+		console.log('auth:user not admin');
+		return false;
+	}
 };

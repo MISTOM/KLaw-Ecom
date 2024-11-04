@@ -1,4 +1,4 @@
-import { getContext, setContext } from "svelte";
+import { getContext, setContext } from 'svelte';
 
 class Cart {
 	cartItems = $state<any[]>([]); // {id,  quantity, product: {id, name, price...}}
@@ -24,8 +24,8 @@ class Cart {
 			return {
 				productId: item.product.id,
 				quantity: item.quantity
-			}
-		})
+			};
+		});
 		try {
 			const response = await fetch('/api/cart', {
 				method: 'POST',
@@ -65,7 +65,7 @@ class Cart {
 	// }
 	constructor() {
 		// this.loadCart();
-	 }
+	}
 }
 
 const STATE_KEY = Symbol('cart-store-key');
