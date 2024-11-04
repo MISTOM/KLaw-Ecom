@@ -1,8 +1,13 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import { fromJSON } from 'postcss';
+	import { applyAction, enhance } from '$app/forms';
+	import { invalidate, invalidateAll } from '$app/navigation';
+	import { getUserState } from '$lib/state.svelte.js';
 
 	const { data, form } = $props();
+
+	const user = getUserState();
+
+	const products = $derived(data.products || []);
 
 	let name = $state(form?.data?.name);
 	let description = $state(form?.data?.description);
@@ -12,33 +17,9 @@
 
 	const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
 
-	let products = $state([
-		{
-			id: 1,
-			title: 'Book - 2011 Edition',
-			price: 300,
-			quantity: 10,
-			published: false
-		},
-		{
-			id: 2,
-			title: 'Book - 2012 Edition',
-			price: 350,
-			quantity: 5,
-			published: false
-		}
-		// Add more products as needed
-	]);
+	const publishProduct = (id: any) => {};
 
-	const publishProduct = (id: any) => {
-		products = products.map((product) =>
-			product.id === id ? { ...product, published: true } : product
-		);
-	};
-
-	const deleteProduct = (id: any) => {
-		products = products.filter((product) => product.id !== id);
-	};
+	const deleteProduct = (id: any) => {};
 
 	const editProduct = (id: any) => {
 		// Logic to edit the product
@@ -50,33 +31,17 @@
 	<div class="col-span-2">
 		<h1 class="text-4xl">All Products for {data.user?.name}</h1>
 		<hr />
-		{#each products as product, i}
+		{#each products as product}
 			<a href={`/admin/product/${product.id}`}>
 				<div class="my-3 flex items-center rounded-md border p-1 hover:shadow-sm">
-					<img src="/samplePhoto.png" alt="sample" class="mr-4 size-14" />
+					<img src={product.Image[0]?.url} alt="product" class="mr-4 size-14" />
 					<div class="flex-grow">
-						<h2 class="text-lg font-semibold">{product.title}</h2>
+						<h2 class="text-lg font-semibold">{product.name}</h2>
 						<p>Price: KES {product.price}</p>
 						<p>Quantity: {product.quantity}</p>
 					</div>
 
-					<div class="flex space-x-2">
-						{#if !product.published}
-							<button
-								onclick={() => publishProduct(product.id)}
-								class="rounded-md border px-2 py-1 hover:border-green-400">Publish</button
-							>
-							<!-- TODO: when one clicks, the <a> tag is triggered -->
-						{/if}
-						<button
-							onclick={() => editProduct(product.id)}
-							class="rounded-md border px-2 py-1 hover:border-primary">Edit</button
-						>
-						<button
-							onclick={() => deleteProduct(product.id)}
-							class="rounded-md border px-2 py-1 hover:border-red-400">Delete</button
-						>
-					</div>
+					<div class="flex space-x-2"></div>
 				</div>
 			</a>
 		{/each}

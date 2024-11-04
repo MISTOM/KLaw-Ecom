@@ -3,7 +3,6 @@ import { redirect, type Handle } from '@sveltejs/kit';
 import { SECRET_KEY, REFRESH_KEY } from '$env/static/private';
 import auth from '$lib/server/auth';
 import prisma from '$lib/server/prisma';
-import { Roles } from '@prisma/client';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const token = event.cookies.get('token');
