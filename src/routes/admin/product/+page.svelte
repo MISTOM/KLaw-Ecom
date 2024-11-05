@@ -23,9 +23,9 @@
 <main class="m-2 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3">
 	<div class="col-span-2">
 		<h1 class="text-4xl">All Products for {data.user?.name}</h1>
-		<hr />	
+		<hr />
 		{#each products as product, i}
-		{i}
+			{i}
 			<a href={`/admin/product/${product.id}`}>
 				<div class="my-3 flex items-center rounded-md border p-1 hover:shadow-sm">
 					<img src={product.Image[0]?.url} alt="product" class="mr-4 size-14" />
@@ -52,14 +52,7 @@
 			{/if}
 			<div class=" space-y-2">
 				<label for="title" class="block">Product Name</label>
-				<input
-					type="text"
-					id="Name"
-					name="name"
-					class="w-full rounded-md border p-2"
-					bind:value={name}
-					required
-				/>
+				<input type="text" id="Name" name="name" class="w-full rounded-md border p-2" bind:value={name} required />
 
 				<label for="price" class="block">Price</label>
 				<input
@@ -110,8 +103,7 @@
 					accept={allowedExtensions.join(',')}
 				/>
 
-				<button type="submit" class="rounded-md border p-2 hover:border-primary">Add Product</button
-				>
+				<button type="submit" class="rounded-md border p-2 hover:border-primary">Add Product</button>
 			</div>
 		</form>
 	</div>

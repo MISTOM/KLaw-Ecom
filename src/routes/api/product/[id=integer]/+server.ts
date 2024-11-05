@@ -3,20 +3,22 @@ import prisma from '$lib/server/prisma';
 import { error, json } from '@sveltejs/kit';
 
 export const DELETE = async ({ params, locals: { user } }) => {
-    const id = Number(params.id);
-    try {
-        if (await auth.isAdmin(user)) {
-            await prisma.product.delete({
-                where: { id }
-            });
-            return json({ success: true });
-        } else {
-            throw error(401, 'Unauthorized');
-        }
-    } catch (e) {
-        console.log('deleteProduct:', e);
-        //@ts-ignore
-        if (e.status === 401) return error(e.status, e.message);
-        return error(500, 'Internal server error deleting product');
-    }
+	const id = Number(params.id);
+	if (!(await auth.isAdmin(user))) throw error(401, 'Unauthorized');
+
+	try {
+		const isProductOnOrder = await prisma.productOnOrder.findFirst({
+			where: { productId: id }
+		});
+		if (isProductOnOrder) throw error(400, 'Product is on an order and cannot be deleted');
+
+		await prisma.product.delete({
+			where: { id }
+		});
+	} catch (e) {
+		console.log('deleteProduct:', e);
+		//@ts-ignore
+		if (e.status === 500) return error(500, 'Internal server error deleting product');
+		return error(e.status, e?.body);
+	}
 };

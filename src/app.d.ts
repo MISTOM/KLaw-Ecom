@@ -5,9 +5,9 @@ import type { JwtPayload } from 'jsonwebtoken';
 // for information about these interfaces
 declare global {
 	namespace App {
-		// interface Error {}
+		// interface Error { status?: number; message?: string }
 		interface Locals {
-			user: JwtPayload | { id; roleId } | null;
+			user: { id; roleId } | JwtPayload | null;
 		}
 		// interface PageData {}
 		// interface PageState {}

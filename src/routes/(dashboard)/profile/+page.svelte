@@ -23,11 +23,7 @@
 <!-- Profile Page -->
 <div class="m-1 grid grid-cols-2">
 	<div>
-		<img
-			src="/kenyaLawFavicon.png"
-			alt="Profile"
-			class="m-auto size-24 rounded-full object-cover shadow-lg"
-		/>
+		<img src="/kenyaLawFavicon.png" alt="Profile" class="m-auto size-24 rounded-full object-cover shadow-lg" />
 		<h2 class="text-center text-2xl font-semibold">Welcome {name}</h2>
 	</div>
 	<div class="p-4">
@@ -43,12 +39,7 @@
 				</div>
 				<div class="mb-4">
 					<label for="password" class="block text-sm font-semibold">New Password</label>
-					<input
-						type="password"
-						id="password"
-						class="w-full rounded-md border p-2"
-						bind:value={password}
-					/>
+					<input type="password" id="password" class="w-full rounded-md border p-2" bind:value={password} />
 				</div>
 				<button
 					type="submit"

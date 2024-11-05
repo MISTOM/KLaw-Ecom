@@ -7,7 +7,8 @@ export const load = (async () => {
 		include: {
 			ProductOnOrder: {
 				include: { product: true }
-			}, user: true
+			},
+			user: true
 		}
 	});
 	console.log(orders);
