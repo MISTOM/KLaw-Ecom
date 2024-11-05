@@ -12,11 +12,7 @@
 		<ul>
 			{#each cart.cartItems as item, i}
 				<div class="flex items-center">
-					<img
-						src={item.product.thumbnail}
-						alt="Product"
-						class="mr-4 size-12 rounded object-cover"
-					/>
+					<img src={item.product.thumbnail} alt="Product" class="mr-4 size-12 rounded object-cover" />
 					<div>
 						<h4>{item.product.title}</h4>
 						<span class="text-sm"><strong>KES</strong> {item.product.price}</span>
@@ -32,8 +28,7 @@
 			<span>KES {cart.cartStats.total.toFixed(2)}</span>
 		</h1>
 		<hr />
-		<button
-			class="m-1 w-full rounded bg-green-500 p-1 transition-colors hover:bg-green-600 hover:text-white"
+		<button class="m-1 w-full rounded bg-green-500 p-1 transition-colors hover:bg-green-600 hover:text-white"
 			>Pay</button
 		>
 	</section>

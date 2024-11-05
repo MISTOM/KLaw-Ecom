@@ -35,9 +35,7 @@
 		</ul>
 	</nav>
 	<div class="flex items-center">
-		<a class="mx-4 transition-colors hover:text-secondary" href="/admin/profile"
-			>Your Profile {user?.name}</a
-		>
+		<a class="mx-4 transition-colors hover:text-secondary" href="/admin/profile">Your Profile {user?.name}</a>
 
 		<button
 			class="mx-3 rounded border border-transparent p-1 transition-colors hover:border-primary"

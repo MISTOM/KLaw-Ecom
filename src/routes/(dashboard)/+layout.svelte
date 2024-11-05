@@ -62,10 +62,7 @@
 				}}>Log out</button
 			>
 		{:else}
-			<a
-				class="mx-3 rounded border border-transparent p-1 transition-colors hover:border-primary"
-				href="/login"
-			>
+			<a class="mx-3 rounded border border-transparent p-1 transition-colors hover:border-primary" href="/login">
 				Log in
 			</a>
 		{/if}

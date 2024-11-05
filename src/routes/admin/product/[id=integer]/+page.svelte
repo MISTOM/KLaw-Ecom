@@ -33,7 +33,6 @@
 
 			if (res.ok) {
 				await invalidate('update:product');
-				
 			} else if (res.status === 401) {
 				console.error('Unauthorized');
 				await goto(`/login?redirect=${window.location.pathname}`);
@@ -59,6 +58,10 @@
 			} else if (res.status === 401) {
 				console.error('Unauthorized');
 				await goto(`/login?redirect=${window.location.pathname}`);
+			} else if (res.status === 400) {
+				console.error('Product is on order');
+				const data = await res.json();
+				console.log(data);
 			} else {
 				console.error('Failed to delete product');
 			}

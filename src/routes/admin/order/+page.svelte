@@ -1,7 +1,5 @@
 <script lang="ts">
 	const { data } = $props();
-	$inspect(data.orders);
-
 	const orders = $derived(data?.orders || []);
 </script>
 
@@ -12,24 +10,29 @@
 		{#if orders.length > 0}
 			{#each orders as order, i}
 				<a href={`/admin/order/${order.id}`}>
-					<div class="my-3 flex items-center rounded-md border p-1 hover:shadow-sm">
-						<h3 class="text-xl font-semibold">Ordered by {order.user.name}</h3>
+					<div
+						class="my-3 flex items-center rounded-md border p-1 transition-colors hover:bg-amber-50 hover:shadow"
+					>
+						<span class="m-5">{order.id}</span>
 						<div class="flex-grow">
-							<h2 class="text-lg font-semibold">Order Date: ${new Date(order.createdAt).toLocaleString()}</h2>
+							<h3 class="font-semibold">Ordered by {order.user.name}</h3>
+							<h2 class="font-semibold">
+								Order Date: {new Date(order.createdAt).toLocaleDateString('en-UK', {
+									day: 'numeric',
+									month: 'short',
+									year: 'numeric'
+								})}
+							</h2>
 							<p>Total Price: KES {order.totalPrice}</p>
-							<p>${order.ProductOnOrder.length} Items</p>
-						</div>
-
-						<div class="flex space-x-2">
-							<button class="rounded-md border px-2 py-1 hover:border-primary">Issue</button>
+							<p>{order.ProductOnOrder.length} {order.ProductOnOrder.length > 1 ? 'Items' : 'Item'}</p>
 						</div>
 					</div>
 				</a>
 			{/each}
 		{:else}
-		<div class="flex items-center justify-center h-full">
-			<p class="text-4xl font-thin">No orders</p>
-		</div>
+			<div class="flex h-full items-center justify-center">
+				<p class="text-4xl font-thin">No orders</p>
+			</div>
 		{/if}
 	</div>
 	<div>

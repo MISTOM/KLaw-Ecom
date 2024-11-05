@@ -41,15 +41,12 @@
 			</div>
 			<button
 				type="submit"
-				class="w-full rounded-md border p-2 transition-colors hover:bg-primary hover:text-white"
-				>Login</button
+				class="w-full rounded-md border p-2 transition-colors hover:bg-primary hover:text-white">Login</button
 			>
 
 			<div class="flex justify-between">
 				<span class="text-sm hover:text-secondary"><a href="/register">Register</a></span>
-				<span class="text-sm hover:text-secondary"
-					><a href="/forgotPassword">Forgot Passowrd</a></span
-				>
+				<span class="text-sm hover:text-secondary"><a href="/forgotPassword">Forgot Passowrd</a></span>
 			</div>
 		</form>
 	</div>

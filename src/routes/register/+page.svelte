@@ -21,7 +21,7 @@
 			class="mt-4"
 			method="POST"
 			use:enhance={({ cancel }) => {
-				if (password !== confirmPassword) {
+				if (!passwordMatch) {
 					console.log('Passwords do not match');
 					//TODO - toast error message
 					cancel();
@@ -30,14 +30,7 @@
 		>
 			<div class="mb-4">
 				<label for="email" class="block text-sm font-semibold">Full Name</label>
-				<input
-					type="text"
-					id="name"
-					name="name"
-					class="w-full rounded-md border p-2"
-					bind:value={name}
-					required
-				/>
+				<input type="text" id="name" name="name" class="w-full rounded-md border p-2" bind:value={name} required />
 			</div>
 			<div class="mb-4">
 				<label for="email" class="block text-sm font-semibold">Email</label>
@@ -72,9 +65,7 @@
 					required
 				/>
 				{#if !passwordMatch}
-					<span class="text-xs text-red-600" in:fade={{ duration: 100 }}
-						>Passwords do not match</span
-					>
+					<span class="text-xs text-red-600" in:fade={{ duration: 100 }}>Passwords do not match</span>
 				{/if}
 			</div>
 			<button
