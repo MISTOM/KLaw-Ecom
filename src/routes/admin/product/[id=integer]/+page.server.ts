@@ -1,8 +1,10 @@
 import prisma from '$lib/server/prisma';
 import { fail, json } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import {} from '$app/navigation'
 
-export const load = (async ({ params }) => {
+export const load = (async ({ params, depends }) => {
+    depends('update:product')
     const id = Number(params.id);
     try {
         const product = await prisma.product.findUnique({
@@ -42,17 +44,23 @@ export const actions = {
 
 
         try {
-            await prisma.product.update({
+            const product = await prisma.product.update({
                 where: { id },
-                data: {
-                    name, description, price, quantity, serviceCode
+                data: { name, description, price, quantity, serviceCode },
+                include: {
+                    Image: {
+                        select: { url: true }
+                    }
                 }
             })
 
-            return { success: true }
+            return { success: true, product }
 
         } catch (e) {
             console.log('editProd:', e);
+            //@ts-ignore
+            if (e.code === 'P2002') return fail(400, { error: 'A product with this service code already exists. Please use a unique service code.' })
+
             return fail(500, { error: 'Internal server error adding product' })
 
         }

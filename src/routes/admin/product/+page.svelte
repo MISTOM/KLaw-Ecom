@@ -9,6 +9,8 @@
 
 	const products = $derived(data.products || []);
 
+	// $inspect(products);
+
 	let name = $state(form?.data?.name);
 	let description = $state(form?.data?.description);
 	let price = $state(form?.data?.price);
@@ -16,22 +18,14 @@
 	let serviceCode = $state(form?.data?.serviceCode);
 
 	const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
-
-	const publishProduct = (id: any) => {};
-
-	const deleteProduct = (id: any) => {};
-
-	const editProduct = (id: any) => {
-		// Logic to edit the product
-		console.log('Edit product:', id);
-	};
 </script>
 
 <main class="m-2 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3">
 	<div class="col-span-2">
 		<h1 class="text-4xl">All Products for {data.user?.name}</h1>
-		<hr />
-		{#each products as product}
+		<hr />	
+		{#each products as product, i}
+		{i}
 			<a href={`/admin/product/${product.id}`}>
 				<div class="my-3 flex items-center rounded-md border p-1 hover:shadow-sm">
 					<img src={product.Image[0]?.url} alt="product" class="mr-4 size-14" />

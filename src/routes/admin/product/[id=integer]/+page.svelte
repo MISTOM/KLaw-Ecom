@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { goto, invalidate } from '$app/navigation';
 
 	const { data, form } = $props();
 
@@ -17,26 +18,52 @@
 		isEditMode = !isEditMode;
 	};
 
-	const publishProduct = async () => {
+	const togglePublish = async () => {
 		console.log('Publishing product');
 		if (data?.product?.id) {
 			const res = await fetch(`/api/product/${data.product.id}/publish`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json'
-				}
+				},
+				body: JSON.stringify({
+					isPublished: !data.product.isPublished
+				})
 			});
 
 			if (res.ok) {
-				const json = await res.json();
-				console.log(json);
+				await invalidate('update:product');
+				
+			} else if (res.status === 401) {
+				console.error('Unauthorized');
+				await goto(`/login?redirect=${window.location.pathname}`);
 			} else {
 				console.error('Failed to publish product');
 			}
 		}
 	};
 
-	const deleteProduct = () => {};
+	const deleteProduct = async () => {
+		console.log('Deleting product');
+		if (data?.product?.id) {
+			const res = await fetch(`/api/product/${data.product.id}`, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+
+			if (res.ok) {
+				console.log('Product deleted');
+				await goto('/admin/product');
+			} else if (res.status === 401) {
+				console.error('Unauthorized');
+				await goto(`/login?redirect=${window.location.pathname}`);
+			} else {
+				console.error('Failed to delete product');
+			}
+		}
+	};
 </script>
 
 <main class="m-4 grid grid-cols-1 p-4 md:grid-cols-2 lg:grid-cols-2">
@@ -46,7 +73,18 @@
 		</div>
 		<div class="m-2">
 			<h1 class="mb-2 text-2xl font-bold">Product Details</h1>
-			<form method="POST">
+			<form
+				method="POST"
+				use:enhance={() => {
+					return async ({ update, result }) => {
+						console.log('form result ->  ', result);
+						if (result.status === 200) {
+							isEditMode = false;
+							await update({ reset: false });
+						} else await update();
+					};
+				}}
+			>
 				{#if form?.error}
 					<span class="text-sm text-red-500">{form.error}</span>
 				{/if}
@@ -121,32 +159,38 @@
 				</div>
 				<div class="flex space-x-2">
 					{#if isEditMode}
-						<button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white transition-colors"
-							>Save</button
-						>
+						<button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white transition-colors">Save</button>
 					{:else}
 						<button
 							type="button"
 							onclick={toggleEditMode}
 							class="rounded bg-green-500 px-4 py-2 text-white transition-colors">Edit</button
 						>
-						<button
-							type="button"
-							class="rounded bg-green-500 px-4 py-2 text-white transition-colors"
-							onclick={publishProduct}>Publish</button
-						>
+
+						<div class="flex items-center space-x-2">
+							<label for="publish" class="text-xs font-semibold">
+								{data.product?.isPublished ? 'Published' : 'Publish'}</label
+							>
+							<input
+								type="checkbox"
+								id="publish"
+								name="publish"
+								checked={data.product?.isPublished}
+								onchange={togglePublish}
+								class="h-4 w-4"
+							/>
+						</div>
 
 						<button
 							type="button"
 							onclick={deleteProduct}
-							class="rounded bg-red-500 px-4 py-2 text-white transition-colors hover:bg-red-600"
-							>Delete</button
+							class="rounded bg-red-500 px-4 py-2 text-white transition-colors hover:bg-red-600">Delete</button
 						>
 					{/if}
 				</div>
 			</form>
 		</div>
-	{:else if data.status === 404}
+	{:else if data?.status === 404}
 		<p class="text-3xl font-thin">{data.error}</p>
 	{:else}
 		<p class="text-lg font-thin">Failed to load product</p>

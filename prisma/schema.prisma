@@ -93,6 +93,7 @@ model Order {
 model ProductOnOrder {
   orderId   Int
   productId Int
+  quantity  Int
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id])
   isIssued  Boolean @default(false)
