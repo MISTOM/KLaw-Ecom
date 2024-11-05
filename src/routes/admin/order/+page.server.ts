@@ -3,13 +3,13 @@ import type { PageServerLoad } from './$types';
 
 export const load = (async () => {
 	//get all orders
-	const order = await prisma.order.findMany({
+	const orders = await prisma.order.findMany({
 		include: {
 			ProductOnOrder: {
 				include: { product: true }
-			}
+			}, user: true
 		}
 	});
-	console.log(order);
-	return { order };
+	console.log(orders);
+	return { orders };
 }) satisfies PageServerLoad;

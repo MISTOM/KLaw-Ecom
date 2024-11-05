@@ -8,7 +8,9 @@ import { dirname } from 'node:path';
 export const load = (async ({ locals }) => {
     try {
         const products = await prisma.product.findMany({
-            include: { Image: true }
+            include: { Image: true },
+            orderBy: { id: 'desc' }
+
         })
         return { products }
     } catch (e) {

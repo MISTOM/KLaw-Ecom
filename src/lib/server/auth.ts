@@ -102,12 +102,12 @@ export default {
 	 * @param {*} user
 	 * @returns
 	 */
-	async isAdmin(user: any) {
+	async isAdmin(user: any | null) {
 		const roles = await this.getRoles();
 		const adminRole = roles.find((role) => role.name === Roles.ADMIN);
 
 		// TODO -  better check
-		if (adminRole && user.roleId === adminRole.id) {
+		if (adminRole && user?.roleId === adminRole.id) {
 			return true;
 		}
 		console.log('auth:user not admin');
