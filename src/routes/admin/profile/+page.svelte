@@ -30,6 +30,7 @@
 			use:enhance={() => {
 				return async ({ update, result }) => {
 					console.log('form result ->  ', result);
+					// TODO - check if password matches
 					if (result.status === 200) {
 						isEditMode = false;
 						await update({ reset: false });
