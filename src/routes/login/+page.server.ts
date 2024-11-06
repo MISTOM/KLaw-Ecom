@@ -5,7 +5,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { invalidateAll } from '$app/navigation';
 
 export const load = (async ({ locals: { user } }) => {
-	console.log('user', user);
+	
 }) satisfies PageServerLoad;
 
 export const actions = {
