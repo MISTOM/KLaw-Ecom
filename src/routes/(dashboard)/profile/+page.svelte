@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { getUserState } from '$lib/state.svelte';
 
-	const UserState = getUserState();
-	const { user } = UserState;
+	const { data } = $props();
+	// const user = $derived(data.user)
+	// const UserState = getUserState();
+	// const { user } = UserState;
 	let isEditMode = $state(false);
 
-	let name = $state(user?.name || '');
-	let email = $state(user?.email || '');
+	let name = $state(data.user?.name || '');
+	let email = $state(data.user?.email || '');
 	let password = $state('');
 
 	const toggleEditMode = () => {

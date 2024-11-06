@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { getUserState } from '$lib/state.svelte';
 
-	const { children } = $props();
+	const { children, data } = $props();
 
-	const UserState = getUserState();
-	const { user } = UserState;
+	// const UserState = getUserState();
+	// const { user } = UserState;
+	const user = $derived(data.user);
 
 	const handleLogout = async () => {
 		const response = await fetch('/api/logout', {
@@ -16,6 +17,7 @@
 		if (!response.ok) {
 			console.error('Failed to log out');
 		}
+		await invalidateAll();
 		console.log(await response.json());
 		goto('/login');
 	};

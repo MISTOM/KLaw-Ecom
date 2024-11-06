@@ -98,7 +98,7 @@
 						id="name"
 						name="name"
 						bind:value={name}
-						class="w-full p-2"
+						class="w-full rounded-md p-2"
 						class:border={isEditMode}
 						class:border-none={!isEditMode}
 						class:bg-transparent={!isEditMode}
@@ -108,10 +108,11 @@
 				<div class="mb-2">
 					<label class="block font-semibold" for="description">Description</label>
 					<textarea
-						name="description"
 						id="description"
+						name="description"
+						rows="2"
 						bind:value={description}
-						class="w-full p-2"
+						class="w-full rounded-md p-2"
 						class:border={isEditMode}
 						class:border-none={!isEditMode}
 						class:bg-transparent={!isEditMode}
@@ -125,7 +126,7 @@
 						id="price"
 						name="price"
 						bind:value={price}
-						class="w-full p-2"
+						class="w-full rounded-md p-2"
 						class:border={isEditMode}
 						class:border-none={!isEditMode}
 						class:bg-transparent={!isEditMode}
@@ -139,7 +140,7 @@
 						id="quantity"
 						name="quantity"
 						bind:value={quantity}
-						class="w-full p-2"
+						class="w-full rounded-md p-2"
 						class:border={isEditMode}
 						class:border-none={!isEditMode}
 						class:bg-transparent={!isEditMode}
@@ -153,7 +154,7 @@
 						id="serviceCode"
 						name="serviceCode"
 						bind:value={serviceCode}
-						class="w-full p-2"
+						class="w-full rounded-md p-2"
 						class:border={isEditMode}
 						class:border-none={!isEditMode}
 						class:bg-transparent={!isEditMode}

@@ -25,9 +25,9 @@
 		<h1 class="text-4xl">All Products for {data.user?.name}</h1>
 		<hr />
 		{#each products as product, i}
-			{i}
 			<a href={`/admin/product/${product.id}`}>
 				<div class="my-3 flex items-center rounded-md border p-1 hover:shadow-sm">
+					<span class="m-5">{i}</span>
 					<img src={product.Image[0]?.url} alt="product" class="mr-4 size-14" />
 					<div class="flex-grow">
 						<h2 class="text-lg font-semibold">{product.name}</h2>
