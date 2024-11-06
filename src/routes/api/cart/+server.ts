@@ -10,19 +10,27 @@ export const GET = async ({ locals: { user } }) => {
 	try {
 		const cart = await prisma.cart.findUnique({
 			where: { userId: user.id },
-			include: { CartItem: { include: { product: true } } }
+			include: {
+				CartItem: {
+					include: {
+						product:
+							{ include: { Image: { select: { url: true } } } }
+					}
+				}
+			}
 		});
 
-		return json(cart?.CartItem || []);
-	} catch (error) {
-		return json({ error: 'Failed to load cart' }, { status: 500 });
+		if (!cart) { return error(404, 'Empty cart') }
+
+		return json(cart.CartItem);
+	} catch (e) {
+		return error(500, 'Failed to load cart');
 	}
 };
 
+
 export const POST = async ({ request, locals: { user } }) => {
-	if (!user?.id) {
-		return error(401, 'Unauthorized');
-	}
+	if (!user?.id) return error(401, 'Unauthorized');
 
 	const cartItems = await request.json(); // [{ productId: 1, quantity: 2 }, { productId: 2, quantity: 3 }]
 

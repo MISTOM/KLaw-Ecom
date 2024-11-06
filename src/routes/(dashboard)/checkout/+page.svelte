@@ -1,7 +1,10 @@
 <script lang="ts">
-	import cart from '$lib/Cart.svelte';
+	import { getCartState } from '$lib/Cart.svelte.js';
+
+	// import cart from '$lib/Cart.svelte';
 	const { data } = $props();
-	let price = $state(300);
+
+	const cart = getCartState()
 </script>
 
 <!-- Checkout page -->
@@ -11,13 +14,16 @@
 		<hr />
 		<ul>
 			{#each cart.cartItems as item, i}
-				<div class="flex items-center">
-					<img src={item.product.thumbnail} alt="Product" class="mr-4 size-12 rounded object-cover" />
-					<div>
-						<h4>{item.product.title}</h4>
-						<span class="text-sm"><strong>KES</strong> {item.product.price}</span>
-						<span class="text-sm">Quantity: {item.quantity} </span>
+				<div class="my-3 flex items-center rounded-md border p-1 hover:shadow-sm">
+					<span class="m-5">{i}</span>
+					<img src={item.product.Image[0]?.url} alt={item.product.name} class="mr-4 size-14" />
+					<div class="flex-grow">
+						<h2 class="text-lg font-semibold">{item.product.name}</h2>
+						<p>Price: KES {item.product.price}</p>
+						<p>Quantity: {item.quantity}</p>
 					</div>
+
+					<div class="flex space-x-2"></div>
 				</div>
 			{/each}
 		</ul>

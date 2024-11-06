@@ -1,27 +1,32 @@
 <script lang="ts">
-	import cart from '$lib/Cart.svelte';
 	import { fade } from 'svelte/transition';
 	import CartItem from '../../lib/components/CartItem.svelte';
-	import { goto } from '$app/navigation';
-	import { getUserState } from '$lib/state.svelte';
+	import { goto, invalidateAll } from '$app/navigation';
+	import { setCartState } from '$lib/Cart.svelte';
+	// import { getUserState } from '$lib/state.svelte';
+	// import cart from '$lib/Cart.svelte';
+	const { children, data } = $props();
 
-	const UserState = getUserState();
-	const { user, name } = UserState;
-	console.log('/(dashboard)/layout userState', user, name);
+	const cart = setCartState(data.cartItems || []);
 
-	const { children } = $props();
+	const user = $derived(data.user);
+
+	// const UserState = getUserState();
+	// const { user, name } = UserState;
+	$inspect(data, ' ::dashboard layout state');
 
 	const handleLogout = async () => {
 		const response = await fetch('/api/logout', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' }
 		});
-
+		
 		if (!response.ok) {
 			console.error('Failed to log out');
 		}
-		UserState.user = null;
-		console.log(await response.json(), 'userState->', UserState);
+		await invalidateAll();
+		// UserState.user = null;
+		console.log(await response.json());
 		goto('/login');
 	};
 </script>

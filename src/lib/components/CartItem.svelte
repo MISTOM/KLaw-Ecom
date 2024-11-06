@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import cart from '$lib/Cart.svelte';
+	import { getCartState, type CartItems } from '$lib/Cart.svelte';
 
-	const { item }: any = $props();
+	const { item }: { item: CartItems } = $props();
+
+	const cart = getCartState();
 </script>
 
 <div
@@ -11,9 +13,9 @@
 	out:fade={{ duration: 100 }}
 >
 	<div class="flex items-center">
-		<img src={item.product.thumbnail} alt="Product" class="mr-4 size-12 rounded object-cover" />
+		<img src={item.product.Image[0].url} alt="Product" class="mr-4 size-12 rounded object-cover" />
 		<div>
-			<h4>{item.product.title}</h4>
+			<h4>{item.product.name}</h4>
 			<span class="text-sm">KES {item.product.price} each</span>
 		</div>
 	</div>
@@ -22,23 +24,25 @@
 		<button
 			class="rounded p-1 hover:bg-gray-200"
 			aria-label="Subtract 1 from quantity"
-			onclick={() => {
+			onclick={async () => {
 				if (item.quantity === 1) return;
 				item.quantity--;
+				await cart.saveCart();
 			}}>-</button
 		>
 		<span class="p-1">{item.quantity}</span>
 		<button
 			class="rounded p-1 hover:bg-gray-200"
 			aria-label="Add 1 to quantity"
-			onclick={() => {
+			onclick={async () => {
 				item.quantity++;
+				await cart.saveCart();
 			}}>+</button
 		>
 		<button
-			class="ml-4 rounded p-1 hover:bg-red-100"
-			onclick={() => {
-				cart.removeItem(item.id);
+			class="ml-4 rounded p-1 hover:bg-red-200"
+			onclick={async () => {
+				await cart.removeItem(item.id);
 			}}>🗑️</button
 		>
 	</div>
