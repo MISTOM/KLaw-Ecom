@@ -34,7 +34,7 @@
 
 						<div>
 							<p class="text-sm text-gray-500">Status</p>
-							<p class="font-medium"> NOT/Issued</p>
+							<p class="font-medium">NOT/Issued</p>
 						</div>
 					</div>
 				</div>
@@ -43,7 +43,7 @@
 					<h2 class="mb-4 text-xl font-semibold">Products</h2>
 
 					<div class="space-y-4">
-						{#each order.ProductOnOrder as product }
+						{#each order.ProductOnOrder as product}
 							<div class="rounded-md border p-4">
 								<div class="flex items-center justify-between">
 									<div>
@@ -68,7 +68,7 @@
 				</div>
 			</div>
 
-			<div class="h-fit rounded-md border p-6">
+			<!-- <div class="h-fit rounded-md border p-6">
 				<h2 class="mb-4 text-xl font-semibold">Order Summary</h2>
 
 				<div class="space-y-2">
@@ -90,7 +90,7 @@
 						<span class="font-bold">KES {order.totalPrice.toLocaleString()}</span>
 					</div>
 				</div>
-			</div>
+			</div> -->
 		</div>
 	</div>
 {:else}

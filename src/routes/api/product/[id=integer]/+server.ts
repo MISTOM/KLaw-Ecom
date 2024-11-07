@@ -15,10 +15,12 @@ export const DELETE = async ({ params, locals: { user } }) => {
 		await prisma.product.delete({
 			where: { id }
 		});
+		return json({ message: 'Product deleted' });
 	} catch (e) {
 		console.log('deleteProduct:', e);
 		//@ts-ignore
 		if (e.status === 500) return error(500, 'Internal server error deleting product');
+		//@ts-ignore
 		return error(e.status, e?.body);
 	}
 };
