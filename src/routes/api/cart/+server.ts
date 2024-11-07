@@ -2,7 +2,6 @@ import { error, json } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
 
 export const GET = async ({ locals: { user } }) => {
-	// TODO
 	if (!user?.id) {
 		return error(401, 'Unauthorized');
 	}

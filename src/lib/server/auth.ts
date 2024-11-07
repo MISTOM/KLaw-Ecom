@@ -37,7 +37,6 @@ export default {
 			const refreshToken = jwt.sign({ id }, REFRESH_KEY, {
 				expiresIn: maxAge
 			});
-			// TODO - Encrypt refresh token
 			const hashedToken = await this.hash(refreshToken);
 			await prisma.user.update({
 				where: { id },
@@ -127,7 +126,6 @@ export default {
 		const roles = await this.getRoles();
 		const adminRole = roles.find((role) => role.name === Roles.ADMIN);
 
-		// TODO -  better check
 		if (adminRole && user?.roleId === adminRole.id) {
 			return true;
 		}

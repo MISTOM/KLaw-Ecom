@@ -49,7 +49,7 @@ export const actions = {
 		const token = auth.sign(user);
 		const refreshToken = await auth.generateRefreshToken(user);
 
-		//TODO - Set this globally
+		
 		const maxAge = 60 * 60 * 24 * 7; // 1 week
 		cookies.set('token', token, { httpOnly: true, secure: true, path: '/', maxAge });
 		cookies.set('refreshToken', refreshToken, { httpOnly: true, secure: true, path: '/', maxAge });

@@ -20,7 +20,6 @@
 	const toggleEditMode = () => (isEditMode = !isEditMode);
 </script>
 
-
 <!-- Profile Page -->
 <div class="m-1 grid grid-cols-2">
 	<div>
@@ -30,10 +29,12 @@
 	<div class="p-4">
 		<form
 			method="POST"
-			use:enhance={() => {
+			use:enhance={({ cancel }) => {
+				if (!passwordMatch)  {console.log('cancelling');return cancel()};
+
 				return async ({ update, result }) => {
 					console.log('form result ->  ', result);
-					// TODO - check if password matches
+
 					if (result.status === 200) {
 						isEditMode = false;
 						await update({ reset: false });
