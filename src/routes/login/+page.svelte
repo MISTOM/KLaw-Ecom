@@ -43,8 +43,11 @@
 				class="w-full rounded-md border p-2 transition-colors hover:bg-primary hover:text-white">Login</button
 			>
 
-			<div class="flex justify-between">
-				<span class="text-sm hover:text-secondary"><a href="/register">Register</a></span>
+			<div class="mt-3 flex justify-between">
+				<span class="text-sm">
+					If you dont have an account, <a href="/register" class="hover:text-secondary">Register</a>
+				</span>
+
 				<span class="text-sm hover:text-secondary"><a href="/forgotPassword">Forgot Passowrd</a></span>
 			</div>
 		</form>
