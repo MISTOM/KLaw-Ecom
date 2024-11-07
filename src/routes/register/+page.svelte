@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import { getToastState } from '$lib/Toast.svelte.js';
 	import { fade } from 'svelte/transition';
 	const { form } = $props();
 
@@ -9,6 +10,8 @@
 	let password = $state('');
 	let confirmPassword = $state('');
 	let passwordMatch = $derived(password === confirmPassword ? true : false);
+
+	const toastState = getToastState();
 </script>
 
 <div class="loginbg flex min-h-screen items-center justify-center bg-gray-100 lg:bg-contain">
@@ -23,6 +26,7 @@
 			use:enhance={({ cancel }) => {
 				if (!passwordMatch) {
 					console.log('Passwords do not match');
+					toastState.add('Error', 'Passwords do not match', 'error');
 					//TODO - toast error message
 					cancel();
 				}
@@ -71,7 +75,7 @@
 			<button
 				type="submit"
 				class="w-full rounded-md border p-2 transition-colors hover:bg-primary hover:text-white disabled:opacity-50"
-				disabled={!passwordMatch}
+				
 				>Register
 			</button>
 			<span class="text-sm hover:text-secondary"><a href="/login">Back to login</a></span>
