@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { getUserState } from '$lib/state.svelte';
+	import { fade } from 'svelte/transition';
 
-	const { data } = $props();
+	const { data, form } = $props();
 	// const user = $derived(data.user)
 	// const UserState = getUserState();
 	// const { user } = UserState;
@@ -10,17 +12,14 @@
 	let name = $state(data.user?.name || '');
 	let email = $state(data.user?.email || '');
 	let password = $state('');
+	let oldPassword = $state('');
+	let confirmPassword = $state('');
 
-	const toggleEditMode = () => {
-		isEditMode = !isEditMode;
-	};
+	let passwordMatch = $derived(password === confirmPassword ? true : false);
 
-	const saveProfile = async () => {
-		// Logic to save the profile data
-		console.log('Profile saved:', { name, email, password });
-		isEditMode = false;
-	};
+	const toggleEditMode = () => (isEditMode = !isEditMode);
 </script>
+
 
 <!-- Profile Page -->
 <div class="m-1 grid grid-cols-2">
@@ -29,44 +28,103 @@
 		<h2 class="text-center text-2xl font-semibold">Welcome {name}</h2>
 	</div>
 	<div class="p-4">
-		{#if isEditMode}
-			<form method="POST">
-				<div class="mb-4">
-					<label for="name" class="block text-sm font-semibold">Full Name</label>
-					<input type="text" id="name" class="w-full rounded-md border p-2" bind:value={name} />
+		<form
+			method="POST"
+			use:enhance={() => {
+				return async ({ update, result }) => {
+					console.log('form result ->  ', result);
+					// TODO - check if password matches
+					if (result.status === 200) {
+						isEditMode = false;
+						await update({ reset: false });
+					} else await update();
+				};
+			}}
+		>
+			{#if form?.errors}
+				<span class="text-sm text-red-400">{form.errors}</span>
+			{/if}
+			{#if form?.success}
+				<span class="text-sm text-green-300">Profile updated successfully</span>
+			{/if}
+
+			<div class="mb-4">
+				<label for="name" class="block text-sm font-semibold">Full Name</label>
+				<input
+					type="text"
+					id="name"
+					name="name"
+					class="w-full rounded-md p-2"
+					bind:value={name}
+					class:border={isEditMode}
+					class:border-none={!isEditMode}
+					class:bg-transparent={!isEditMode}
+					disabled={!isEditMode}
+				/>
+			</div>
+			<div class="mb-4">
+				<label for="email" class="block text-sm font-semibold">Email</label>
+				<input
+					type="email"
+					id="email"
+					name="email"
+					class="w-full rounded-md border p-2"
+					bind:value={email}
+					class:border={isEditMode}
+					class:border-none={!isEditMode}
+					class:bg-transparent={!isEditMode}
+					disabled={!isEditMode}
+				/>
+			</div>
+			{#if isEditMode}
+				<div class="mb-4" in:fade={{ duration: 150 }}>
+					<label for="oldPassword" class="block text-sm font-semibold">Old Password</label>
+					<input
+						type="password"
+						id="oldPassword"
+						name="oldPassword"
+						class="w-full rounded-md border p-1"
+						bind:value={oldPassword}
+					/>
 				</div>
-				<div class="mb-4">
-					<label for="email" class="block text-sm font-semibold">Email</label>
-					<input type="email" id="email" class="w-full rounded-md border p-2" bind:value={email} />
-				</div>
-				<div class="mb-4">
+				<div class="mb-4" in:fade={{ duration: 150 }}>
 					<label for="password" class="block text-sm font-semibold">New Password</label>
-					<input type="password" id="password" class="w-full rounded-md border p-2" bind:value={password} />
+					<input
+						type="password"
+						id="password"
+						name="password"
+						class="w-full rounded-md border p-1"
+						bind:value={password}
+					/>
+				</div>
+				<div class="mb-4" in:fade={{ duration: 150 }}>
+					<label for="confirmPassword" class="block text-sm font-semibold">Confirm New Password</label>
+					<input
+						type="password"
+						name="confirmPassword"
+						id="confirmPassword"
+						class="w-full rounded-md border p-1"
+						bind:value={confirmPassword}
+					/>
+					{#if !passwordMatch}
+						<span class="text-xs text-red-600" in:fade={{ duration: 100 }}>Passwords do not match</span>
+					{/if}
 				</div>
 				<button
 					type="submit"
-					class="w-full rounded-md bg-blue-500 p-2 text-white transition-colors hover:bg-blue-600"
+					class="w-full rounded-md bg-fadeblack p-2 text-white transition-colors hover:bg-black"
 				>
 					Save
 				</button>
-			</form>
-		{:else}
-			<div>
-				<div class="mb-4">
-					<label for="nameText" class="block text-sm font-semibold">Full Name</label>
-					<p id="nameText" class="w-full rounded-md bg-gray-100 p-2">{name}</p>
-				</div>
-				<div class="mb-4">
-					<label for="emailText" class="block text-sm font-semibold">Email</label>
-					<p id="emailText" class="w-full rounded-md bg-gray-100 p-2">{email}</p>
-				</div>
+			{:else}
 				<button
+					type="button"
 					onclick={toggleEditMode}
-					class="w-full rounded-md bg-green-500 p-2 text-white transition-colors hover:bg-green-600"
+					class="w-20 rounded-md bg-fadeblack p-2 text-white transition-colors hover:bg-black"
 				>
 					Edit
 				</button>
-			</div>
-		{/if}
+			{/if}
+		</form>
 	</div>
 </div>
