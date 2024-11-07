@@ -13,14 +13,14 @@
 
 	// const UserState = getUserState();
 	// const { user, name } = UserState;
-	$inspect(data, ' ::dashboard layout state');
+	$inspect(data.user, ' ::dashboard layout state');
 
 	const handleLogout = async () => {
 		const response = await fetch('/api/logout', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' }
 		});
-		
+
 		if (!response.ok) {
 			console.error('Failed to log out');
 		}
@@ -51,40 +51,40 @@
 	</nav>
 	<div class="flex items-center">
 		{#if user}
-			<a class="mx-4 transition-colors hover:text-secondary" href="/profile">Profile</a>
+			<a class="mx-4 transition-colors hover:text-secondary" href="/profile">My Account</a>
 		{/if}
 		<button
-			class="rounded bg-secondary p-2 transition-colors hover:bg-secondary"
+			class="rounded-md p-1 transition-colors hover:border-b hover:border-secondary"
 			onclick={() => (cart.cartopen = !cart.cartopen)}
 		>
 			Cart: {cart.cartStats.quantity}</button
 		>
 		{#if user}
 			<button
-				class="mx-3 rounded border border-transparent p-1 transition-colors hover:border-primary"
+				class="mx-4 transition-colors hover:text-secondary"
 				onclick={() => {
 					handleLogout();
 				}}>Log out</button
 			>
 		{:else}
-			<a class="mx-3 rounded border border-transparent p-1 transition-colors hover:border-primary" href="/login">
-				Log in
-			</a>
+			<a class="mx-4 transition-colors hover:text-secondary" href="/login"> Log in </a>
 		{/if}
 	</div>
 </header>
+
+<!-- CART -->
 {#if cart.cartopen}
 	<div
 		class="absolute right-0 top-28 rounded-md bg-white shadow-lg"
 		in:fade={{ duration: 200 }}
-		out:fade={{ duration: 200 }}
+		out:fade={{ duration: 100 }}
 	>
 		<div class="relative p-4">
 			<h2 class="text-lg font-bold">Your cart</h2>
 			<button
-				class="absolute right-2 top-3 rounded-full p-1 font-bold hover:bg-gray-100"
+				class="absolute right-2 top-3 rounded-full p-1 font-semibold hover:bg-gray-100"
 				aria-label="close cart"
-				onclick={() => (cart.cartopen = false)}>×</button
+				onclick={() => (cart.cartopen = false)}>X</button
 			>
 
 			<!-- Cart items -->

@@ -3,7 +3,7 @@
 
 	const { data } = $props();
 	const orders = $derived(data?.orders || []);
-	$inspect(orders)
+	$inspect(orders);
 
 	function getIssuedProducts(order: any) {
 		if (order) return order.ProductOnOrder.filter((product: any) => product.isIssued);
@@ -22,7 +22,7 @@
 	<h1 class="mb-8 text-3xl font-bold">My Orders</h1>
 
 	<div class="grid gap-6">
-		{#each orders as order }
+		{#each orders as order}
 			<div class="rounded-md border p-6 transition-all hover:shadow-lg">
 				<div class="flex flex-wrap items-center justify-between gap-4">
 					<div>
@@ -41,11 +41,11 @@
 				<div class="mt-4">
 					<h4 class="mb-2 font-semibold">Issued Products</h4>
 					<div class="space-y-2">
-						{#each getIssuedProducts(order) as product }
+						{#each getIssuedProducts(order) as product}
 							<div class="rounded-md bg-gray-50 p-3">
 								<div class="flex items-center justify-between">
 									<div>
-										<p class="font-medium">{product.name}</p>
+										<p class="font-medium">{product.product.name}</p>
 										<p class="text-sm text-gray-600">Quantity: {product.quantity}</p>
 									</div>
 									<p class="font-semibold">

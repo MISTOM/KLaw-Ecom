@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto, invalidate } from '$app/navigation';
+	import { page } from '$app/stores';
+	import Error from '../../../+error.svelte';
 
 	const { data, form } = $props();
 
@@ -59,6 +61,8 @@
 				console.error('Unauthorized');
 				await goto(`/login?redirect=${window.location.pathname}`);
 			} else if (res.status === 400) {
+				//tost here
+
 				console.error('Product is on order');
 				const data = await res.json();
 				console.log(data);
@@ -89,7 +93,7 @@
 				}}
 			>
 				{#if form?.error}
-					<span class="text-sm text-red-500">{form.error}</span>
+					<span class="text-sm text-red-500">{form?.error}</span>
 				{/if}
 				<div class="mb-2">
 					<label class="block font-semibold" for="name">Product name</label>

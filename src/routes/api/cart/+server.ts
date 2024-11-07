@@ -13,21 +13,21 @@ export const GET = async ({ locals: { user } }) => {
 			include: {
 				CartItem: {
 					include: {
-						product:
-							{ include: { Image: { select: { url: true } } } }
+						product: { include: { Image: { select: { url: true } } } }
 					}
 				}
 			}
 		});
 
-		if (!cart) { return error(404, 'Empty cart') }
+		if (!cart) {
+			return error(404, 'Empty cart');
+		}
 
 		return json(cart.CartItem);
 	} catch (e) {
 		return error(500, 'Failed to load cart');
 	}
 };
-
 
 export const POST = async ({ request, locals: { user } }) => {
 	if (!user?.id) return error(401, 'Unauthorized');

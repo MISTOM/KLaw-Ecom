@@ -1,7 +1,6 @@
 import prisma from '$lib/server/prisma';
-import { fail, json } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import {} from '$app/navigation';
 
 export const load = (async ({ params, depends }) => {
 	depends('update:product');
