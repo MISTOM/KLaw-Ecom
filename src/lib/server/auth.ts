@@ -26,9 +26,8 @@ export default {
 	},
 
 	/**
-	 * Generate refresh token and save it to the database
-	 * @param {import('@prisma/client').User} user
-	 * @returns refreshToken
+	 * Generate refresh token, hash it and save it to the database
+	 * @returns hashed refreshToken
 	 */
 	async generateRefreshToken(user: User): Promise<string> {
 		const maxAge = 60 * 60 * 24; // 24 hours
@@ -39,10 +38,11 @@ export default {
 				expiresIn: maxAge
 			});
 			// TODO - Encrypt refresh token
+			const hashedToken = await this.hash(refreshToken);
 			await prisma.user.update({
 				where: { id },
 				data: {
-					refreshToken: refreshToken
+					refreshToken: hashedToken
 				}
 			});
 
@@ -50,6 +50,27 @@ export default {
 		} catch (e) {
 			console.log('Error generating refresh token', e);
 			throw error(500, 'Error generating refresh token');
+		}
+	},
+	/**
+	 * Verify refresh token
+	 */
+	async verifyRefreshToken(token: string, userId: number): Promise<boolean> {
+		try {
+			const user = await prisma.user.findUnique({
+				where: { id: userId },
+				select: { refreshToken: true }
+			});
+
+			if (!user || !user.refreshToken) {
+				return false;
+			}
+
+			const isMatch = await bcrypt.compare(token, user.refreshToken);
+			return isMatch;
+		} catch (e) {
+			console.log('Error verifying refresh token', e);
+			throw error(500, 'Error verifying refresh token');
 		}
 	},
 
