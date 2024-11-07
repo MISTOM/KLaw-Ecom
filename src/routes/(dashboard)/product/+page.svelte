@@ -33,7 +33,7 @@
 	<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 		{#each products as product (product.id)}
 			<div class="group overflow-hidden rounded-md border transition-all hover:shadow-lg">
-				<div class="aspect-square mx-auto overflow-hidden">
+				<div class="mx-auto aspect-square overflow-hidden">
 					<img
 						src={product.Image[0].url}
 						alt={product.name}

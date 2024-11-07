@@ -3,8 +3,6 @@
 	import '../app.css';
 
 	let { children, data } = $props();
-
-	
 </script>
 
 <div class="font-sans">

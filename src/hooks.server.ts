@@ -39,7 +39,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 			event.locals.user = null;
 			event.cookies.delete('token', { path: '/' });
 			event.cookies.delete('refreshToken', { path: '/' });
-			console.log('Hooks error', e);
+			//@ts-ignore
+			console.log(e.message);
 		}
 	}
 

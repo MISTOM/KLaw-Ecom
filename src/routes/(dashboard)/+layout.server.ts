@@ -14,8 +14,8 @@ export const load = (async ({ locals: { user }, url }) => {
 					}
 				}
 			}
-		})
-		return { cartItems: cart?.CartItem || [] }
+		});
+		return { cartItems: cart?.CartItem || [] };
 	}
-	return { cartItems: [] }
+	return { cartItems: [] };
 }) satisfies PageServerLoad;
