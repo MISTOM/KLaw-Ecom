@@ -19,7 +19,7 @@
 </script>
 
 <!-- Profile Page -->
-<div class="m-1 grid grid-cols-2">
+<div class="m-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
 	<div>
 		<img src="/kenyaLawFavicon.png" alt="Profile" class="m-auto size-24 rounded-full object-cover shadow-lg" />
 		<h2 class="text-center text-2xl font-semibold">Welcome {name}</h2>
