@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { getCartState } from '$lib/Cart.svelte.js';
 
 	// import cart from '$lib/Cart.svelte.js';
@@ -31,16 +32,17 @@
 	<h1 class="mb-8 text-3xl font-bold">Our Products</h1>
 
 	<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-		{#each products as product (product.id)}
+		{#each products as product}
 			<div class="group overflow-hidden rounded-md border transition-all hover:shadow-lg">
-				<div class="mx-auto aspect-square overflow-hidden">
-					<img
-						src={product.Image[0].url}
-						alt={product.name}
-						class="h-full object-cover transition-transform group-hover:scale-105"
-					/>
-				</div>
-
+				<a href="/product/{product.id}">
+					<div class="mx-auto aspect-square overflow-hidden">
+						<img
+							src={product.Image[0].url}
+							alt={product.name}
+							class="h-full object-cover transition-transform group-hover:scale-105"
+						/>
+					</div>
+				</a>
 				<div class="p-4">
 					<h3 class="text-lg font-semibold">{product.name}</h3>
 					<p class="mt-2 line-clamp-2 text-sm text-gray-600">{product.description}</p>
@@ -51,7 +53,9 @@
 						</span>
 						<button
 							class="flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white transition-colors hover:bg-primary/90"
-							onclick={() => cart.addItem(product)}
+							onclick={async (event) => {
+								await cart.addItem(product);
+							}}
 						>
 							<!-- <ShoppingCart size={16} /> -->
 							Add to Cart
