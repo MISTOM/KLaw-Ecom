@@ -14,8 +14,6 @@ export interface CartItems {
 	product: ProductWithImage;
 }
 
-
-
 class Cart {
 	cartItems = $state<CartItems[]>([]); // { id: 1, productId: 1, quantity: 2, product: { id: 1, name: 'product1', price: 100, Image: { url: 'url' } } }
 	cartopen = $state(false);
@@ -41,13 +39,13 @@ class Cart {
 		if (existingItem) {
 			existingItem.quantity++;
 		} else {
-
-			this.cartItems = [...this.cartItems
-				, { id: Math.random() * Date.now(), productId: product.id, quantity: 1, product }];
+			this.cartItems = [
+				...this.cartItems,
+				{ id: Math.random() * Date.now(), productId: product.id, quantity: 1, product }
+			];
 		}
 
 		await this.saveCart();
-
 	}
 
 	async saveCart() {
@@ -76,8 +74,6 @@ class Cart {
 			} else {
 				console.error('Error saving cart');
 			}
-
-
 		} catch (e) {
 			console.error(e);
 		}
@@ -112,9 +108,7 @@ class Cart {
 	// 			this.cartItems = [];
 	// 		}
 
-
 	// 		console.log('EndLoadCart: ', response, await response.json());
-
 
 	// 	} catch (e) {
 	// 		console.error(e);
