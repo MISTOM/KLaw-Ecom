@@ -24,10 +24,10 @@
 		if (!response.ok) {
 			console.error('Failed to log out');
 		}
-		await invalidateAll();
+
 		// UserState.user = null;
 		console.log(await response.json());
-		goto('/login');
+		await goto('/login', { invalidateAll: true });
 	};
 </script>
 

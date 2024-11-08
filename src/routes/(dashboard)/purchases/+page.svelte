@@ -25,7 +25,7 @@
 		{#if orders.length === 0}
 			<p class="text-lg text-gray-600">You have no orders yet.</p>
 		{/if}
-		{#each orders as order}
+		{#each orders as order (order.id)}
 			<div class="rounded-md border p-6 transition-all hover:shadow-lg">
 				<div class="flex flex-wrap items-center justify-between gap-4">
 					<div>
