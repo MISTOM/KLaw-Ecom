@@ -9,7 +9,7 @@
 </script>
 
 <Toaster />
-<div class="font-sans">
+<div class=" font-optima">
 	<!-- TODO: Fix Optima font -->
 	{@render children?.()}
 </div>
