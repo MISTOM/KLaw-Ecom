@@ -26,8 +26,7 @@
 			use:enhance={({ cancel }) => {
 				if (!passwordMatch) {
 					console.log('Passwords do not match');
-					toastState.add('Error', 'Passwords do not match', 'error');
-					//TODO - toast error message
+					toastState.add('Error', 'Passwords do not match', 'error',);
 					cancel();
 				}
 			}}

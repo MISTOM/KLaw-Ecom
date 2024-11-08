@@ -4,7 +4,7 @@ export interface Toast {
     id: string;
     title: string;
     message: string;
-    type: 'info' | 'success' | 'error';
+    type: 'info' | 'success' | 'error' | 'warning';
 
 }
 
@@ -23,11 +23,12 @@ class ToastState {
         })
     }
 
-    add(title: string, message: string, type: 'info' | 'success' | 'error' = 'success', durationMs = 5000) {
+    add(title: string, message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info', durationMs = 5000) {
         const id = crypto.randomUUID()
 
         this.toasts.push({ id, title, message, type })
 
+        // remove toast after durationMs 
         this.toastToTimeoutMap.set(id, setTimeout(() => {
             this.remove(id)
         }, durationMs))
