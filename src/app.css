@@ -2,38 +2,81 @@
 @tailwind components;
 @tailwind utilities;
 
+
 @font-face {
 	font-family: 'Optima';
 	font-style: normal;
-	font-weight: normal;
-	src:
-		local('Optima'),
-		url('/static/fonts/OPTIMA.TTF') format('ttf');
+	font-weight: 900;
+	src: local('Optima Black'), url('/fonts/optima/OptimaLTPro-Black.otf') format('opentype');
 }
 
 @font-face {
-	font-family: 'Optima Italic';
-	font-style: normal;
-	font-weight: normal;
-	src:
-		local('Optima Italic'),
-		url('/static/fonts/Optima_Italic.woff') format('woff');
+	font-family: 'Optima';
+	font-style: italic;
+	font-weight: 900;
+	src: local('Optima Black Italic'), url('/fonts/optima/OptimaLTPro-BlackItalic.otf') format('opentype');
 }
 
 @font-face {
-	font-family: 'Optima Medium';
+	font-family: 'Optima';
 	font-style: normal;
-	font-weight: normal;
-	src:
-		local('Optima Medium'),
-		url('/static/fonts/Optima Medium.woff') format('woff');
+	font-weight: 700;
+	src: local('Optima Bold'), url('/fonts/optima/OptimaLTPro-Bold.otf') format('opentype');
 }
 
 @font-face {
-	font-family: 'Optima Bold';
+	font-family: 'Optima';
+	font-style: italic;
+	font-weight: 700;
+	src: local('Optima Bold Italic'), url('/fonts/optima/OptimaLTPro-BoldItalic.otf') format('opentype');
+}
+
+@font-face {
+	font-family: 'Optima';
 	font-style: normal;
-	font-weight: normal;
-	src:
-		local('Optima Bold'),
-		url('/static/fonts/OPTIMA_B.woff') format('woff');
+	font-weight: 600;
+	src: local('Optima DemiBold'), url('/fonts/optima/OptimaLTPro-DemiBold.otf') format('opentype');
+}
+
+@font-face {
+	font-family: 'Optima';
+	font-style: italic;
+	font-weight: 600;
+	src: local('Optima DemiBold Italic'), url('/fonts/optima/OptimaLTPro-DemiBoldItalic.otf') format('opentype');
+}
+
+@font-face {
+	font-family: 'Optima';
+	font-style: normal;
+	font-weight: 800;
+	src: local('Optima ExtraBlack'), url('/fonts/optima/OptimaLTPro-ExtraBlack.otf') format('opentype');
+}
+
+@font-face {
+	font-family: 'Optima';
+	font-style: italic;
+	font-weight: 400;
+	src: local('Optima Italic'), url('/fonts/optima/OptimaLTPro-Italic.otf') format('opentype');
+}
+
+
+@font-face {
+	font-family: 'Optima';
+	font-style: normal;
+	font-weight: 500;
+	src: local('Optima Medium'), url('/fonts/optima/OptimaLTPro-Medium.otf') format('opentype');
+}
+
+@font-face {
+	font-family: 'Optima';
+	font-style: italic;
+	font-weight: 500;
+	src: local('Optima Medium Italic'), url('/fonts/optima/OptimaLTPro-MediumItalic.otf') format('opentype');
+}
+
+@font-face {
+	font-family: 'Optima';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Optima Roman'), url('/fonts/optima/OptimaLTPro-Roman.otf') format('opentype');
 }

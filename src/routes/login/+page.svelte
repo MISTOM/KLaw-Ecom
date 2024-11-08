@@ -4,7 +4,7 @@
 	const { form } = $props();
 
 	let email = $state(form?.data?.email);
-	let password = $state();
+	let password = $state('');
 </script>
 
 <div class="loginbg flex min-h-screen items-center justify-center bg-gray-100 lg:bg-contain">
