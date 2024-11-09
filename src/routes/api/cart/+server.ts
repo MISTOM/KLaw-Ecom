@@ -34,53 +34,41 @@ export const POST = async ({ request, locals: { user } }) => {
 
 	const cartItems = await request.json(); // [{ productId: 1, quantity: 2 }, { productId: 2, quantity: 3 }]
 
+	// Validate request data
+	if (!Array.isArray(cartItems) || !cartItems.every(item =>
+		typeof item.productId === 'number' &&
+		typeof item.quantity === 'number' &&
+		item.quantity > 0
+	)) {
+		throw error(400, 'Invalid cart items format');
+	}
+
+
 	try {
-		// TODO - Review this approach
-		// Validate cart items
 
-		// if (!Array.isArray(cartItems) || !cartItems.every(item => item.productId && item.quantity)) {
-		//     throw error(400, 'Invalid cart items');
-		// }
+		// Upsert cart and cartItems in a transaction
+		await prisma.$transaction(async (tx) => {
+			// Find or create cart
+			const cart = await tx.cart.upsert({
+				where: { userId: user.id },
+				create: { userId: user.id },
+				update: {}
+			});
 
-		// await prisma.$transaction(async (tx) => {
-		//     // Clear existing cart items
-		//     await tx.cartItem.deleteMany({ where: { userId: user.id } });
+			// Delete existing cart items
+			await tx.cartItem.deleteMany({
+				where: { cartId: cart.id }
+			});
 
-		//     // Add new cart items
-		//     await tx.cartItem.createMany({
-		//         data: cartItems.map(item => ({
-		//             userId: user.id,
-		//             productId: item.productId,
-		//             quantity: item.quantity
-		//         }))
-		//     });
-		// });
-
-		await prisma.cart.upsert({
-			where: { userId: user.id },
-			update: {
-				CartItem: {
-					deleteMany: {}, // Clear existing items
-
-					//@ts-ignore
-					create: cartItems.map((item) => ({
-						productId: item.productId,
-						quantity: item.quantity
-					}))
-				}
-			},
-			create: {
-				userId: user.id,
-				CartItem: {
-					//@ts-ignore
-					create: cartItems.map((item) => ({
-						productId: item.productId,
-						quantity: item.quantity
-					}))
-				}
-			}
+			// Create new cart items
+			await tx.cartItem.createMany({
+				data: cartItems.map(item => ({
+					cartId: cart.id,
+					productId: item.productId,
+					quantity: item.quantity
+				}))
+			});
 		});
-
 		return json({ message: 'Cart saved' });
 	} catch (e) {
 		return error(500, 'Error saving cart');
