@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from 'tailwindcss';
 export default {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	theme: {
@@ -9,10 +9,9 @@ export default {
 				fadeblack: '#282828'
 			},
 			fontFamily: {
-				optima: ['Optima', 'sans-serif'],
+				optima: ['Optima', 'sans-serif']
 			}
 		}
 	},
-	plugins: [],
-
+	plugins: []
 } as Config;

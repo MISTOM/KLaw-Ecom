@@ -1,6 +1,7 @@
 import { error, json } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
 
+
 export const GET = async ({ locals: { user } }) => {
 	if (!user?.id) {
 		return error(401, 'Unauthorized');
@@ -35,6 +36,26 @@ export const POST = async ({ request, locals: { user } }) => {
 
 	try {
 		// TODO - Review this approach
+		// Validate cart items
+
+		// if (!Array.isArray(cartItems) || !cartItems.every(item => item.productId && item.quantity)) {
+		//     throw error(400, 'Invalid cart items');
+		// }
+
+		// await prisma.$transaction(async (tx) => {
+		//     // Clear existing cart items
+		//     await tx.cartItem.deleteMany({ where: { userId: user.id } });
+
+		//     // Add new cart items
+		//     await tx.cartItem.createMany({
+		//         data: cartItems.map(item => ({
+		//             userId: user.id,
+		//             productId: item.productId,
+		//             quantity: item.quantity
+		//         }))
+		//     });
+		// });
+
 		await prisma.cart.upsert({
 			where: { userId: user.id },
 			update: {
@@ -59,6 +80,7 @@ export const POST = async ({ request, locals: { user } }) => {
 				}
 			}
 		});
+
 		return json({ message: 'Cart saved' });
 	} catch (e) {
 		return error(500, 'Error saving cart');

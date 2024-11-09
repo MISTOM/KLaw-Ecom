@@ -26,7 +26,7 @@
 			use:enhance={({ cancel }) => {
 				if (!passwordMatch) {
 					console.log('Passwords do not match');
-					toastState.add('Error', 'Passwords do not match', 'error',);
+					toastState.add('Error', 'Passwords do not match', 'error');
 					cancel();
 				}
 			}}
@@ -74,7 +74,6 @@
 			<button
 				type="submit"
 				class="w-full rounded-md border p-2 transition-colors hover:bg-primary hover:text-white disabled:opacity-50"
-				
 				>Register
 			</button>
 			<span class="text-sm hover:text-secondary"><a href="/login">Back to login</a></span>

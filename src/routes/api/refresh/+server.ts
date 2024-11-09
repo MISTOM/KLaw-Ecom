@@ -24,7 +24,7 @@
 
 // 		const newToken = auth.sign(user);
 
-// 		
+//
 // 		const maxAge = 60 * 60 * 24 * 7; // 1 week
 // 		cookies.set('token', newToken, { httpOnly: true, secure: true, path: '/', maxAge });
 

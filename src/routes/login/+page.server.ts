@@ -4,7 +4,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { invalidateAll } from '$app/navigation';
 
-export const load = (async ({ locals: { user } }) => { }) satisfies PageServerLoad;
+export const load = (async ({ locals: { user } }) => {}) satisfies PageServerLoad;
 
 export const actions = {
 	default: async ({ request, cookies }) => {
@@ -49,13 +49,10 @@ export const actions = {
 		const token = auth.sign(user);
 		const refreshToken = await auth.generateRefreshToken(user);
 
-
 		const maxAge = 60 * 60 * 24 * 7; // 1 week
 		cookies.set('token', token, { httpOnly: true, secure: true, path: '/', maxAge });
 		cookies.set('refreshToken', refreshToken, { httpOnly: true, secure: true, path: '/', maxAge });
 
-
 		(await auth.isAdmin(user)) ? redirect(303, '/admin/product') : redirect(303, '/product');
-		return { errors: '' };
 	}
 } satisfies Actions;

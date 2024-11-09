@@ -69,11 +69,13 @@
 			>
 
 			<div class="mt-3 flex justify-between">
-				<span class="text-sm">
-					If you dont have an account, <a href="/register" class="hover:text-secondary">Register</a>
-				</span>
+				<a href="/register" class="text-sm transition-colors hover:text-secondary"
+					>If you dont have an account,Register</a
+				>
 
-				<span class="text-sm hover:text-secondary"><a href="/forgotPassword">Forgot Passowrd</a></span>
+				<a href="/forgotPassword" class="text-sm transition-colors hover:text-secondary hover:underline"
+					>Forgot Passowrd</a
+				>
 			</div>
 		</form>
 	</div>

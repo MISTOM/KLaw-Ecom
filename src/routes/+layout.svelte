@@ -5,7 +5,7 @@
 	import Toaster from '$lib/components/Toaster.svelte';
 
 	let { children, data } = $props();
-	setToastState()
+	setToastState();
 </script>
 
 <Toaster />
