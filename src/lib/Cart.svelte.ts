@@ -70,6 +70,7 @@ class Cart {
 			});
 
 			if (!response.ok) {
+				console.error(await response.json())
 				throw error(response.status, 'Failed to save cart');
 			}
 			return { success: true };
