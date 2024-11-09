@@ -12,7 +12,8 @@ export const load = (async ({ locals: { user } }) => {
 					ProductOnOrder: {
 						include: { product: true }
 					}
-				}, orderBy: { createdAt: 'desc' }
+				},
+				orderBy: { createdAt: 'desc' }
 			});
 
 			return { orders };

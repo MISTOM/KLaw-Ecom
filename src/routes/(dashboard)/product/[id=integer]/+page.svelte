@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { getCartState } from '$lib/Cart.svelte';
+	import { getToastState } from '$lib/Toast.svelte';
 
 	const { data } = $props();
 	const product = $derived(data.product);
 	const cart = getCartState();
+	const toast = getToastState();
 </script>
 
 <div class="container mx-auto px-4 py-8">
@@ -31,7 +33,9 @@
 					<span class="text-2xl font-bold">KES {product.price.toLocaleString()}</span>
 					<button
 						class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm text-white transition-colors hover:bg-primary/90"
-						onclick={() => cart.addItem(product)}
+						onclick={async () => {
+							if (await cart.addItem(product)) toast.add('Success', 'Product added to cart', 'success', 2000);
+						}}
 					>
 						<!-- <ShoppingCart size={16} /> -->
 

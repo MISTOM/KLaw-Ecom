@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { getCartState } from '$lib/Cart.svelte.js';
+	import { getToastState } from '$lib/Toast.svelte';
 
 	// import cart from '$lib/Cart.svelte.js';
 	const { data } = $props();
 	const products = $derived(data.products || []);
 	const cart = getCartState();
+	const toast = getToastState()
 </script>
 
 <!-- <main class="grid grid-cols-1 gap-4 font-optima sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -54,7 +56,11 @@
 						<button
 							class="flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white transition-colors hover:bg-primary/90"
 							onclick={async (event) => {
-								await cart.addItem(product);
+								if(await cart.addItem(product)) {
+									toast.add('Success', 'Product added to cart', 'success', 2000);
+								} else {
+									toast.add('Error', 'Failed to add product', 'error', 2000);
+								}
 							}}
 						>
 							<!-- <ShoppingCart size={16} /> -->

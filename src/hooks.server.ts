@@ -24,7 +24,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 				if (!userId) throw error(401, 'Invalid refresh token');
 
-
 				// Verify the refresh token
 				const isValidRefreshToken = await auth.verifyRefreshToken(refreshToken, userId);
 
@@ -46,7 +45,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 			}
 		} catch (e) {
 			clearUserSession(event);
-			console.error('Token verification error:', e);
+			//@ts-ignore
+			console.error('Token verification error:', e?.message);
 		}
 	}
 

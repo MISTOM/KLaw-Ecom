@@ -1,6 +1,10 @@
 import { goto } from '$app/navigation';
 import { getContext, setContext } from 'svelte';
 import type { Product } from '@prisma/client';
+import { getToastState } from './Toast.svelte';
+import { error } from '@sveltejs/kit';
+
+// const toastState = getToastState();
 
 // extend product with image property
 interface ProductWithImage extends Product {
@@ -17,7 +21,7 @@ export interface CartItems {
 class Cart {
 	cartItems = $state<CartItems[]>([]); // { id: 1, productId: 1, quantity: 2, product: { id: 1, name: 'product1', price: 100, Image: { url: 'url' } } }
 	cartopen = $state(false);
-
+	isLoading = $state(false);
 	cartStats = $derived.by(() => {
 		let quantity = 0,
 			total = 0;
@@ -41,14 +45,16 @@ class Cart {
 		} else {
 			this.cartItems = [
 				...this.cartItems,
+				// TODO - use crypto.randomUUID() instead
 				{ id: Math.random() * Date.now(), productId: product.id, quantity: 1, product }
 			];
 		}
 
-		await this.saveCart();
+		return await this.saveCart();
 	}
 
 	async saveCart() {
+		this.isLoading = true;
 		const cartItems = this.cartItems.map((item) => {
 			return {
 				productId: item.product.id,
@@ -63,19 +69,18 @@ class Cart {
 				body: JSON.stringify(cartItems)
 			});
 
-			if (response.status === 401) {
-				console.error('Unauthorized saving cart: No user logged in');
-				// await goto('/login');
-				return;
+			if (!response.ok) {
+				throw error(response.status, 'Failed to save cart');
 			}
-
-			if (response.ok) {
-				console.log('Cart saved');
-			} else {
-				console.error('Error saving cart');
-			}
+			return { success: true };
 		} catch (e) {
+
 			console.error(e);
+			//TODO- Rethrow error to handle it in the UI
+
+			return { success: false };
+		} finally {
+			this.isLoading = false;
 		}
 	}
 
@@ -117,6 +122,16 @@ class Cart {
 	// }
 
 	async removeItem(id: number) {
+		// TODO - rollback if failed
+		// const previousItems = [...this.cartItems];
+		// this.cartItems = this.cartItems.filter((item) => item.id !== id);
+
+		// try {
+		//     await this.saveCart();
+		// } catch (error) {
+		//     this.cartItems = previousItems; // Rollback on failure
+		//     throw error;
+		// }
 		this.cartItems = this.cartItems.filter((item) => item.id !== id);
 		if (this.cartStats.quantity === 0) this.cartopen = false;
 		await this.saveCart();

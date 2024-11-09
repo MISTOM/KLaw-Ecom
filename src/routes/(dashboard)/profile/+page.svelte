@@ -30,7 +30,10 @@
 		<form
 			method="POST"
 			use:enhance={({ cancel }) => {
-				if (!passwordMatch)  {console.log('cancelling');return cancel()};
+				if (!passwordMatch) {
+					console.log('cancelling');
+					return cancel();
+				}
 
 				return async ({ update, result }) => {
 					console.log('form result ->  ', result);

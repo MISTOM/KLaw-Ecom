@@ -18,7 +18,7 @@
 			console.error('Failed to log out');
 		}
 		console.log(await response.json());
-		goto('/login', {invalidateAll: true});
+		goto('/login', { invalidateAll: true });
 	};
 </script>
 
