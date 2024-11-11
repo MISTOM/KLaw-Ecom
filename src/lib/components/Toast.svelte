@@ -3,9 +3,7 @@
 	import { getToastState } from '$lib/Toast.svelte';
 	import { slide } from 'svelte/transition';
 
-	type Props = {
-		toast: Toast;
-	};
+	type Props = { toast: Toast };
 
 	let { toast }: Props = $props();
 	const toastState = getToastState();
@@ -30,6 +28,7 @@
 		}
 	};
 
+	// Toast icons
 	const toastIcons = {
 		success: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
     <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
@@ -54,7 +53,7 @@
 </script>
 
 <div
-	class="relative flex h-16 w-80 items-center justify-between rounded-md px-4 py-2 bg-gray-50 shadow-sm"
+	class="relative flex h-16 w-80 items-center justify-between rounded-md bg-gray-50 px-4 py-2 shadow-sm"
 	in:slide
 	out:slide={{ duration: 100 }}
 >
@@ -64,19 +63,6 @@
 				{@html toastIcon}
 			</div>
 		{/if}
-		<!-- <div class={`rounded-full p-1 ${toastStyles.bg} ${toastStyles.text}`}>
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6"
-				> 
-
-				
-				<path
-					fill-rule="evenodd"
-					d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-					clip-rule="evenodd"
-				/></svg
-			>
-		</div> -->
-
 		<div>
 			<p class="font-medium">{toast.title}</p>
 			<p class="text-sm text-gray-600">{toast.message}</p>

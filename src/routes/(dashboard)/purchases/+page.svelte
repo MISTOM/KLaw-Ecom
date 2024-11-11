@@ -3,7 +3,7 @@
 
 	const { data } = $props();
 	const orders = $derived(data?.orders || []);
-	$inspect(orders);
+	// $inspect(orders);
 
 	function getIssuedProducts(order: any) {
 		if (order) return order.ProductOnOrder.filter((product: any) => product.isIssued);
