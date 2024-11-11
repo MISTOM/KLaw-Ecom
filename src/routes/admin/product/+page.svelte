@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { applyAction, enhance } from '$app/forms';
-	import { invalidate, invalidateAll } from '$app/navigation';
+	import { enhance } from '$app/forms';
 	import { getUserState } from '$lib/state.svelte.js';
+	import { getToastState } from '$lib/Toast.svelte';
 
 	const { data, form } = $props();
 
@@ -9,7 +9,9 @@
 
 	const products = $derived(data.products || []);
 	// const products = $state($state.snapshot(data.products) || []);
-	$inspect(products);
+	// $inspect(products);
+
+	const toast = getToastState();
 
 	let name = $state(form?.data?.name);
 	let description = $state(form?.data?.description);
@@ -204,12 +206,7 @@
 		<div class="rounded-lg border border-gray-200 bg-white p-6">
 			<h2 class="mb-6 text-2xl font-semibold">Add New Book</h2>
 
-			<form
-				method="POST"
-				enctype="multipart/form-data"
-				use:enhance
-				class="space-y-4"
-			>
+			<form method="POST" enctype="multipart/form-data" class="space-y-4" use:enhance>
 				{#if form?.errors}
 					<div class="rounded-md bg-red-50 p-3 text-sm text-red-500">
 						{form.errors}
@@ -288,7 +285,6 @@
 						id="image"
 						name="image"
 						accept={allowedExtensions.join(',')}
-						required
 						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
 					/>
 					<p class="text-xs text-gray-500">

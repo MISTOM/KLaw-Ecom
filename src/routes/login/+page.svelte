@@ -6,7 +6,7 @@
 
 	const { form } = $props();
 
-	let formErrors = $state('');
+	let formErrors = $state();
 	let email = $state(form?.data?.email);
 	let password = $state('');
 </script>
@@ -24,6 +24,7 @@
 			use:enhance={() => {
 				return async ({ result }) => {
 					console.log('form result ->  ', result);
+					console.log('form data ->  ', form);
 					if (result.type === 'redirect') {
 						await goto(result.location, { invalidateAll: true });
 					} else if (result.type === 'failure') {
@@ -45,9 +46,7 @@
 					name="email"
 					class="w-full rounded-md border p-2"
 					bind:value={email}
-					oninput={() => {
-						formErrors ? (formErrors = '') : console.log('cleared this error - ', formErrors);
-					}}
+					oninput={() => (formErrors ? (formErrors = '') : null)}
 					required
 				/>
 				<label for="email" class="label"> </label>
@@ -60,6 +59,7 @@
 					name="password"
 					class="w-full rounded-md border p-2"
 					bind:value={password}
+					oninput={() => (formErrors ? (formErrors = '') : null)}
 					required
 				/>
 			</div>
