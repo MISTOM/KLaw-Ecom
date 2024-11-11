@@ -7,7 +7,7 @@
 	const { data } = $props();
 	const products = $derived(data.products || []);
 	const cart = getCartState();
-	const toast = getToastState()
+	const toast = getToastState();
 </script>
 
 <!-- <main class="grid grid-cols-1 gap-4 font-optima sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -55,11 +55,13 @@
 						</span>
 						<button
 							class="flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white transition-colors hover:bg-primary/90"
-							onclick={async (event) => {
-								if(await cart.addItem(product)) {
+							onclick={async () => {
+								if (await cart.addItem(product)) {
+									console.log('product added to cart');
 									toast.add('Success', 'Product added to cart', 'success', 2000);
 								} else {
-									toast.add('Error', 'Failed to add product', 'error', 2000);
+									console.log('product not added to cart');
+									if (data.user) toast.add('Error', 'Failed to add product to cart', 'error', 2000);
 								}
 							}}
 						>

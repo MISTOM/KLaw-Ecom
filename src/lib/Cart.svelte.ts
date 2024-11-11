@@ -70,16 +70,16 @@ class Cart {
 			});
 
 			if (!response.ok) {
-				console.error(await response.json())
-				throw error(response.status, 'Failed to save cart');
+				console.error()
+				throw error(response.status, await response.json());
 			}
-			return { success: true };
+			return true;
 		} catch (e) {
 
 			console.error(e);
 			//TODO- Rethrow error to handle it in the UI
 
-			return { success: false };
+			return false;
 		} finally {
 			this.isLoading = false;
 		}

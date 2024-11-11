@@ -12,11 +12,11 @@ export const load = (async ({ locals }) => {
 			orderBy: { id: 'desc' }
 		});
 		return { products };
-	} catch (e) {}
+	} catch (e) { }
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-	addproduct: async ({ request }) => {
+	default: async ({ request }) => {
 		const formData = await request.formData();
 
 		const name = formData.get('name')?.toString();
@@ -75,16 +75,10 @@ export const actions: Actions = {
 					quantity: parseInt(quantity),
 					serviceCode,
 					Image: imageUrl
-						? {
-								create: {
-									url: imageUrl
-								}
-							}
+						? { create: { url: imageUrl } }
 						: undefined
 				},
-				include: {
-					Image: true
-				}
+				include: { Image: true }
 			});
 
 			const [newProduct] = await Promise.all([newProductPromise, imageUrl ? writeFilePromise : Promise.resolve()]);
