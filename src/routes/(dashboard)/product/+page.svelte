@@ -58,7 +58,7 @@
 							KES {product.price.toLocaleString()}
 						</span>
 						<button
-							class="flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white transition-colors hover:bg-primary/90"
+							class="rounded-md bg-primary px-3 py-2 text-sm text-white transition-colors hover:bg-primary/90"
 							onclick={async () => {
 								if (await cart.addItem(product)) {
 									console.log('product added to cart');
@@ -69,7 +69,6 @@
 								}
 							}}
 						>
-							<!-- <ShoppingCart size={16} /> -->
 							Add to Cart
 						</button>
 					</div>
