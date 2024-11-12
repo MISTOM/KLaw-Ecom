@@ -41,6 +41,10 @@
 	};
 </script>
 
+<svelte:head>
+	<title>Checkout</title>
+</svelte:head>
+
 <!-- Checkout page -->
 <main class="m-4 grid grid-cols-1 gap-6 lg:grid-cols-3">
 	<section class="col-span-2">

@@ -1,5 +1,7 @@
 # Ecommerce
+
 Platform for selling and purchasing publications for kenyalaw.
+
 ## Getting Started
 
 ### Prerequisites
@@ -30,10 +32,10 @@ RESET_KEY="reset
 ```
 
 Ensure to grant `user` all privileges to `[database-name]`
+
 ```sql
 GRANT ALL PRIVILEGES ON DATABASE [database-name] TO [user];
 ```
-
 
 Run migrations, seed and sync database tables based on Prisma schema models [(prisma.schema)](/prisma/schema.prisma)
 

@@ -12,6 +12,7 @@
 </script>
 
 <svelte:head>
+	<title>Login</title>
 	<link rel="preload" href="/banner-bg.jpg" as="image" />
 </svelte:head>
 

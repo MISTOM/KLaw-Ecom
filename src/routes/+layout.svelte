@@ -9,8 +9,7 @@
 </script>
 
 <Toaster />
-<div class=" font-optima">
-	<!-- TODO: Fix Optima font -->
+<div class="font-optima">
 	{@render children?.()}
 </div>
 <footer class=""></footer>

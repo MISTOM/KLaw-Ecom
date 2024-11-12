@@ -70,12 +70,11 @@ class Cart {
 			});
 
 			if (!response.ok) {
-				console.error()
+				console.error();
 				throw error(response.status, await response.json());
 			}
 			return true;
 		} catch (e) {
-
 			console.error(e);
 			//TODO- Rethrow error to handle it in the UI
 

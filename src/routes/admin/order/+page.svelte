@@ -71,6 +71,9 @@
 		});
 	}
 </script>
+<svelte:head>
+	<title>Purchases</title>
+</svelte:head>
 
 <main class="container mx-auto p-6">
 	<div class="mb-8 grid gap-6 md:grid-cols-3">
@@ -83,7 +86,7 @@
 						type="text"
 						bind:value={searchQuery}
 						placeholder="Search by customer name..."
-						class="w-full rounded-lg border border-gray-200 bg-white p-2 px-4  focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+						class="w-full rounded-lg border border-gray-200 bg-white p-2 px-4 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
 					/>
 				</div>
 			</div>

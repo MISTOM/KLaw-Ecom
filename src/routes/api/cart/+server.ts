@@ -1,7 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
 
-
 export const GET = async ({ locals: { user } }) => {
 	if (!user?.id) {
 		return error(401, 'Unauthorized');
@@ -35,17 +34,16 @@ export const POST = async ({ request, locals: { user } }) => {
 	const cartItems = await request.json(); // [{ productId: 1, quantity: 2 }, { productId: 2, quantity: 3 }]
 
 	// Validate request data
-	if (!Array.isArray(cartItems) || !cartItems.every(item =>
-		typeof item.productId === 'number' &&
-		typeof item.quantity === 'number' &&
-		item.quantity > 0
-	)) {
+	if (
+		!Array.isArray(cartItems) ||
+		!cartItems.every(
+			(item) => typeof item.productId === 'number' && typeof item.quantity === 'number' && item.quantity > 0
+		)
+	) {
 		throw error(400, 'Invalid cart items format');
 	}
 
-
 	try {
-
 		// Upsert cart and cartItems in a transaction
 		await prisma.$transaction(async (tx) => {
 			// Find or create cart
@@ -62,7 +60,7 @@ export const POST = async ({ request, locals: { user } }) => {
 
 			// Create new cart items
 			await tx.cartItem.createMany({
-				data: cartItems.map(item => ({
+				data: cartItems.map((item) => ({
 					cartId: cart.id,
 					productId: item.productId,
 					quantity: item.quantity

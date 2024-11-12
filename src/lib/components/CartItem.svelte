@@ -13,7 +13,11 @@
 	out:fade={{ duration: 100 }}
 >
 	<div class="flex items-center">
-		<img src={item.product.Image[0].url} alt="Product" class="mr-4 size-12 rounded object-cover" />
+		<img
+			src={item.product.Image[0]?.url || '/kLawPillers.png'}
+			alt="Product"
+			class="mr-4 size-12 rounded object-cover"
+		/>
 		<div>
 			<h4>{item.product.name}</h4>
 			<span class="text-sm">KES {item.product.price} each</span>

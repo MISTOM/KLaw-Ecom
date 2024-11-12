@@ -12,7 +12,7 @@ export const load = (async ({ locals }) => {
 			orderBy: { id: 'desc' }
 		});
 		return { products };
-	} catch (e) { }
+	} catch (e) {}
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
@@ -74,9 +74,7 @@ export const actions: Actions = {
 					price: parseFloat(price),
 					quantity: parseInt(quantity),
 					serviceCode,
-					Image: imageUrl
-						? { create: { url: imageUrl } }
-						: undefined
+					Image: imageUrl ? { create: { url: imageUrl } } : undefined
 				},
 				include: { Image: true }
 			});

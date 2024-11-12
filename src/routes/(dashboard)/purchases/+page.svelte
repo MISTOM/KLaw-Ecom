@@ -18,6 +18,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Purchases</title>
+</svelte:head>
+
 <div class="container mx-auto px-4 py-8">
 	<h1 class="mb-8 text-3xl font-bold">My Orders</h1>
 

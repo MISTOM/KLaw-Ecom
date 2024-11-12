@@ -21,12 +21,15 @@ class ToastState {
 	}
 
 	add(title: string, message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info', durationMs = 5000) {
-		const id = crypto.randomUUID()
+		const id = crypto.randomUUID();
 
 		this.toasts.push({ id, title, message, type });
 
 		// remove toast after durationMs
-		this.toastToTimeoutMap.set(id, setTimeout(() => this.remove(id), durationMs));
+		this.toastToTimeoutMap.set(
+			id,
+			setTimeout(() => this.remove(id), durationMs)
+		);
 	}
 
 	remove(id: string) {

@@ -31,6 +31,9 @@
 		);
 	});
 </script>
+<svelte:head>
+	<title>Products</title>
+</svelte:head>
 
 <!-- <main class="m-2 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3">
 	<div class="col-span-2">
@@ -148,7 +151,7 @@
 								<img
 									src={book.Image[0]?.url || '/kLawPillers.png'}
 									alt={book.name}
-									class="h-full w-full object-cover  bg-primary"
+									class="h-full w-full bg-primary object-cover"
 								/>
 							</div>
 
@@ -189,7 +192,7 @@
 						</div>
 
 						<!-- Action Buttons -->
-						<div class="absolute right-4 bottom-4 hidden gap-2 group-hover:flex">
+						<div class="absolute bottom-4 right-4 hidden gap-2 group-hover:flex">
 							<a
 								href={`/admin/product/${book.id}`}
 								class="rounded-md bg-gray-100 p-2 text-gray-600 transition-colors hover:bg-gray-200"

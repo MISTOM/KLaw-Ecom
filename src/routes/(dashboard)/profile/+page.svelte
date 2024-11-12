@@ -20,6 +20,10 @@
 	const toggleEditMode = () => (isEditMode = !isEditMode);
 </script>
 
+<svelte:head>
+	<title>Profile</title>
+</svelte:head>
+
 <!-- Profile Page -->
 <div class="m-1 grid grid-cols-2">
 	<div>

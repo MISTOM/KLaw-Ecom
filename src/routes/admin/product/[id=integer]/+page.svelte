@@ -75,6 +75,10 @@
 	};
 </script>
 
+<svelte:head>
+	<title>{name} Details</title>
+</svelte:head>
+
 <!-- <main class="m-4 grid grid-cols-1 p-4 md:grid-cols-2 lg:grid-cols-2">
 	{#if data.product}
 		<div class="m-2">

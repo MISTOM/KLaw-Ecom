@@ -10,9 +10,7 @@ export const load = (async ({ locals: { user } }) => {
 		const products = await prisma.product.findMany({
 			where: { isPublished: true },
 			include: {
-				Image: {
-					select: { url: true }
-				}
+				Image: { select: { url: true } }
 			}
 		});
 		return { products };

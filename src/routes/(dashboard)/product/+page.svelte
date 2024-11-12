@@ -10,6 +10,10 @@
 	const toast = getToastState();
 </script>
 
+<svelte:head>
+	<title>Products</title>
+</svelte:head>
+
 <!-- <main class="grid grid-cols-1 gap-4 font-optima sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 	{#each products as product, i}
 		<div class=" m-3 overflow-hidden rounded-md border border-gray-300 p-4">
@@ -41,7 +45,7 @@
 						<img
 							src={product.Image[0]?.url || '/kLawPillers.png'}
 							alt={product.name}
-							class="h-full object-cover transition-transform group-hover:scale-105 bg-primary"
+							class="h-full bg-primary object-cover transition-transform group-hover:scale-105"
 						/>
 					</div>
 				</a>
