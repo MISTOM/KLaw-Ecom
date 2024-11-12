@@ -2,7 +2,7 @@ import type { PageServerLoad } from './$types';
 import prisma from '$lib/server/prisma';
 
 export const load = (async ({ params, depends }) => {
-	depends('update:order');
+	// depends('update:order');
 	//get all orders
 	const id = Number(params.id);
 	try {

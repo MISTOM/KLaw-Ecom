@@ -155,7 +155,7 @@
 							<div class="flex-grow">
 								<div class="flex items-start justify-between">
 									<div>
-										<h3 class="font-semibold">{book.name}</h3>
+										<h3 class="font-semibold capitalize">{book.name}</h3>
 										<p class="text-sm text-gray-600">Code: {book.serviceCode}</p>
 									</div>
 									<div class="flex items-center gap-2">

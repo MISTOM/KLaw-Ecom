@@ -1,7 +1,8 @@
 import prisma from '$lib/server/prisma';
 import type { PageServerLoad } from './$types';
 
-export const load = (async () => {
+export const load = (async ({depends}) => {
+	depends('update:order');
 	//get all orders
 	const orders = await prisma.order.findMany({
 		include: {
