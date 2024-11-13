@@ -10,6 +10,7 @@
 	let errors = $state('');
 
 	const createOrder = async () => {
+		if (!confirm('Are you sure you want to purchase these items?')) return;
 		const res = await fetch('/api/order', {
 			method: 'POST',
 			headers: {
@@ -54,7 +55,11 @@
 			{#each cart.cartItems as item, i}
 				<li class="my-3 flex items-center rounded-md border p-1 hover:shadow-sm">
 					<span class="m-5">{i + 1}</span>
-					<img src={item.product.Image[0]?.url} alt={item.product.name} class="mr-4 size-14" />
+					<img
+						src={item.product.Image[0]?.url || '/kLawPillers.png'}
+						alt={item.product.name}
+						class="mr-4 size-14"
+					/>
 					<div class="flex-grow">
 						<h2 class="text-lg font-semibold">{item.product.name}</h2>
 						<p>Price: KES {item.product.price}</p>

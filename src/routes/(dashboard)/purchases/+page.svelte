@@ -5,8 +5,9 @@
 	const orders = $derived(data?.orders || []);
 	// $inspect(orders);
 
-	function getIssuedProducts(order: any) {
+	function getIssuedProducts(order: any): any[] {
 		if (order) return order.ProductOnOrder.filter((product: any) => product.isIssued);
+		return [];
 	}
 
 	function formatDate(date: Date) {
@@ -23,11 +24,11 @@
 </svelte:head>
 
 <div class="container mx-auto px-4 py-8">
-	<h1 class="mb-8 text-3xl font-bold">My Orders</h1>
+	<h1 class="mb-8 text-3xl font-bold">My Purchases</h1>
 
 	<div class="grid gap-6">
 		{#if orders.length === 0}
-			<p class="text-lg text-gray-600">You have no orders yet.</p>
+			<p class="text-lg text-gray-600">You have no purchases yet.</p>
 		{/if}
 		{#each orders as order (order.id)}
 			<div class="rounded-md border p-6 transition-all hover:shadow-lg">
