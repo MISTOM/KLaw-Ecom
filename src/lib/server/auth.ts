@@ -2,8 +2,8 @@ import { error } from '@sveltejs/kit';
 import { REFRESH_KEY, SECRET_KEY, RESET_KEY } from '$env/static/private';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import prisma from '$lib/server/prisma';
 import { type User, type Role, Roles } from '@prisma/client';
+import prisma from '$lib/server/prisma';
 
 let roleCache: Role[];
 
@@ -129,7 +129,6 @@ export default {
 		if (adminRole && user?.roleId === adminRole.id) {
 			return true;
 		}
-		console.log('auth:user not admin');
 		return false;
 	}
 };
