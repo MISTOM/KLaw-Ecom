@@ -9,6 +9,7 @@
 	let formErrors = $state();
 	let email = $state(form?.data?.email);
 	let password = $state('');
+	let passwordVisible = $state(false);
 </script>
 
 <svelte:head>
@@ -25,7 +26,6 @@
 			use:enhance={() => {
 				return async ({ result }) => {
 					console.log('form result ->  ', result);
-					console.log('form data ->  ', form);
 					if (result.type === 'redirect') {
 						await goto(result.location, { invalidateAll: true });
 					} else if (result.type === 'failure') {
@@ -52,10 +52,10 @@
 				/>
 				<label for="email" class="label"> </label>
 			</div>
-			<div class="mb-4">
+			<div class="group relative mb-4">
 				<label for="password" class="block text-sm font-semibold">Password</label>
 				<input
-					type="password"
+					type={passwordVisible ? 'text' : 'password'}
 					id="password"
 					name="password"
 					class="w-full rounded-md border p-2"
@@ -63,6 +63,19 @@
 					oninput={() => (formErrors ? (formErrors = '') : null)}
 					required
 				/>
+
+				<button
+					type="button"
+					class="absolute right-3 top-9 hidden text-xs text-gray-400 group-hover:flex"
+					onclick={() => (passwordVisible = !passwordVisible)}
+					tabindex="-1"
+				>
+					{#if passwordVisible}
+						Hide
+					{:else}
+						Show
+					{/if}
+				</button>
 			</div>
 			<button
 				type="submit"

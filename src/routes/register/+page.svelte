@@ -13,6 +13,7 @@
 
 	const toastState = getToastState();
 </script>
+
 <svelte:head>
 	<title>Register</title>
 </svelte:head>

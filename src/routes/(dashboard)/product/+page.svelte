@@ -65,7 +65,7 @@
 									toast.add('Success', 'Product added to cart', 'success', 2000);
 								} else {
 									console.log('product not added to cart');
-									if (data.user) toast.add('Error', 'Failed to add product to cart', 'error', 2000);
+									// if (data.user) toast.add('Error', 'Failed to add product to cart', 'error', 2000);
 								}
 							}}
 						>

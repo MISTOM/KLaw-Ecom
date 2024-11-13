@@ -71,6 +71,7 @@
 		});
 	}
 </script>
+
 <svelte:head>
 	<title>Purchases</title>
 </svelte:head>

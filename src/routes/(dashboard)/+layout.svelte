@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import CartItem from '../../lib/components/CartItem.svelte';
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { setCartState } from '$lib/Cart.svelte';
 	// import { getUserState } from '$lib/state.svelte';
 	// import cart from '$lib/Cart.svelte';
@@ -13,7 +13,7 @@
 
 	// const UserState = getUserState();
 	// const { user, name } = UserState;
-	$inspect(data.user, ' ::dashboard layout state');
+	// $inspect(data.user, ' ::dashboard layout state');
 
 	const handleLogout = async () => {
 		const response = await fetch('/api/logout', {
