@@ -50,8 +50,9 @@ export const actions = {
 		const refreshToken = await auth.generateRefreshToken(user);
 
 		const maxAge = 60 * 60 * 24 * 7; // 1 week
-		cookies.set('token', token, { httpOnly: true, secure: true, path: '/', maxAge });
-		cookies.set('refreshToken', refreshToken, { httpOnly: true, secure: true, path: '/', maxAge });
+		//TODO - set secure to true in production
+		cookies.set('token', token, { httpOnly: true, secure: false, path: '/', maxAge });
+		cookies.set('refreshToken', refreshToken, { httpOnly: true, secure: false, path: '/', maxAge });
 
 		(await auth.isAdmin(user)) ? redirect(303, '/admin/product') : redirect(303, '/product');
 	}

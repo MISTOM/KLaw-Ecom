@@ -1,4 +1,4 @@
-// src/routes/api/logout/+server.ts
+	// src/routes/api/logout/+server.ts
 import { json } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
 
@@ -12,8 +12,8 @@ export const POST = async ({ cookies, locals: { user } }) => {
 	}
 
 	// Clear the authentication cookies
-	cookies.delete('token', { path: '/' });
-	cookies.delete('refreshToken', { path: '/' });
+	cookies.delete('token', { path: '/', secure: false });
+	cookies.delete('refreshToken', { path: '/', secure: false });
 
 	return json({ message: 'Logged out' });
 };

@@ -35,7 +35,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 					if (user) {
 						const newToken = auth.sign(user);
 						const maxAge = 60 * 60 * 24 * 7; // 1 week
-						event.cookies.set('token', newToken, { httpOnly: true, secure: true, path: '/', maxAge });
+						event.cookies.set('token', newToken, { httpOnly: true, secure: false, path: '/', maxAge });
 					} else {
 						clearUserSession(event);
 					}
