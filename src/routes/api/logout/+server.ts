@@ -1,4 +1,3 @@
-	// src/routes/api/logout/+server.ts
 import { json } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
 

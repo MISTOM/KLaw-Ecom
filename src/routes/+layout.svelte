@@ -14,7 +14,7 @@
 		{@render children?.()}
 	</div>
 
-	<footer class=" mx-12 mt-7 rounded-sm bg-gray-50 pb-4 font-optima">
+	<footer class=" mt-7 rounded-sm bg-gray-50 pb-4 font-optima lg:mx-12">
 		<div class="container mx-auto px-4">
 			<hr class="mb-4 border-gray-400" />
 			<div class="mb-4 flex flex-wrap justify-between">
