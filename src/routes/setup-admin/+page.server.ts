@@ -4,7 +4,7 @@ import type { Actions } from './$types';
 import auth from '$lib/server/auth';
 import prisma from '$lib/server/prisma';
 
-export const load = (async ({ locals }) => {
+export const load = (() => {
 	// if (locals.user) { throw redirect(303, '/') }
 }) satisfies PageServerLoad;
 
@@ -51,11 +51,7 @@ export const actions = {
 					name: name.toString(),
 					email: email.toString(),
 					password: hashedPassword,
-					role: {
-						connect: {
-							name: 'ADMIN'
-						}
-					}
+					role: { connect: { name: 'ADMIN' } }
 				}
 			});
 

@@ -33,6 +33,7 @@
 				<a href="/admin/product">Products</a>
 			</li>
 			<li class="mx-4 transition-colors hover:text-secondary"><a href="/admin/order">Orders</a></li>
+			<li class="mx-4 transition-colors hover:text-secondary"><a href="/admin/users">Users</a></li>
 		</ul>
 	</nav>
 	<div class="flex items-center">
