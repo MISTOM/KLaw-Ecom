@@ -20,7 +20,7 @@
 		<div class="grid gap-8 md:grid-cols-2">
 			<div class="group aspect-square overflow-hidden rounded-md">
 				<img
-					src={product.Image[0].url}
+					src={product.Image[0]?.url || '/kLawPillers.png'}
 					alt={product.name}
 					class="h-full w-full object-cover transition-transform group-hover:scale-105"
 				/>
