@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { type User, type Role, Roles } from '@prisma/client';
 import prisma from '$lib/server/prisma';
+import { maxAge } from '$lib/server/utils';
 
 let roleCache: Role[];
 
@@ -14,9 +15,6 @@ export default {
 	 * @returns  token
 	 */
 	sign(payload: User): string {
-		//maxAge
-		//TODO - Extend maxAge
-		const maxAge = 2 * 60; // 2 minutes
 		const id = payload.id;
 		const roleId = payload.roleId;
 
@@ -30,7 +28,7 @@ export default {
 	 * @returns hashed refreshToken
 	 */
 	async generateRefreshToken(user: User): Promise<string> {
-		const maxAge = 60 * 60 * 24; // 24 hours
+		const maxAge = 60 * 60 * 24 * 7; // 1 week
 		const id = user.id;
 
 		try {
@@ -40,15 +38,13 @@ export default {
 			const hashedToken = await this.hash(refreshToken);
 			await prisma.user.update({
 				where: { id },
-				data: {
-					refreshToken: hashedToken
-				}
+				data: { refreshToken: hashedToken }
 			});
 
 			return refreshToken;
 		} catch (e) {
 			console.log('Error generating refresh token', e);
-			throw error(500, 'Error generating refresh token');
+			return '';
 		}
 	},
 	/**
@@ -69,13 +65,12 @@ export default {
 			return isMatch;
 		} catch (e) {
 			console.log('Error verifying refresh token', e);
-			throw error(500, 'Error verifying refresh token');
+			return false;
 		}
 	},
 
 	/**
 	 * Generate reset Password token
-	 * @param {Number} id User Id
 	 */
 	generateResetToken(id: User['id']) {
 		const maxAge = 60 * 60; // 1 hour
@@ -84,8 +79,6 @@ export default {
 
 	/**
 	 * Compare Passwords to it's hash
-	 * @param {String | Buffer} password
-	 * @param {String} hash
 	 */
 	async compare(password: string | Buffer, hash: string) {
 		return await bcrypt.compare(password, hash);
@@ -93,15 +86,19 @@ export default {
 
 	/**
 	 * Hash Password
-	 * @param {String | Buffer} password The password to encrypt
+	 * @param  password The password to encrypt
 	 * @returns Encrypted Password
 	 */
-	async hash(password: string | Buffer) {
+	async hash(password: string | Buffer): Promise<string> {
 		const salt = await bcrypt.genSalt();
 		return await bcrypt.hash(password, salt);
 	},
 
-	async getRoles() {
+	/**
+	 * Get roles from the database
+	 * @returns roles
+	 **/
+	async getRoles(): Promise<Role[]> {
 		if (!roleCache) {
 			console.log('Querying db for roles');
 			await prisma.role
@@ -119,16 +116,13 @@ export default {
 
 	/**
 	 * Check if user is an admin
-	 * @param {*} user
-	 * @returns
+	 * @param user
 	 */
-	async isAdmin(user: any | null) {
+	async isAdmin(user: any | null): Promise<boolean> {
 		const roles = await this.getRoles();
 		const adminRole = roles.find((role) => role.name === Roles.ADMIN);
 
-		if (adminRole && user?.roleId === adminRole.id) {
-			return true;
-		}
+		if (adminRole && user?.roleId === adminRole.id) return true;
 		return false;
 	}
 };

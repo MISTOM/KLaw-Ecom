@@ -3,6 +3,8 @@ import type { PageServerLoad } from './$types';
 import type { Actions } from './$types';
 import auth from '$lib/server/auth';
 import prisma from '$lib/server/prisma';
+import { maxAge, refreshTokenMaxAge } from '$lib/server/utils';
+import { NODE_ENV } from '$env/static/private';
 
 export const load = (async ({ locals }) => {
 	// if (locals.user) { throw redirect(303, '/') }
@@ -61,14 +63,12 @@ export const actions = {
 			const token = auth.sign(newUser);
 			const refreshToken = await auth.generateRefreshToken(newUser);
 
-			//TODO - Set this globally
-			const maxAge = 60 * 60 * 24 * 7; // 1 week
-			cookies.set('token', token, { httpOnly: true, secure: false, path: '/', maxAge });
+			cookies.set('token', token, { httpOnly: true, secure: NODE_ENV === 'production', path: '/', maxAge });
 			cookies.set('refreshToken', refreshToken, {
 				httpOnly: true,
-				secure: false,
+				secure: NODE_ENV === 'production',
 				path: '/',
-				maxAge
+				maxAge: refreshTokenMaxAge
 			});
 
 			console.log('User created', formData, hashedPassword);

@@ -22,7 +22,7 @@
 				<img
 					src={product.Image[0]?.url || '/kLawPillers.png'}
 					alt={product.name}
-					class="h-full w-full object-cover transition-transform group-hover:scale-105"
+					class="h-full w-full bg-primary object-cover transition-transform group-hover:scale-105"
 				/>
 			</div>
 

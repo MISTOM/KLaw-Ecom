@@ -3,6 +3,8 @@ import auth from '$lib/server/auth.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { invalidateAll } from '$app/navigation';
+import { maxAge, refreshTokenMaxAge } from '$lib/server/utils';
+import { NODE_ENV } from '$env/static/private';
 
 export const load = (async ({ locals: { user } }) => {}) satisfies PageServerLoad;
 
@@ -49,10 +51,14 @@ export const actions = {
 		const token = auth.sign(user);
 		const refreshToken = await auth.generateRefreshToken(user);
 
-		const maxAge = 60 * 60 * 24 * 7; // 1 week
 		//TODO - set secure to true in production
-		cookies.set('token', token, { httpOnly: true, secure: false, path: '/', maxAge });
-		cookies.set('refreshToken', refreshToken, { httpOnly: true, secure: false, path: '/', maxAge });
+		cookies.set('token', token, { httpOnly: true, secure: NODE_ENV === 'production', path: '/', maxAge });
+		cookies.set('refreshToken', refreshToken, {
+			httpOnly: true,
+			secure: NODE_ENV === 'production',
+			path: '/',
+			maxAge: refreshTokenMaxAge
+		});
 
 		(await auth.isAdmin(user)) ? redirect(303, '/admin/product') : redirect(303, '/product');
 	}
