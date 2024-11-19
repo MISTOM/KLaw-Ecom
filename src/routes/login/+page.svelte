@@ -67,14 +67,12 @@
 				<button
 					type="button"
 					class="absolute right-3 top-9 hidden text-xs text-gray-400 group-hover:flex"
-					onclick={() => (passwordVisible = !passwordVisible)}
+					onmousedown={() => (passwordVisible = true)}
+					onmouseup={() => (passwordVisible = false)}
+					onmouseleave={() => (passwordVisible = false)}
 					tabindex="-1"
 				>
-					{#if passwordVisible}
-						Hide
-					{:else}
-						Show
-					{/if}
+					{passwordVisible ? 'Hide' : 'Show'}
 				</button>
 			</div>
 			<button

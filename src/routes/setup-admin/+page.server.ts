@@ -3,7 +3,7 @@ import type { PageServerLoad } from './$types';
 import type { Actions } from './$types';
 import auth from '$lib/server/auth';
 import prisma from '$lib/server/prisma';
-import { maxAge, refreshTokenMaxAge } from '$lib/server/utils';
+import { maxAge, refreshTokenMaxAge, secure } from '$lib/server/utils';
 import { NODE_ENV } from '$env/static/private';
 
 export const load = (() => {
@@ -61,10 +61,10 @@ export const actions = {
 			const token = auth.sign(newUser);
 			const refreshToken = await auth.generateRefreshToken(newUser);
 
-			cookies.set('token', token, { httpOnly: true, secure: NODE_ENV === 'production', path: '/', maxAge });
+			cookies.set('token', token, { httpOnly: true, secure: secure, path: '/', maxAge });
 			cookies.set('refreshToken', refreshToken, {
 				httpOnly: true,
-				secure: NODE_ENV === 'production',
+				secure: secure,
 				path: '/',
 				maxAge: refreshTokenMaxAge
 			});

@@ -3,7 +3,7 @@ import jwt, { type JwtPayload } from 'jsonwebtoken';
 import { error, redirect, type Handle } from '@sveltejs/kit';
 import auth from '$lib/server/auth';
 import prisma from '$lib/server/prisma';
-import { maxAge } from '$lib/server/utils';
+import { maxAge, secure } from '$lib/server/utils';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const token = event.cookies.get('token');
@@ -72,7 +72,7 @@ async function refreshAccessToken(event: any, refreshToken: string) {
 		// **Update the token cookie**
 		event.cookies.set('token', newToken, {
 			httpOnly: true,
-			secure: NODE_ENV === 'production',
+			secure: secure,
 			path: '/',
 			maxAge
 		});

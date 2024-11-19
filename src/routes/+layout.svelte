@@ -9,12 +9,13 @@
 </script>
 
 <div class="flex min-h-screen flex-col font-optima">
+	<noscript>Please Enable Javascript for this app to run</noscript>
 	<Toaster />
 	<div class="flex-grow">
 		{@render children?.()}
 	</div>
 
-	<footer class=" mt-7 rounded-sm bg-gray-50 pb-4 font-optima lg:mx-12">
+	<footer class="mt-7 rounded-sm bg-gray-50 pb-4 font-optima lg:mx-12">
 		<div class="container mx-auto px-4">
 			<hr class="mb-4 border-gray-400" />
 			<div class="mb-4 flex flex-wrap justify-between">
