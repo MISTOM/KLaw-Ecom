@@ -21,7 +21,7 @@ class ToastState {
 	}
 
 	add(title: string, message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info', durationMs = 5000) {
-		const id = crypto.randomUUID();
+		const id = (Date.now() * Math.random()).toString(); // TODO -  in secure context, use crypto.randomUUID()
 
 		this.toasts.push({ id, title, message, type });
 

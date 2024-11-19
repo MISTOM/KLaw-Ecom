@@ -16,11 +16,8 @@ export const load = (async ({ depends }) => {
 		});
 		console.log(orders);
 		return { orders };
-		
 	} catch (e) {
 		console.log('Error loading orders', e);
 		return { orders: [] };
-		
 	}
-	
 }) satisfies PageServerLoad;
