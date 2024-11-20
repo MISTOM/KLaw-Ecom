@@ -70,6 +70,8 @@
 					onmousedown={() => (passwordVisible = true)}
 					onmouseup={() => (passwordVisible = false)}
 					onmouseleave={() => (passwordVisible = false)}
+					ontouchstart={() => (passwordVisible = true)}
+					ontouchend={() => (passwordVisible = false)}
 					tabindex="-1"
 				>
 					{passwordVisible ? 'Hide' : 'Show'}

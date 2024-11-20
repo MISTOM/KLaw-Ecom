@@ -11,7 +11,7 @@
 	let confirmPassword = $state('');
 	let passwordMatch = $derived(password === confirmPassword ? true : false);
 
-	const toastState = getToastState();
+	const toast = getToastState();
 </script>
 
 <svelte:head>
@@ -29,7 +29,7 @@
 			method="POST"
 			use:enhance={({ cancel }) => {
 				if (!passwordMatch) {
-					toastState.add('Error', 'Passwords do not match', 'error');
+					toast.add('Error', 'Passwords do not match', 'error');
 					cancel();
 				}
 			}}
