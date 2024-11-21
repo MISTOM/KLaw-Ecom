@@ -1,8 +1,9 @@
 <script>
-	import { fade } from "svelte/transition";
+	import { fade } from 'svelte/transition';
 </script>
+
 <svg
-    in:fade
+	in:fade
 	class="-ml-3 mr-3 h-5 w-5 animate-spin text-primary group-hover:text-white"
 	xmlns="http://www.w3.org/2000/svg"
 	fill="none"

@@ -12,7 +12,6 @@ export const actions: Actions = {
 	default: async ({ request, url }) => {
 		const formData = await request.formData();
 		const email = formData.get('email')?.toString();
-		console.log(url);
 
 		if (!email) return fail(400, { message: 'Email is required', data: { email } });
 
@@ -27,12 +26,13 @@ export const actions: Actions = {
 
 			// create reset password link
 			const link = url.origin + `/reset-password?token=${resetToken}`;
+			const origin = url.origin;
 
 			// Send email
-			const emailSent = await sendEmail(user.email, 'Password Reset', 'password-reset', { link });
+			const emailSent = await sendEmail(user.email, 'Password Reset', 'password-reset', { link, origin });
 			console.log('Email Sent: please check your mailbox ', emailSent);
-		} catch (error) {
-			console.error('Error with token:', error);
+		} catch (e) {
+			console.error('Error with sending email:', e);
 			return fail(500, { message: 'Something went wrong', data: { email } });
 		}
 	}

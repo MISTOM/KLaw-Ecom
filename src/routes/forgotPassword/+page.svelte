@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { getToastState } from '$lib/Toast.svelte.js';
+	import Spinner from '$lib/components/Spinner.svelte';
+	import { fade } from 'svelte/transition';
 	const toast = getToastState();
 	const { form } = $props();
 
 	let formErrors = $state();
 	let email = $state(form?.data?.email);
+	let loading = $state(false);
 </script>
 
 <svelte:head>
@@ -21,12 +24,16 @@
 			method="POST"
 			class="mt-4"
 			use:enhance={() => {
-				return async ({ result }) => {
-					if (result.type === 'failure') {
+				loading = true;
+				return async ({ result, update }) => {
+					if (result.type === 'failure')
 						formErrors = result?.data?.message ? result.data.message : 'Error sending your email';
-					}
+
 					if (result.type === 'success')
 						toast.add('Success', 'Check your email for a password reset link', 'success');
+
+					await update();
+					loading = false;
 				};
 			}}
 		>
@@ -47,10 +54,15 @@
 			</div>
 			<button
 				type="submit"
-				class="w-full rounded-md border p-2 transition-colors hover:bg-primary hover:text-white"
-				>Reset Password
+				class="group flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:bg-primary hover:text-white"
+				disabled={loading}
+			>
+				{#if loading}
+					<Spinner />
+				{/if}
+				Reset Passsord
 			</button>
-			<span class="text-sm hover:text-secondary"><a href="/login">Back to login</a></span>
+			<span class="text-xs text-gray-400 hover:text-secondary/70"><a href="/login">Back to login</a></span>
 		</form>
 	</div>
 </div>
