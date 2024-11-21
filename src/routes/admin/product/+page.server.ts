@@ -60,12 +60,11 @@ export const actions: Actions = {
 				where: { serviceCode }
 			});
 
-			if (isProductExist) {
+			if (isProductExist)
 				return fail(400, {
 					data: { name, description, price, quantity, serviceCode },
 					errors: 'Product with this service code already exists'
 				});
-			}
 
 			const newProductPromise = prisma.product.create({
 				data: {

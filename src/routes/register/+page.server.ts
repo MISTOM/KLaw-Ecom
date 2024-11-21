@@ -30,20 +30,18 @@ export const actions = {
 		if (password !== confirmPassword) {
 			return fail(400, {
 				data: { name, email },
-				errors: 'Passwords do not matchhh'
+				errors: 'Passwords do not match'
 			});
 		}
 
 		try {
 			const user = await prisma.user.findUnique({
-				where: {
-					email: email.toString()
-				}
+				where: { email: email.toString() }
 			});
 			if (user) {
 				return fail(400, {
 					data: { name, email },
-					errors: 'User already exists'
+					errors: 'Invalid email or password'
 				});
 			}
 			const hashedPassword = await auth.hash(password.toString());
@@ -52,11 +50,7 @@ export const actions = {
 					name: name.toString(),
 					email: email.toString(),
 					password: hashedPassword,
-					role: {
-						connect: {
-							name: 'USER'
-						}
-					}
+					role: { connect: { name: 'USER' } }
 				}
 			});
 
