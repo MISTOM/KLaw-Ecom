@@ -7,8 +7,6 @@
 	const toast = getToastState();
 	let { data, form } = $props();
 
-	console.log('data -> ', data);
-
 	let password = $state('');
 	let confirmPassword = $state('');
 	let passwordVisible = $state(false);
