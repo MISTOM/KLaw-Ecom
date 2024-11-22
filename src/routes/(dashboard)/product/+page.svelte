@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { getCartState } from '$lib/Cart.svelte.js';
 	import { getToastState } from '$lib/Toast.svelte';
 
@@ -38,7 +37,7 @@
 	<h1 class="mb-8 text-3xl font-bold">Our Products</h1>
 
 	<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-		{#each products as product}
+		{#each products as product (product.id)}
 			<div class="group overflow-hidden rounded-md border transition-all hover:shadow-lg">
 				<a href="/product/{product.id}">
 					<div class="mx-auto aspect-square overflow-hidden">

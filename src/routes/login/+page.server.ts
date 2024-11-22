@@ -29,7 +29,7 @@ export const actions = {
 			if (!user) {
 				return fail(400, {
 					data: { email },
-					errors: 'Invalid emmail or password'
+					errors: 'Invalid email or password'
 				});
 			}
 		} catch (e) {
@@ -44,7 +44,7 @@ export const actions = {
 		if (!isvalidPassword) {
 			return fail(401, {
 				data: { email },
-				errors: 'Invalid email or passsword'
+				errors: 'Invalid email or password'
 			});
 		}
 		const token = auth.sign(user);

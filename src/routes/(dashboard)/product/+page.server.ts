@@ -11,7 +11,8 @@ export const load = (async ({ locals: { user } }) => {
 			where: { isPublished: true },
 			include: {
 				Image: { select: { url: true } }
-			}
+			},
+			orderBy: { createdAt: 'desc' }
 		});
 		return { products };
 	} catch (e) {

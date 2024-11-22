@@ -12,7 +12,8 @@ export const load = (async ({ depends }) => {
 					include: { product: true }
 				},
 				user: true
-			}
+			},
+			orderBy: { createdAt: 'desc' }
 		});
 		console.log(orders);
 		return { orders };

@@ -349,19 +349,17 @@
 									></textarea>
 								</div>
 							</div>
-							<div class="flex items-center gap-2">
-								<input
-									id="isPublished"
-									type="checkbox"
-									name="isPublished"
-									checked={data.product?.isPublished}
-									onchange={togglePublish}
-									class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-								/>
-								<label for="isPublished" class="text-sm font-medium text-gray-700">
-									{data.product?.isPublished ? 'Published' : 'Draft'}
-								</label>
-							</div>
+							<label for="isPublished" class="text-sm font-black text-gray-700">
+								{data.product?.isPublished ? 'Published' : 'Publish'}
+							</label>
+							<input
+								id="isPublished"
+								type="checkbox"
+								name="isPublished"
+								checked={data.product?.isPublished}
+								onchange={togglePublish}
+								class="block h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+							/>
 
 							<div class="flex justify-end">
 								<button

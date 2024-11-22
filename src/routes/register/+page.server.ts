@@ -4,7 +4,6 @@ import type { Actions } from './$types';
 import auth from '$lib/server/auth';
 import prisma from '$lib/server/prisma';
 import { maxAge, refreshTokenMaxAge, secure } from '$lib/server/utils';
-import { NODE_ENV } from '$env/static/private';
 import { sendEmail } from '$lib/server/mailService';
 
 export const load = (async ({ locals }) => {

@@ -1,4 +1,4 @@
-import { SECRET_KEY, REFRESH_KEY, NODE_ENV } from '$env/static/private';
+import { SECRET_KEY, REFRESH_KEY } from '$env/static/private';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import { error, redirect, type Handle } from '@sveltejs/kit';
 import auth from '$lib/server/auth';

@@ -69,10 +69,8 @@ class Cart {
 				body: JSON.stringify(cartItems)
 			});
 
-			if (!response.ok) {
-				console.error();
-				throw error(response.status, await response.json());
-			}
+			if (!response.ok) throw error(response.status, await response.json());
+
 			return true;
 		} catch (e) {
 			console.error(e);
