@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto, invalidateAll } from '$app/navigation';
+	import Spinner from '$lib/components/Spinner.svelte';
 	import { error } from '@sveltejs/kit';
 	import { fade } from 'svelte/transition';
 
@@ -10,6 +11,7 @@
 	let email = $state(form?.data?.email);
 	let password = $state('');
 	let passwordVisible = $state(false);
+	let loading = $state(false);
 </script>
 
 <svelte:head>
@@ -21,6 +23,7 @@
 	class="mt-4"
 	method="POST"
 	use:enhance={() => {
+		loading = true;
 		return async ({ result }) => {
 			console.log('form result ->  ', result);
 			if (result.type === 'redirect') {
@@ -29,6 +32,7 @@
 				password = '';
 				formErrors = result?.data?.errors ? result.data.errors : 'Error logging in';
 			}
+			loading = false;
 		};
 	}}
 >
@@ -73,8 +77,14 @@
 			{passwordVisible ? 'Hide' : 'Show'}
 		</button>
 	</div>
-	<button type="submit" class="w-full rounded-md border p-2 transition-colors hover:bg-primary hover:text-white"
-		>Login</button
+	<button
+		type="submit"
+		class="group flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:bg-primary hover:text-white"
+	>
+		{#if loading}
+			<Spinner />
+		{/if}
+		Login</button
 	>
 
 	<div class="mt-3 flex justify-between">

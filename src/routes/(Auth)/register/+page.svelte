@@ -10,6 +10,7 @@
 	let password = $state('');
 	let confirmPassword = $state('');
 	let passwordMatch = $derived(password === confirmPassword ? true : false);
+	let loading = $state(false);
 
 	const toast = getToastState();
 </script>
@@ -26,6 +27,7 @@
 	class="mt-4"
 	method="POST"
 	use:enhance={({ cancel }) => {
+		// TODO - Implement Loading state
 		if (!passwordMatch) {
 			toast.add('Error', 'Passwords do not match', 'error');
 			cancel();
