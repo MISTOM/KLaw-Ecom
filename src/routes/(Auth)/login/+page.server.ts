@@ -1,8 +1,7 @@
 import prisma from '$lib/server/prisma.js';
 import auth from '$lib/server/auth.js';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { invalidateAll } from '$app/navigation';
 import { maxAge, refreshTokenMaxAge, secure } from '$lib/server/utils';
 
 // export const load = (async ({ locals: { user } }) => {}) satisfies PageServerLoad;
