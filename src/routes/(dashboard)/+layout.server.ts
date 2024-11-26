@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from '../login/$types';
 import prisma from '$lib/server/prisma';
+import type { LayoutServerLoad } from './$types';
 
 export const load = (async ({ locals: { user }, url }) => {
 	if (!url.pathname.startsWith('/product') && !user) throw redirect(303, '/login');
@@ -18,4 +18,4 @@ export const load = (async ({ locals: { user }, url }) => {
 		return { cartItems: cart?.CartItem || [] };
 	}
 	return { cartItems: [] };
-}) satisfies PageServerLoad;
+}) satisfies LayoutServerLoad;

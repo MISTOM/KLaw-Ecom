@@ -5,8 +5,6 @@
 
 	const { data, form } = $props();
 
-	const user = getUserState();
-
 	const products = $derived(data.products || []);
 	// const products = $state($state.snapshot(data.products) || []);
 	// $inspect(products);
@@ -143,66 +141,70 @@
 			</div>
 
 			<div class="space-y-4">
-				{#each filteredBooks as book (book.id)}
-					<div
-						class="group relative rounded-lg border border-gray-200 bg-white p-4 transition-all hover:shadow-md"
-					>
-						<div class="flex gap-4">
-							<div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md">
-								<img
-									src={book.Image[0]?.url || '/kLawPillers.png'}
-									alt={book.name}
-									class="h-full w-full bg-primary object-cover"
-								/>
-							</div>
-
-							<div class="flex-grow">
-								<div class="flex items-start justify-between">
-									<div>
-										<h3 class="font-semibold capitalize">{book.name}</h3>
-										<p class="text-sm text-gray-600">Code: {book.serviceCode}</p>
-									</div>
-									<div class="flex items-center gap-2">
-										{#if book.isPublished}
-											<span
-												class="flex items-center gap-1 rounded-full bg-green-100 px-2 py-1 text-xs text-green-700"
-											>
-												Published
-											</span>
-										{:else}
-											<span
-												class="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700"
-											>
-												Draft
-											</span>
-										{/if}
-									</div>
+				{#if filteredBooks.length === 0}
+					<p class="text-center text-gray-500">No books found</p>
+				{:else}
+					{#each filteredBooks as book (book.id)}
+						<div
+							class="group relative rounded-lg border border-gray-200 bg-white p-4 transition-all hover:shadow-md"
+						>
+							<div class="flex gap-4">
+								<div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md">
+									<img
+										src={book.Image[0]?.url || '/kLawPillers.png'}
+										alt={book.name}
+										class="h-full w-full bg-primary object-cover"
+									/>
 								</div>
 
-								<div class="mt-2 grid grid-cols-2 gap-4 text-sm">
-									<div>
-										<span class="text-gray-500">Price:</span>
-										<span class="ml-1 font-medium">KES {book.price.toLocaleString()}</span>
+								<div class="flex-grow">
+									<div class="flex items-start justify-between">
+										<div>
+											<h3 class="font-semibold capitalize">{book.name}</h3>
+											<p class="text-sm text-gray-600">Code: {book.serviceCode}</p>
+										</div>
+										<div class="flex items-center gap-2">
+											{#if book.isPublished}
+												<span
+													class="flex items-center gap-1 rounded-full bg-green-100 px-2 py-1 text-xs text-green-700"
+												>
+													Published
+												</span>
+											{:else}
+												<span
+													class="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700"
+												>
+													Draft
+												</span>
+											{/if}
+										</div>
 									</div>
-									<div>
-										<span class="text-gray-500">In Stock:</span>
-										<span class="ml-1 font-medium">{book.quantity}</span>
+
+									<div class="mt-2 grid grid-cols-2 gap-4 text-sm">
+										<div>
+											<span class="text-gray-500">Price:</span>
+											<span class="ml-1 font-medium">KES {book.price.toLocaleString()}</span>
+										</div>
+										<div>
+											<span class="text-gray-500">In Stock:</span>
+											<span class="ml-1 font-medium">{book.quantity}</span>
+										</div>
 									</div>
 								</div>
 							</div>
-						</div>
 
-						<!-- Action Buttons -->
-						<div class="absolute bottom-4 right-4 hidden gap-2 group-hover:flex">
-							<a
-								href={`/admin/product/${book.id}`}
-								class="rounded-md bg-gray-100 p-2 text-gray-600 transition-colors hover:bg-gray-200"
-							>
-								Edit
-							</a>
+							<!-- Action Buttons -->
+							<div class="absolute bottom-4 right-4 hidden gap-2 group-hover:flex">
+								<a
+									href={`/admin/product/${book.id}`}
+									class="rounded-md bg-gray-100 p-2 text-gray-600 transition-colors hover:bg-gray-200"
+								>
+									Edit
+								</a>
+							</div>
 						</div>
-					</div>
-				{/each}
+					{/each}
+				{/if}
 			</div>
 		</div>
 

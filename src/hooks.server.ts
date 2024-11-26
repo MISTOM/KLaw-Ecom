@@ -14,8 +14,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 			await authenticateWithAccessToken(event, token, refreshToken);
 		} else if (refreshToken) {
 			await authenticateWithRefreshToken(event, refreshToken);
-		} else {
-			throw error(401, 'No authentication tokens provided');
 		}
 	} catch (err: any) {
 		clearUserSession(event);

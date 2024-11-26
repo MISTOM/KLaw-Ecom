@@ -6,7 +6,7 @@ import { maxAge, refreshTokenMaxAge, secure } from '$lib/server/utils';
 
 // export const load = (async ({ locals: { user } }) => {}) satisfies PageServerLoad;
 
-export const actions = {
+export const actions: Actions = {
 	default: async ({ request, cookies }) => {
 		const formData = await request.formData();
 		console.log(formData);
@@ -60,4 +60,4 @@ export const actions = {
 
 		(await auth.isAdmin(user)) ? redirect(303, '/admin/product') : redirect(303, '/product');
 	}
-} satisfies Actions;
+}

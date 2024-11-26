@@ -3,11 +3,15 @@ import prisma from '$lib/server/prisma';
 
 export const POST = async ({ cookies, locals: { user } }) => {
 	if (user?.id) {
-		// Remove the refresh token from the database
-		await prisma.user.update({
-			where: { id: user.id },
-			data: { refreshToken: null }
-		});
+		try {
+			// Remove the refresh token from the database
+			await prisma.user.update({
+				where: { id: user.id },
+				data: { refreshToken: null }
+			});
+		} catch (e) {
+			console.error('Failed to update user refresh token:', e);
+		}
 	}
 
 	// Clear the authentication cookies
