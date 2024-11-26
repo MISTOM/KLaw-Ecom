@@ -11,8 +11,14 @@
 	let price = $state(data.product?.price);
 	let quantity = $state(data.product?.quantity);
 	let serviceCode = $state(data.product?.serviceCode);
+	let author = $state(data.product?.author);
+	let publicationDateISO = $state(data.product?.publicationDate);
+	let pageCount = $state(data.product?.pageCount);
 	let imageUrl = $state(data.product?.Image[0]?.url);
 	let showDeleteModal = $state(false);
+
+	// Format publication date to bind to date input
+	let publicationDate = $state(publicationDateISO ? new Date(publicationDateISO).toISOString().split('T')[0] : '');
 
 	let isEditMode = $state(false);
 
@@ -338,6 +344,39 @@
 										class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
 									/>
 								</div>
+								<div>
+									<label for="author" class="text-sm font-medium text-gray-700">Author</label>
+									<input
+										id="author"
+										type="text"
+										name="author"
+										bind:value={author}
+										class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+									/>
+								</div>
+
+								<div>
+									<label for="publicationDate" class="text-sm font-medium text-gray-700">Publication Date</label>
+									<input
+										id="publicationDate"
+										type="date"
+										name="publicationDate"
+										bind:value={publicationDate}
+										class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+									/>
+								</div>
+
+								<div>
+									<label for="pageCount" class="text-sm font-medium text-gray-700">Page Count</label>
+									<input
+										id="pageCount"
+										type="number"
+										name="pageCount"
+										bind:value={pageCount}
+										class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+									/>
+								</div>
+
 								<div>
 									<label for="" class="text-sm font-medium text-gray-700">Description</label>
 									<textarea

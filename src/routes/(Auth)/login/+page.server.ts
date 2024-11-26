@@ -60,4 +60,4 @@ export const actions: Actions = {
 
 		(await auth.isAdmin(user)) ? redirect(303, '/admin/product') : redirect(303, '/product');
 	}
-}
+};

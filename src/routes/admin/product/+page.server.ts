@@ -2,7 +2,7 @@ import type { Actions, PageServerLoad } from './$types';
 import prisma from '$lib/server/prisma';
 import { redirect, fail } from '@sveltejs/kit';
 import { writeFile } from 'node:fs/promises';
-import { mkdir } from 'node:fs';
+import { mkdir, unlink } from 'node:fs';
 import { dirname } from 'node:path';
 
 export const load = (async ({ locals }) => {
@@ -24,30 +24,45 @@ export const actions: Actions = {
 		const price = formData.get('price')?.toString();
 		const quantity = formData.get('quantity')?.toString();
 		const serviceCode = formData.get('serviceCode')?.toString();
+		const author = formData.get('author')?.toString();
+		const publicationDateData = formData.get('publicationDate')?.toString();
+		const pageCount = formData.get('pageCount')?.toString();
+
+		const publicationDate = publicationDateData ? new Date(publicationDateData) : undefined;
 
 		const image = formData.get('image') as File;
 		console.log('productImage: ', image);
 
-		if (!name || !description || !price || !quantity || !serviceCode) {
+		if (
+			!name ||
+			!description ||
+			!price ||
+			!quantity ||
+			!serviceCode ||
+			!author ||
+			!publicationDate ||
+			!pageCount
+		) {
 			return fail(400, {
-				data: { name, description, price, quantity, serviceCode },
+				data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
 				errors: 'All fields are required'
 			});
 		}
 
+		let imagePath = null;
 		try {
 			let imageUrl = null;
 			let writeFilePromise;
 			if (image && image.name) {
 				console.log('Saving image');
 				const fileName = `${Date.now()}-${image.name}`;
-				const imagePath = `static/images/${fileName}`;
+				imagePath = `static/images/${fileName}`;
 				const directory = dirname(imagePath);
 
 				// Ensure the directory exists
 				mkdir(directory, { recursive: true }, (err) =>
 					fail(500, {
-						data: { name, description, price, quantity, serviceCode },
+						data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
 						errors: 'Failed to create directory'
 					})
 				);
@@ -62,7 +77,7 @@ export const actions: Actions = {
 
 			if (isProductExist)
 				return fail(400, {
-					data: { name, description, price, quantity, serviceCode },
+					data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
 					errors: 'Product with this service code already exists'
 				});
 
@@ -73,6 +88,9 @@ export const actions: Actions = {
 					price: parseFloat(price),
 					quantity: parseInt(quantity),
 					serviceCode,
+					author,
+					publicationDate,
+					pageCount: parseInt(pageCount),
 					Image: imageUrl ? { create: { url: imageUrl } } : undefined
 				},
 				include: { Image: true }
@@ -88,9 +106,17 @@ export const actions: Actions = {
 				}
 			};
 		} catch (e) {
-			console.log('addProduct:', e);
+			console.log('addProduct error: ', e);
+
+			// Delete the image if it was saved
+			imagePath
+				? unlink(imagePath, (err) => {
+						if (err) console.error('Failed to delete image', err);
+					})
+				: null;
+
 			return fail(500, {
-				data: { name, description, price, quantity, serviceCode },
+				data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
 				errors: 'Internal server error'
 			});
 		}

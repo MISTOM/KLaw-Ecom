@@ -53,18 +53,17 @@
 					<div>
 						<p class="mb-2 font-medium">Product Details</p>
 						<ul class="space-y-1 text-sm text-gray-600">
-							<li>Author: Jane Doe</li>
-							<li>Genre: Fiction</li>
-							<li>Pages: 256</li>
-							<li>Publication Date: January 1, 2023</li>
+							<li>Author: {product.author}</li>
+							<li>Pages: {product.pageCount}</li>
+							<li>
+								Publication Date: {product.publicationDate?.toLocaleDateString('en-uk', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								})}
+							</li>
 						</ul>
 					</div>
-
-					<div>
-						<p class="mb-2 font-medium">Shipping</p>
-						<p class="text-sm text-gray-600">This item ships within 2-3 business days.</p>
-					</div>
-
 					<div>
 						<p class="mb-2 font-medium">Returns</p>
 						<p class="text-sm text-gray-600">30-day returns. See our return policy for details.</p>

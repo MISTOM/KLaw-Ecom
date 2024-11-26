@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { getUserState } from '$lib/state.svelte.js';
 	import { getToastState } from '$lib/Toast.svelte';
 
 	const { data, form } = $props();
@@ -16,6 +15,12 @@
 	let price = $state(form?.data?.price);
 	let quantity = $state(form?.data?.quantity);
 	let serviceCode = $state(form?.data?.serviceCode);
+	let author = $state(form?.data?.author);
+	let pageCount = $state(form?.data?.pageCount);
+	let publicationDateISO = $state(form?.data?.publicationDate);
+
+	// Format publication date to bind to date input
+	let publicationDate = $state(publicationDateISO ? new Date(publicationDateISO).toISOString().split('T')[0] : '');
 
 	let searchQuery = $state('');
 
@@ -212,7 +217,20 @@
 		<div class="rounded-lg border border-gray-200 bg-white p-6">
 			<h2 class="mb-6 text-2xl font-semibold">Add New Book</h2>
 
-			<form method="POST" enctype="multipart/form-data" class="space-y-4" use:enhance>
+			<form
+				method="POST"
+				enctype="multipart/form-data"
+				class="space-y-4"
+				use:enhance={() => {
+					return async ({ update, result }) => {
+						if (result.type === 'success') {
+							toast.add('Success', 'Book added successfully', 'success', 2000);
+							await update({ reset: true });
+						}
+						await update({ reset: false });
+					};
+				}}
+			>
 				{#if form?.errors}
 					<div class="rounded-md bg-red-50 p-3 text-sm text-red-500">
 						{form.errors}
@@ -271,7 +289,6 @@
 					>
 					</textarea>
 				</div>
-
 				<div class="space-y-2">
 					<label for="serviceCode" class="text-sm font-medium text-gray-700">Service Code</label>
 					<input
@@ -279,6 +296,41 @@
 						id="serviceCode"
 						name="serviceCode"
 						bind:value={serviceCode}
+						required
+						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+					/>
+				</div>
+				<div class="space-y-2">
+					<label for="author" class="text-sm font-medium text-gray-700">Author</label>
+					<input
+						type="text"
+						id="author"
+						name="author"
+						bind:value={author}
+						required
+						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+					/>
+				</div>
+				<div class="space-y-2">
+					<label for="pageCount" class="text-sm font-medium text-gray-700">Page Count</label>
+					<input
+						type="number"
+						id="pageCount"
+						name="pageCount"
+						bind:value={pageCount}
+						min="0"
+						required
+						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+					/>
+				</div>
+
+				<div class="space-y-2">
+					<label for="publicationDate" class="text-sm font-medium text-gray-700">Publication Date</label>
+					<input
+						type="date"
+						id="publicationDate"
+						name="publicationDate"
+						bind:value={publicationDate}
 						required
 						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
 					/>
