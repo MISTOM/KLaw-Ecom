@@ -9,7 +9,6 @@ import { maxAge, refreshTokenMaxAge, secure } from '$lib/server/utils';
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {
 		const formData = await request.formData();
-		console.log(formData);
 		const email = formData.get('email');
 		const password = formData.get('password');
 

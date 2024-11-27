@@ -30,7 +30,7 @@ export const actions = {
 		if (password !== confirmPassword) {
 			return fail(400, {
 				data: { name, email },
-				errors: 'Passwords do not matchhh'
+				errors: 'Passwords do not match'
 			});
 		}
 
@@ -43,9 +43,10 @@ export const actions = {
 			if (user) {
 				return fail(400, {
 					data: { name, email },
-					errors: 'Invalid email'
+					errors: 'Invalid email or password'
 				});
 			}
+			// TODO - check if theres an admin user already
 			const hashedPassword = await auth.hash(password.toString());
 			const newUser = await prisma.user.create({
 				data: {

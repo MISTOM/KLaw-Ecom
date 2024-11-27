@@ -5,18 +5,26 @@ import type { PageServerLoad } from './$types';
 export const load = (async ({ params, depends }) => {
 	depends('update:product');
 	const id = Number(params.id);
+
 	try {
-		const product = await prisma.product.findUnique({
+		const productPromise = prisma.product.findUnique({
 			where: { id },
 			include: {
 				Image: {
 					select: { url: true }
+				},
+				categories: {
+					select: { id: true, name: true }
 				}
 			}
 		});
+		const categoriesPromise = prisma.category.findMany();
+
+		const [product, categories] = await Promise.all([productPromise, categoriesPromise]);
+
 		if (!product) return { status: 404, error: 'Product not found' };
 
-		return { success: true, product };
+		return { success: true, product, categories };
 	} catch (e) {
 		console.log('getProduct:', e);
 		return { status: 500, error: 'Internal server error getting product details' };
@@ -35,15 +43,53 @@ export const actions = {
 		const serviceCode = formData.get('serviceCode')?.toString();
 		const author = formData.get('author')?.toString();
 		const publicationDateData = formData.get('publicationDate')?.toString();
-		const pageCount = formData.get('pageCount')?.toString() || '0';
+		const pageCountData = formData.get('pageCount')?.toString();
+		const categoryIds = formData.getAll('categoryIds').map((id) => parseInt(id.toString()));
 
 		// console.log('update product data fromEntries: ', Object.fromEntries(formData.entries())); TODO: use Object.fromEntries to get all form data
 
 		const price = priceData ? parseFloat(priceData) : undefined;
 		const quantity = quantityData ? parseInt(quantityData) : undefined;
 		const publicationDate = publicationDateData ? new Date(publicationDateData) : undefined;
+		const pageCount = pageCountData ? parseInt(pageCountData) : undefined;
+
+		if (
+			!name ||
+			!description ||
+			!price ||
+			!quantity ||
+			!serviceCode ||
+			!author ||
+			!publicationDate ||
+			!pageCount
+		) {
+			return fail(400, {
+				data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
+				errors: 'All fields and atleast one category are required'
+			});
+		}
 
 		try {
+			// Check if product with this service code already exists
+			const isProductExist = await prisma.product.findUnique({
+				where: { serviceCode }
+			});
+			if (isProductExist && isProductExist.id !== id)
+				return fail(400, {
+					data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
+					errors: 'Product with this service code already exists'
+				});
+
+			// Validate category ids
+			const categories = await prisma.category.findMany({ where: { id: { in: categoryIds } } });
+			if (categories.length !== categoryIds.length) {
+				return fail(400, {
+					data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
+					errors: 'Invalid category ids'
+				});
+			}
+
+			// Update product
 			const product = await prisma.product.update({
 				where: { id },
 				data: {
@@ -54,24 +100,18 @@ export const actions = {
 					serviceCode,
 					author,
 					publicationDate,
-					pageCount: parseInt(pageCount)
-				},
-				include: {
-					Image: {
-						select: { url: true }
+					pageCount,
+					categories: {
+						set: categoryIds.map((id) => ({ id }))
 					}
 				}
 			});
 
 			return { success: true, product };
 		} catch (e) {
-			console.log('editProd:', e);
-			//@ts-ignore
-			if (e?.code === 'P2002')
-				return fail(400, {
-					error: 'A product with this service code already exists. Please use a unique service code.'
-				});
+			console.log('editProd: ', e);
 
+			//@ts-ignore
 			return fail(500, { error: 'Internal server error adding product' });
 		}
 	}

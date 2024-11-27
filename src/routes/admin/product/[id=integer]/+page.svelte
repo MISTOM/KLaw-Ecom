@@ -5,6 +5,10 @@
 
 	const { data, form } = $props();
 	const toast = getToastState();
+
+	let product = $derived(data.product || null);
+	let categories = $state(data?.categories || []);
+
 	let name = $state(data.product?.name);
 	let description = $state(data.product?.description);
 
@@ -218,202 +222,242 @@
 </main> -->
 
 <div class="container mx-auto p-6">
-	<!-- Delete Confirmation Modal -->
-	{#if showDeleteModal}
-		<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-			<div class="w-full max-w-md rounded-lg bg-white p-6">
-				<h3 class="mb-4 text-xl font-bold">Delete Book</h3>
-				<p class="mb-6 text-gray-600">
-					Are you sure you want to delete "{name}"? This action cannot be undone.
-				</p>
-				<div class="flex justify-end gap-4">
-					<button
-						class="rounded-md px-4 py-2 text-gray-600 hover:bg-gray-100"
-						onclick={() => (showDeleteModal = false)}
-					>
-						Cancel
-					</button>
-					<button
-						type="submit"
-						class="rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-						onclick={async () => {
-							showDeleteModal = false;
-							await deleteProduct();
-						}}
-					>
-						Delete
-					</button>
+	{#if !product}
+		<p class="text-center text-sm font-black text-gray-500">Product not found</p>
+	{:else}
+		<div class="mb-6 flex items-center gap-4">
+			<img
+				src={imageUrl || '/kLawPillers.png'}
+				alt="product"
+				class="h-32 w-32 rounded bg-primary object-cover shadow-sm"
+			/>
+			<div>
+				<h1 class="text-2xl font-bold">{name}</h1>
+				<p class="text-gray-600">{description}</p>
+			</div>
+		</div>
+		<!-- Delete Confirmation Modal -->
+		{#if showDeleteModal}
+			<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+				<div class="w-full max-w-md rounded-lg bg-white p-6">
+					<h3 class="mb-4 text-xl font-bold">Delete Book</h3>
+					<p class="mb-6 text-gray-600">
+						Are you sure you want to delete "{name}"? This action cannot be undone.
+					</p>
+					<div class="flex justify-end gap-4">
+						<button
+							class="rounded-md px-4 py-2 text-gray-600 hover:bg-gray-100"
+							onclick={() => (showDeleteModal = false)}
+						>
+							Cancel
+						</button>
+						<button
+							type="submit"
+							class="rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+							onclick={async () => {
+								showDeleteModal = false;
+								await deleteProduct();
+							}}
+						>
+							Delete
+						</button>
+					</div>
+				</div>
+			</div>
+		{/if}
+
+		<div class="mb-6 flex items-center gap-4">
+			<a
+				href="/admin/product"
+				class="flex items-center gap-2 rounded-md bg-gray-100 px-4 py-2 text-gray-600 transition-colors hover:bg-gray-200"
+			>
+				← Back to Products
+			</a>
+		</div>
+
+		<div class="grid gap-6 lg:grid-cols-3">
+			<!-- Main Content -->
+			<div class="lg:col-span-2">
+				<div class="rounded-lg border border-gray-200 bg-white">
+					<div class="border-b p-6">
+						<div class="flex items-center justify-between">
+							<h1 class="text-2xl font-bold">{name}</h1>
+							<div class="flex items-center gap-2">
+								<button
+									class="rounded-md bg-red-100 p-2 text-red-600 transition-colors hover:bg-red-200"
+									onclick={() => (showDeleteModal = true)}
+								>
+									<!-- <Trash2 size={16} /> -->
+									delete
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<div class="p-6">
+						<form
+							method="POST"
+							use:enhance={() => {
+								return async ({ update, result }) => {
+									console.log('form result ->  ', result);
+									if (result.status === 200) {
+										isEditMode = false;
+										await update({ reset: false });
+										toast.add('Success', 'Product updated', 'success');
+									} else await update();
+								};
+							}}
+							class="space-y-6"
+						>
+							{#if form?.error}
+								<div class="rounded-md bg-red-50 p-3 text-sm text-red-500">
+									{form.error}
+								</div>
+							{/if}
+
+							<div class="space-y-4">
+								<div class="grid gap-4 sm:grid-cols-2">
+									<div>
+										<label for="name" class="text-sm font-medium text-gray-700">Book Title</label>
+										<input
+											id="name"
+											type="text"
+											name="name"
+											bind:value={name}
+											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+										/>
+									</div>
+									<div>
+										<label for="servicecode" class="text-sm font-medium text-gray-700">Service Code</label>
+										<input
+											id="servicecode"
+											type="text"
+											name="serviceCode"
+											bind:value={serviceCode}
+											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+										/>
+									</div>
+								</div>
+
+								<div class="grid gap-4 sm:grid-cols-2">
+									<div>
+										<label for="price" class="text-sm font-medium text-gray-700">Price (KES)</label>
+										<input
+											id="price"
+											type="number"
+											name="price"
+											bind:value={price}
+											min="0"
+											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+										/>
+									</div>
+									<div>
+										<label for="quantity" class="text-sm font-medium text-gray-700">Quantity in Stock</label>
+										<input
+											id="quantity"
+											type="number"
+											name="quantity"
+											bind:value={quantity}
+											min="0"
+											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+										/>
+									</div>
+									<div>
+										<label for="author" class="text-sm font-medium text-gray-700">Author</label>
+										<input
+											id="author"
+											type="text"
+											name="author"
+											bind:value={author}
+											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+										/>
+									</div>
+
+									<div>
+										<label for="publicationDate" class="text-sm font-medium text-gray-700">Publication Date</label>
+										<input
+											id="publicationDate"
+											type="date"
+											name="publicationDate"
+											bind:value={publicationDate}
+											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+										/>
+									</div>
+
+									<!-- Select categories section -->
+									<div class="space-y-2">
+										<label for="categories" class="text-sm font-medium text-gray-700">Select Categories</label>
+
+										<div class="grid gap-2 sm:grid-cols-2">
+											{#each categories as category}
+												<div class="">
+													<label for={`${category.id}`} class="text-sm font-medium text-gray-700"
+														>{category.name}</label
+													>
+													<input
+														id={`${category.id}`}
+														type="checkbox"
+														name="categoryIds"
+														value={category.id}
+														checked={!!product?.categories?.find((c) => c.id === category.id)}
+														class="mt-1 w-full rounded-md border border-gray-300 p-2"
+													/>
+												</div>
+											{/each}
+										</div>
+
+										<div>
+											<label for="pageCount" class="text-sm font-medium text-gray-700">Page Count</label>
+											<input
+												id="pageCount"
+												type="number"
+												name="pageCount"
+												bind:value={pageCount}
+												class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+											/>
+										</div>
+
+										<div>
+											<label for="" class="text-sm font-medium text-gray-700">Description</label>
+											<textarea
+												id="description"
+												name="description"
+												rows="3"
+												bind:value={description}
+												class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+											></textarea>
+										</div>
+									</div>
+									<div>
+										<label for="isPublished" class="text-sm font-black text-gray-700">
+											{data.product?.isPublished ? 'Published' : 'Publish'}
+										</label>
+										<input
+											id="isPublished"
+											type="checkbox"
+											name="isPublished"
+											checked={data.product?.isPublished}
+											onchange={togglePublish}
+											class="block h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+										/>
+									</div>
+
+									<div class="flex justify-end">
+										<button
+											type="submit"
+											class="rounded-md bg-primary px-4 py-2 text-white transition-colors hover:bg-primary/90"
+										>
+											Save
+										</button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>
 	{/if}
-
-	<div class="mb-6 flex items-center gap-4">
-		<a
-			href="/admin/product"
-			class="flex items-center gap-2 rounded-md bg-gray-100 px-4 py-2 text-gray-600 transition-colors hover:bg-gray-200"
-		>
-			← Back to Products
-		</a>
-	</div>
-
-	<div class="grid gap-6 lg:grid-cols-3">
-		<!-- Main Content -->
-		<div class="lg:col-span-2">
-			<div class="rounded-lg border border-gray-200 bg-white">
-				<div class="border-b p-6">
-					<div class="flex items-center justify-between">
-						<h1 class="text-2xl font-bold">{name}</h1>
-						<div class="flex items-center gap-2">
-							<button
-								class="rounded-md bg-red-100 p-2 text-red-600 transition-colors hover:bg-red-200"
-								onclick={() => (showDeleteModal = true)}
-							>
-								<!-- <Trash2 size={16} /> -->
-								delete
-							</button>
-						</div>
-					</div>
-				</div>
-
-				<div class="p-6">
-					<form
-						method="POST"
-						use:enhance={() => {
-							return async ({ update, result }) => {
-								console.log('form result ->  ', result);
-								if (result.status === 200) {
-									isEditMode = false;
-									await update({ reset: false });
-									toast.add('Success', 'Product updated', 'success');
-								} else await update();
-							};
-						}}
-						class="space-y-6"
-					>
-						{#if form?.error}
-							<div class="rounded-md bg-red-50 p-3 text-sm text-red-500">
-								{form.error}
-							</div>
-						{/if}
-
-						<div class="space-y-4">
-							<div class="grid gap-4 sm:grid-cols-2">
-								<div>
-									<label for="name" class="text-sm font-medium text-gray-700">Book Title</label>
-									<input
-										id="name"
-										type="text"
-										name="name"
-										bind:value={name}
-										class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-									/>
-								</div>
-								<div>
-									<label for="servicecode" class="text-sm font-medium text-gray-700">Service Code</label>
-									<input
-										id="servicecode"
-										type="text"
-										name="serviceCode"
-										bind:value={serviceCode}
-										class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-									/>
-								</div>
-							</div>
-
-							<div class="grid gap-4 sm:grid-cols-2">
-								<div>
-									<label for="price" class="text-sm font-medium text-gray-700">Price (KES)</label>
-									<input
-										id="price"
-										type="number"
-										name="price"
-										bind:value={price}
-										min="0"
-										class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-									/>
-								</div>
-								<div>
-									<label for="quantity" class="text-sm font-medium text-gray-700">Quantity in Stock</label>
-									<input
-										id="quantity"
-										type="number"
-										name="quantity"
-										bind:value={quantity}
-										min="0"
-										class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-									/>
-								</div>
-								<div>
-									<label for="author" class="text-sm font-medium text-gray-700">Author</label>
-									<input
-										id="author"
-										type="text"
-										name="author"
-										bind:value={author}
-										class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-									/>
-								</div>
-
-								<div>
-									<label for="publicationDate" class="text-sm font-medium text-gray-700">Publication Date</label>
-									<input
-										id="publicationDate"
-										type="date"
-										name="publicationDate"
-										bind:value={publicationDate}
-										class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-									/>
-								</div>
-
-								<div>
-									<label for="pageCount" class="text-sm font-medium text-gray-700">Page Count</label>
-									<input
-										id="pageCount"
-										type="number"
-										name="pageCount"
-										bind:value={pageCount}
-										class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-									/>
-								</div>
-
-								<div>
-									<label for="" class="text-sm font-medium text-gray-700">Description</label>
-									<textarea
-										id="description"
-										name="description"
-										rows="3"
-										bind:value={description}
-										class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-									></textarea>
-								</div>
-							</div>
-							<label for="isPublished" class="text-sm font-black text-gray-700">
-								{data.product?.isPublished ? 'Published' : 'Publish'}
-							</label>
-							<input
-								id="isPublished"
-								type="checkbox"
-								name="isPublished"
-								checked={data.product?.isPublished}
-								onchange={togglePublish}
-								class="block h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-							/>
-
-							<div class="flex justify-end">
-								<button
-									type="submit"
-									class="rounded-md bg-primary px-4 py-2 text-white transition-colors hover:bg-primary/90"
-								>
-									Save
-								</button>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
 </div>
 
 <style>

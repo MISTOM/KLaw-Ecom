@@ -5,6 +5,7 @@
 	const { data, form } = $props();
 
 	const products = $derived(data.products || []);
+	const categories = $derived(data.categories || []);
 	// const products = $state($state.snapshot(data.products) || []);
 	// $inspect(products);
 
@@ -334,6 +335,27 @@
 						required
 						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
 					/>
+				</div>
+
+				<!-- Select Categories Section -->
+				<div class="space-y-2">
+					<label for="categories" class="text-sm font-medium text-gray-700">Select Categories</label>
+					<div class="flex flex-wrap gap-4">
+						{#each categories as category}
+							<div class="flex items-center">
+								<input
+									type="checkbox"
+									name="categoryIds"
+									value={category.id}
+									id={`category-${category.id}`}
+									class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+								/>
+								<label for={`category-${category.id}`} class="ml-2 text-sm text-gray-700">
+									{category.name}
+								</label>
+							</div>
+						{/each}
+					</div>
 				</div>
 
 				<div class="space-y-2">

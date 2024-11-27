@@ -25,7 +25,7 @@ model User {
 }
 
 model Product {
-  id              Int               @id @default(autoincrement())
+  id              Int              @id @default(autoincrement())
   name            String
   description     String
   price           Float
@@ -33,12 +33,12 @@ model Product {
   author          String? //TODO - retrun the optional fields to required
   pageCount       Int?
   publicationDate DateTime?
-  serviceCode     String            @unique
-  isPublished     Boolean           @default(false)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  serviceCode     String           @unique
+  isPublished     Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   Image           Image[]
-  category        ProductCategory[]
+  categories        Category[]       @relation("ProductCategory") // implicit many to many relationship ref: https://www.prisma.io/docs/orm/prisma-schema/data-model/relations/many-to-many-relations#implicit-many-to-many-relations
   ProductOnOrder  ProductOnOrder[]
   CartItem        CartItem[]
 }
@@ -54,24 +54,25 @@ model Image {
 }
 
 model Category {
-  id        Int               @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
-  Product   ProductCategory[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Products   Product[] @relation("ProductCategory") // implicit many to many relationship
 }
 
-model ProductCategory {
-  id         Int      @default(autoincrement())
-  productId  Int
-  categoryId Int
-  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+//explicit many to many relationship
+// model ProductCategory {
+//   id         Int      @default(autoincrement())
+//   productId  Int
+//   categoryId Int
+//   product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+//   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+//   createdAt  DateTime @default(now())
+//   updatedAt  DateTime @updatedAt
 
-  @@id([productId, categoryId])
-}
+//   @@id([productId, categoryId])
+// }
 
 model Cart {
   id        Int        @id @default(autoincrement())

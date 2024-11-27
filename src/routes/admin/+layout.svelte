@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto,  } from '$app/navigation';
+	import { goto } from '$app/navigation';
 
 	const { children, data } = $props();
 
@@ -19,7 +19,7 @@
 
 <div class="m-5">
 	<a href="/admin/product">
-	<img src="/kLawLogo.png" alt="logo" class="h-10 md:h-12 lg:h-20" />
+		<img src="/kLawLogo.png" alt="logo" class="h-10 md:h-12 lg:h-20" />
 	</a>
 </div>
 

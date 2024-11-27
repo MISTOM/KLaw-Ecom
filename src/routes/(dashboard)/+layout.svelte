@@ -27,7 +27,7 @@
 
 		// UserState.user = null;
 		console.log(await response.json());
-		await goto('/login', { invalidateAll: true });
+		await goto('/', { invalidateAll: true });
 	};
 </script>
 
