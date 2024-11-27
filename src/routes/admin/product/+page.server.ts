@@ -29,7 +29,7 @@ export const actions: Actions = {
 		const description = formData.get('description')?.toString();
 		const price = formData.get('price')?.toString();
 		const quantity = formData.get('quantity')?.toString();
-		const serviceCode = formData.get('serviceCode')?.toString();
+		const serviceCode = Math.floor(Math.random() * 87654321).toString(); //auto generate service code  /* formData.get('serviceCode')?.toString();*/
 		const author = formData.get('author')?.toString();
 		const publicationDateData = formData.get('publicationDate')?.toString();
 		const pageCount = formData.get('pageCount')?.toString();
@@ -37,7 +37,7 @@ export const actions: Actions = {
 		const publicationDate = publicationDateData ? new Date(publicationDateData) : undefined;
 
 		const image = formData.get('image') as File;
-		console.log('productImage: ', image);
+		console.log('productImage: ', image, serviceCode);
 
 		if (
 			!name ||
@@ -47,8 +47,7 @@ export const actions: Actions = {
 			!serviceCode ||
 			!author ||
 			!publicationDate ||
-			!pageCount ||
-			categoryIds.length === 0
+			!pageCount
 		) {
 			return fail(400, {
 				data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
@@ -139,3 +138,24 @@ export const actions: Actions = {
 		}
 	}
 };
+// let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+// let generatedCodes = new Set<string>();
+
+// /**
+//  * Generates a unique code
+//  * @param {Number} numChars Character length of the code
+//  * @returns {String} Unique code
+//  */
+// function generateUniqueCode(numChars: number): string {
+// 	let code;
+// 	do {
+// 		code = "";
+// 		for (let j = 0; j < numChars; j++) {
+// 			let index = Math.floor(Math.random() * chars.length);
+// 			code += chars[index];
+// 		}
+// 	} while (generatedCodes.has(code));
+
+// 	generatedCodes.add(code);
+// 	return code;
+// }

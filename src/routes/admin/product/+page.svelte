@@ -290,7 +290,7 @@
 					>
 					</textarea>
 				</div>
-				<div class="space-y-2">
+				<!-- <div class="space-y-2">
 					<label for="serviceCode" class="text-sm font-medium text-gray-700">Service Code</label>
 					<input
 						type="text"
@@ -300,7 +300,7 @@
 						required
 						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
 					/>
-				</div>
+				</div> -->
 				<div class="space-y-2">
 					<label for="author" class="text-sm font-medium text-gray-700">Author</label>
 					<input

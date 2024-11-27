@@ -40,7 +40,7 @@ export const actions = {
 		const description = formData.get('description')?.toString();
 		const priceData = formData.get('price')?.toString();
 		const quantityData = formData.get('quantity')?.toString();
-		const serviceCode = formData.get('serviceCode')?.toString();
+		const serviceCode = Math.floor(Math.random() * 8765430).toString(); //auto generate service code  /* formData.get('serviceCode')?.toString();*/
 		const author = formData.get('author')?.toString();
 		const publicationDateData = formData.get('publicationDate')?.toString();
 		const pageCountData = formData.get('pageCount')?.toString();
@@ -52,6 +52,8 @@ export const actions = {
 		const quantity = quantityData ? parseInt(quantityData) : undefined;
 		const publicationDate = publicationDateData ? new Date(publicationDateData) : undefined;
 		const pageCount = pageCountData ? parseInt(pageCountData) : undefined;
+
+		console.log('serviceCode ', serviceCode);
 
 		if (
 			!name ||
