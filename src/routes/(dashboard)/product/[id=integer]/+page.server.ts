@@ -7,7 +7,7 @@ export const load = (async ({ params }) => {
 	try {
 		const product = await prisma.product.findUnique({
 			where: { id, isPublished: true },
-			include: { Image: true }
+			include: { Image: true, categories: true }
 		});
 
 		if (!product) return { status: 404, error: 'Product not found' };

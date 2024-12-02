@@ -62,6 +62,13 @@
 									day: 'numeric'
 								})}
 							</li>
+							<!-- Categories -->
+							<li>
+								Categories:
+								{#each product.categories as category}
+									<span>{category.name} </span>
+								{/each}
+							</li>
 						</ul>
 					</div>
 					<div>

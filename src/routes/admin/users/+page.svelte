@@ -61,7 +61,7 @@
 			</a>
 		</div>
 
-		<!-- Filters Section --
+		<-- Filters Section --
 		<div class="mb-6 grid gap-4 md:grid-cols-4">
 			<div class="relative">
 				<input
@@ -91,7 +91,7 @@
 			</select>
 		</div>
 
-		<!-- Users Table --
+		<-- Users Table --
 		<div class="overflow-scroll rounded-md border border-gray-200 bg-white">
 			<table class="min-w-full divide-y divide-gray-200">
 				<thead class="bg-gray-50">

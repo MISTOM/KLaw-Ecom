@@ -4,9 +4,21 @@
 
 	// import cart from '$lib/Cart.svelte.js';
 	const { data } = $props();
+
 	const products = $derived(data.products || []);
+	const categories = $derived(data.categories || []);
+
+	let selectedCategoryId = $state('all');
+
 	const cart = getCartState();
 	const toast = getToastState();
+
+	let filteredProducts = $derived.by(() => {
+		if (selectedCategoryId === 'all') return products;
+		return products.filter((product) =>
+			product.categories.some((category) => category.id === parseInt(selectedCategoryId))
+		);
+	});
 </script>
 
 <svelte:head>
@@ -35,9 +47,21 @@
 
 <div class="container mx-auto px-4 py-8">
 	<h1 class="mb-8 text-3xl font-bold">Our Products</h1>
+	<!-- Filters Section -->
+	<div class="mb-6 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+		<select
+			bind:value={selectedCategoryId}
+			class="rounded-lg border border-gray-200 bg-white px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+		>
+			<option value="all">All Categories</option>
+			{#each categories as category}
+				<option value={category.id}>{category.name}</option>
+			{/each}
+		</select>
+	</div>
 
 	<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-		{#each products as product (product.id)}
+		{#each filteredProducts as product (product.id)}
 			<div class="group overflow-hidden rounded-md border transition-all hover:shadow-lg">
 				<a href="/product/{product.id}">
 					<div class="mx-auto aspect-square overflow-hidden">

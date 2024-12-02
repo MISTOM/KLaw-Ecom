@@ -9,7 +9,7 @@ export const load = (async ({ locals }) => {
 	try {
 		const productsPromise = prisma.product.findMany({
 			include: { Image: true, categories: true },
-			orderBy: { id: 'desc' }
+			orderBy: { createdAt: 'desc' }
 		});
 		const categoriesPromise = prisma.category.findMany();
 
