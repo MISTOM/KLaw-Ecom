@@ -38,7 +38,7 @@ model Product {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   Image           Image[]
-  categories        Category[]       @relation("ProductCategory") // implicit many to many relationship ref: https://www.prisma.io/docs/orm/prisma-schema/data-model/relations/many-to-many-relations#implicit-many-to-many-relations
+  categories      Category[]       @relation("ProductCategory") // implicit many to many relationship ref: https://www.prisma.io/docs/orm/prisma-schema/data-model/relations/many-to-many-relations#implicit-many-to-many-relations
   ProductOnOrder  ProductOnOrder[]
   CartItem        CartItem[]
 }
@@ -58,7 +58,7 @@ model Category {
   name      String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  Products   Product[] @relation("ProductCategory") // implicit many to many relationship
+  Products  Product[] @relation("ProductCategory") // implicit many to many relationship
 }
 
 //explicit many to many relationship
@@ -101,6 +101,9 @@ model CartItem {
 model Order {
   id             Int              @id @default(autoincrement())
   totalPrice     Float
+  status         OrderStatus      @default(PENDING)
+  transactionId  String?
+  description    String?
   userId         Int
   user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt      DateTime         @default(now())
@@ -117,6 +120,12 @@ model ProductOnOrder {
   isIssued  Boolean @default(false)
 
   @@id([orderId, productId])
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
 }
 
 model Role {

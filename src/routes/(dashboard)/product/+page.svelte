@@ -19,6 +19,7 @@
 			product.categories.some((category) => category.id === parseInt(selectedCategoryId))
 		);
 	});
+	// TODO - Save the selected category in the URL
 </script>
 
 <svelte:head>
@@ -61,42 +62,46 @@
 	</div>
 
 	<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-		{#each filteredProducts as product (product.id)}
-			<div class="group overflow-hidden rounded-md border transition-all hover:shadow-lg">
-				<a href="/product/{product.id}">
-					<div class="mx-auto aspect-square overflow-hidden">
-						<img
-							src={product.Image[0]?.url || '/kLawPillers.png'}
-							alt={product.name}
-							class="h-full bg-primary object-cover transition-transform group-hover:scale-105"
-						/>
-					</div>
-				</a>
-				<div class="p-4">
-					<h3 class="text-lg font-semibold">{product.name}</h3>
-					<p class="mt-2 line-clamp-2 text-sm text-gray-600">{product.description}</p>
+		{#if filteredProducts.length === 0}
+			<div class="col-span-full text-center text-gray-600">No products found</div>
+		{:else}
+			{#each filteredProducts as product (product.id)}
+				<div class="group overflow-hidden rounded-md border transition-all hover:shadow-lg">
+					<a href="/product/{product.id}">
+						<div class="mx-auto aspect-square overflow-hidden">
+							<img
+								src={product.Image[0]?.url || '/kLawPillers.png'}
+								alt={product.name}
+								class="h-full bg-primary object-cover transition-transform group-hover:scale-105"
+							/>
+						</div>
+					</a>
+					<div class="p-4">
+						<h3 class="text-lg font-semibold">{product.name}</h3>
+						<p class="mt-2 line-clamp-2 text-sm text-gray-600">{product.description}</p>
 
-					<div class="mt-4 flex items-center justify-between">
-						<span class="text-lg font-bold">
-							KES {product.price.toLocaleString()}
-						</span>
-						<button
-							class="rounded-md bg-primary px-3 py-2 text-sm text-white transition-colors hover:bg-primary/90"
-							onclick={async () => {
-								if (await cart.addItem(product)) {
-									console.log('product added to cart');
-									toast.add('Success', 'Product added to cart', 'success', 2000);
-								} else {
-									console.log('product not added to cart');
-									// if (data.user) toast.add('Error', 'Failed to add product to cart', 'error', 2000);
-								}
-							}}
-						>
-							Add to Cart
-						</button>
+						<div class="mt-4 flex items-center justify-between">
+							<span class="text-lg font-bold">
+								KES {product.price.toLocaleString()}
+							</span>
+							<button
+								class="rounded-md bg-primary px-3 py-2 text-sm text-white transition-colors hover:bg-primary/90"
+								onclick={async () => {
+									if (await cart.addItem(product)) {
+										console.log('product added to cart');
+										toast.add('Success', 'Product added to cart', 'success', 2000);
+									} else {
+										console.log('product not added to cart');
+										// if (data.user) toast.add('Error', 'Failed to add product to cart', 'error', 2000);
+									}
+								}}
+							>
+								Add to Cart
+							</button>
+						</div>
 					</div>
 				</div>
-			</div>
-		{/each}
+			{/each}
+		{/if}
 	</div>
 </div>
