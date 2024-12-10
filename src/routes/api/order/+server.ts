@@ -106,7 +106,7 @@ export const POST: RequestHandler = async ({ locals: { user }, request }) => {
 		// Execute all operations in a transaction
 		const result = await prisma.$transaction(
 			async (tx) => {
-				// Fetch all products in a single query with FOR UPDATE lock
+				// Fetch all products in a single query
 				const products = await tx.product.findMany({
 					where: {
 						id: { in: orderedItems.map((item) => item.productId) }
@@ -184,7 +184,7 @@ export const POST: RequestHandler = async ({ locals: { user }, request }) => {
 			totalPrice: result.totalPrice
 		});
 	} catch (e) {
-		console.error('Cart API Error: ', e);
+		console.error(e);
 		//@ts-ignore
 		if (e.code === 'P2024') {
 			throw error(408, 'Transaction timeout - please try again');

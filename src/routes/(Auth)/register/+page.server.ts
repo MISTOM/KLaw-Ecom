@@ -10,7 +10,7 @@ export const load = (async ({ locals }) => {
 	// if (locals.user) { throw redirect(303, '/') }
 }) satisfies PageServerLoad;
 
-export const actions = {
+export const actions: Actions = {
 	default: async ({ request, cookies }) => {
 		const formData = await request.formData();
 		console.log(formData);
@@ -66,7 +66,7 @@ export const actions = {
 			});
 
 			console.log(
-				'is Email Sent: --',
+				'is Email Sent: --\n',
 				await sendEmail(newUser.email, `Welcome ${newUser.name}`, 'welcome', { username: name, email })
 			);
 		} catch (e) {
@@ -78,4 +78,4 @@ export const actions = {
 		}
 		throw redirect(303, '/product');
 	}
-} satisfies Actions;
+};

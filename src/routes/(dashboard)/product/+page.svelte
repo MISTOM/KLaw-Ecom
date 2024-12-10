@@ -20,31 +20,24 @@
 		);
 	});
 	// TODO - Save the selected category in the URL
+
+	let selectedCategoryIds = $state<number[]>([]);
+
+	// Allow filtering by multiple categories
+	//   let filteredProducts = $derived.by(() => {
+	//     if (selectedCategoryIds.length === 0) {
+	//       return products;
+	//     } else {
+	//       return products.filter(product =>
+	//         product.categories.some(category => selectedCategoryIds.includes(category.id))
+	//       );
+	//     }
+	//   });
 </script>
 
 <svelte:head>
 	<title>Products</title>
 </svelte:head>
-
-<!-- <main class="grid grid-cols-1 gap-4 font-optima sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-	{#each products as product, i}
-		<div class=" m-3 overflow-hidden rounded-md border border-gray-300 p-4">
-			<img src={product.Image[0].url} alt={product.name} class="m-auto h-36 object-cover" />
-			<div class="p-4">
-				<h4 class="text-xl text-fadeblack">{product.name}</h4>
-				<p class="m-1 truncate text-sm">{product.description}</p>
-				<div class="flex items-center justify-between">
-					<span class="font-semibold">KES {product.price}</span>
-					<button
-						class="rounded-md border border-primary px-2 py-1 transition-colors hover:bg-primary hover:text-white"
-						onclick={() => cart.addItem(product)}
-						>Add to cart</button
-					>
-				</div>
-			</div>
-		</div>
-	{/each}
-</main> -->
 
 <div class="container mx-auto px-4 py-8">
 	<h1 class="mb-8 text-3xl font-bold">Our Products</h1>
@@ -59,9 +52,29 @@
 				<option value={category.id}>{category.name}</option>
 			{/each}
 		</select>
-	</div>
 
-	<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+		<!-- Allow filtering by multiple categories -->
+		<!-- <div>
+			<label class="text-sm font-medium text-gray-700">Filter by Categories</label>
+			<div class="mt-2 space-y-2">
+				{#each categories as category}
+					<div class="flex items-center">
+						<input
+							type="checkbox"
+							bind:group={selectedCategoryIds}
+							value={category.id}
+							id={`category-${category.id}`}
+							class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+						/>
+						<label for={`category-${category.id}`} class="ml-2 text-sm text-gray-700">
+							{category.name}
+						</label>
+					</div>
+				{/each}
+			</div>
+		</div> -->
+	</div>
+	<main class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 		{#if filteredProducts.length === 0}
 			<div class="col-span-full text-center text-gray-600">No products found</div>
 		{:else}
@@ -103,5 +116,5 @@
 				</div>
 			{/each}
 		{/if}
-	</div>
+	</main>
 </div>

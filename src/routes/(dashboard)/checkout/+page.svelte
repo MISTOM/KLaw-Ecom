@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { getCartState } from '$lib/Cart.svelte.js';
-
-	// import cart from '$lib/Cart.svelte';
 	const { data } = $props();
+
+	const paymentDetails = $derived(data.paymentDetails);
 
 	const cart = getCartState();
 
@@ -11,6 +11,7 @@
 
 	const createOrder = async () => {
 		if (!confirm('Are you sure you want to purchase these items?')) return;
+
 		const res = await fetch('/api/order', {
 			method: 'POST',
 			headers: {
@@ -25,15 +26,16 @@
 		});
 
 		const resData = await res.json();
-
 		if (res.ok) {
-			console.log(resData.message, resData.order);
+			console.log(resData.message);
 			cart.cartItems = [];
+			// submit payment
+			const form = document.getElementById('payment-form') as HTMLFormElement;
+			form ? form.submit() : console.error('Payment Form not found');
 		} else if (res.status === 401) {
 			console.error('Unauthorized');
 			await goto(`/login?redirect=${window.location.pathname}`);
 		} else if (res.status === 400) {
-			console.error('Bad order request');
 			errors = resData.message;
 			console.log(resData.message);
 		} else {
@@ -71,38 +73,67 @@
 			{/each}
 		</ul>
 	</section>
-	<section class="">
-		<div class="h-fit rounded-md border p-6">
-			<h2 class="mb-4 text-xl font-semibold">Order Summary</h2>
+	<section class="h-fit rounded-md border p-6">
+		<h2 class="mb-4 text-xl font-semibold">Order Summary</h2>
 
-			{#if errors}
-				<p class="text-red-600">{errors}</p>
-			{/if}
+		{#if errors}
+			<p class="text-red-600">{errors}</p>
+		{/if}
 
-			<div class="space-y-2">
-				<div class="flex justify-between">
-					<span class="text-gray-600">Subtotal</span>
-					<span class="font-medium">KES {cart.cartStats.total.toLocaleString()}</span>
-				</div>
-				<div class="flex justify-between">
-					<span class="text-gray-600">Tax</span>
-					<span class="font-medium">KES 0</span>
-				</div>
-				<div class="flex justify-between">
-					<span class="text-gray-600">Shipping</span>
-					<span class="font-medium">KES 0</span>
-				</div>
-				<div class="my-2 border-t"></div>
-				<div class="flex justify-between">
-					<span class="font-semibold">Total</span>
-					<span class="font-bold">KES {cart.cartStats.total.toLocaleString()}</span>
-				</div>
+		<div class="space-y-2">
+			<div class="flex justify-between">
+				<span class="text-gray-600">Subtotal</span>
+				<span class="font-medium">KES {cart.cartStats.total.toLocaleString()}</span>
 			</div>
-			<hr />
+			<div class="flex justify-between">
+				<span class="text-gray-600">Tax</span>
+				<span class="font-medium">KES 0</span>
+			</div>
+			<div class="flex justify-between">
+				<span class="text-gray-600">Shipping</span>
+				<span class="font-medium">KES 0</span>
+			</div>
+			<div class="my-2 border-t"></div>
+			<div class="flex justify-between">
+				<span class="font-semibold">Total</span>
+				<span class="font-bold">KES {cart.cartStats.total.toLocaleString()}</span>
+			</div>
+		</div>
+		<hr />
+
+		<form
+			id="payment-form"
+			method="post"
+			action="https://payments.ecitizen.go.ke/PaymentAPI/iframev2.1.php"
+			target="my_frame"
+		>
+			<input type="hidden" name="apiClientID" value={paymentDetails?.apiClientID} />
+			<input type="hidden" name="secureHash" value={paymentDetails?.secureHash} />
+			<input type="hidden" name="billDesc" value={paymentDetails?.billDesc} />
+			<input type="hidden" name="billRefNumber" value={paymentDetails?.billRefNumber} />
+			<input type="hidden" name="currency" value={paymentDetails?.currency} />
+			<input type="hidden" name="serviceID" value={paymentDetails?.serviceID} />
+			<input type="hidden" name="clientMSISDN" value={paymentDetails?.clientMSISDN} />
+			<input type="hidden" name="clientName" value={paymentDetails?.clientName} />
+			<input type="hidden" name="clientIDNumber" value={paymentDetails?.clientIDNumber} />
+			<input type="hidden" name="clientEmail" value={paymentDetails?.clientEmail} />
+			<input type="hidden" name="callBackURLOnSuccess" value={paymentDetails?.callBackURLOnSuccess} />
+			<input type="hidden" name="callBackURLOnFail" value={paymentDetails?.callBackURLOnFail} />
+			<input type="hidden" name="notificationURL" value={paymentDetails?.notificationURL} />
+			<input type="hidden" name="pictureURL" value={paymentDetails?.pictureURL} />
+			<input type="hidden" name="amountExpected" value={paymentDetails?.amountExpected} />
+		</form>
+
+		{#if paymentDetails}
 			<button
 				class="transition-color m-1 w-full rounded bg-green-600 p-1 text-white hover:opacity-90"
-				onclick={createOrder}>Pay</button
-			>
-		</div>
+				onclick={createOrder}
+				>Pay
+			</button>
+		{:else}
+			<a href="/product" class="text-secondary hover:underline">Continue shopping...</a>
+		{/if}
+		<iframe width="100%" height="400px" name="my_frame" style="border:none;" title="PesaFlow Payment Form"
+		></iframe>
 	</section>
 </main>

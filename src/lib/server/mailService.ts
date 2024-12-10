@@ -45,6 +45,16 @@ function getTransport(config?: Partial<MailConfig>) {
 	return transporters.get(configKey)!; // ! is safe because we set it above
 }
 
+/**
+ * Sends an email using the specified template and properties.
+ *
+ * @param to - The recipient's email address.
+ * @param subject - The subject of the email.
+ * @param templateName - The name of the email template to use [ welcome | password-reset ].
+ * @param props - The properties to pass to the email template.
+ * @param config - Optional configuration for the mail service.
+ * @returns A promise that resolves to a boolean indicating whether the email was sent successfully.
+ */
 export async function sendEmail(
 	to: string,
 	subject: string,
@@ -74,6 +84,13 @@ export async function sendEmail(
 	}
 }
 
+/**
+ * Renders an email template(.svelte) with the specified properties.
+ *
+ * @param templateName - The name of the email template to render.
+ * @param props - The properties to pass to the email template.
+ * @returns A promise that resolves to the rendered email HTML.
+ */
 async function renderEmail(templateName: string, props: any): Promise<string> {
 	switch (templateName) {
 		case 'welcome':

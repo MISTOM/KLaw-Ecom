@@ -33,15 +33,28 @@
 		{#each orders as order (order.id)}
 			<div class="rounded-md border p-6 transition-all hover:shadow-lg">
 				<div class="flex flex-wrap items-center justify-between gap-4">
-					<div>
-						<span class="text-sm text-gray-500">Order #{order.id}</span>
-						<p class="text-sm text-gray-600">{formatDate(order.createdAt)}</p>
+					<div class="text-sm text-gray-600">
+						<span class="text-gray-500">Order #{order.id} </span>
+						<p>{formatDate(order.createdAt)}</p>
+						<!-- Payment status -->
+						<p>
+							Payment:
+							{#if order.status === 'COMPLETED'}	
+								<span class="text-green-600">Paid</span>
+							{:else if order.status === 'PENDING'}
+								<span class="text-yellow-600">Pending</span>
+							{:else if order.status === 'CANCELLED'}
+								<span class="text-red-600">Cancelled</span>
+							{/if}
+							<!-- {:else if order.status === 'FAILED'}
+								<span class="text-red-600">Failed</span> -->
+						</p>
 					</div>
 
 					<div class="text-right">
 						<p class="text-lg font-bold">KES {order.totalPrice.toLocaleString()}</p>
 						<p class="text-sm text-gray-600">
-							{order.ProductOnOrder.filter((product) => !product.isIssued).length} items pending
+							{order.ProductOnOrder.filter((product) => !product.isIssued).length} item(s) not issued
 						</p>
 					</div>
 				</div>
