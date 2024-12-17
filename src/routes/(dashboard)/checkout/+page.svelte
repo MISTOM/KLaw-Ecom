@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { getCartState } from '$lib/Cart.svelte.js';
+	import Spinner from '$lib/components/Spinner.svelte';
+	import { tick } from 'svelte';
+	import { fade } from 'svelte/transition';
 	const { data } = $props();
 
 	const paymentDetails = $derived(data.paymentDetails);
@@ -8,6 +11,8 @@
 	const cart = getCartState();
 
 	let errors = $state('');
+	let showPaymentModal = $state(false);
+	let loading = $state(false);
 
 	const createOrder = async () => {
 		if (!confirm('Are you sure you want to purchase these items?')) return;
@@ -31,7 +36,14 @@
 			cart.cartItems = [];
 			// submit payment
 			const form = document.getElementById('payment-form') as HTMLFormElement;
-			form ? form.submit() : console.error('Payment Form not found');
+			if (form) {
+				showPaymentModal = true; // Display the modal
+				loading = true;
+				await tick();
+				form.submit();
+			} else {
+				console.error('Payment Form not found');
+			}
 		} else if (res.status === 401) {
 			console.error('Unauthorized');
 			await goto(`/login?redirect=${window.location.pathname}`);
@@ -104,7 +116,7 @@
 		<form
 			id="payment-form"
 			method="post"
-			action="https://payments.ecitizen.go.ke/PaymentAPI/iframev2.1.php"
+			action={/*'https://payments.ecitizen.go.ke/PaymentAPI/iframev2.1.php'*/ 'https://test.pesaflow.com/PaymentAPI/iframev2.1.php'}
 			target="my_frame"
 		>
 			<input type="hidden" name="apiClientID" value={paymentDetails?.apiClientID} />
@@ -133,7 +145,49 @@
 		{:else}
 			<a href="/product" class="text-secondary hover:underline">Continue shopping...</a>
 		{/if}
-		<iframe width="100%" height="400px" name="my_frame" style="border:none;" title="PesaFlow Payment Form"
-		></iframe>
 	</section>
 </main>
+{#if showPaymentModal}
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+		role="button"
+		tabindex="-1"
+		onclick={() => (showPaymentModal = false)}
+		onkeydown={(e) => {
+			e.key === 'Escape' && (showPaymentModal = false);
+		}}
+		in:fade={{ duration: 100 }}
+		out:fade={{ duration: 50 }}
+	>
+		<div
+			class="relative max-h-[90vh] w-4/5 max-w-[800px] overflow-hidden rounded-lg bg-white p-5"
+			role="button"
+			onkeydown={() => {}}
+			tabindex="0"
+			onclick={(e) => e.stopPropagation()}
+		>
+			<!-- Close Button -->
+			<button
+				class="absolute right-6 top-2 text-2xl text-gray-500 hover:text-gray-700"
+				aria-label="Close"
+				onclick={() => (showPaymentModal = false)}
+			>
+				&times;
+			</button>
+
+			<!-- Loading Overlay -->
+			{#if loading}
+				<div class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75">
+					<Spinner />
+				</div>
+			{/if}
+
+			<iframe
+				class="h-[500px] w-full border-0"
+				name="my_frame"
+				title="PesaFlow Payment Form"
+				onload={() => (loading = false)}
+			></iframe>
+		</div>
+	</div>
+{/if}

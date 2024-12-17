@@ -1,5 +1,6 @@
-import { redirect } from '@sveltejs/kit';
+import { API_CLIENT_ID, KEY, SECRET, SERVICE_ID } from '$env/static/private';
 import type { Actions, PageServerLoad } from './$types';
+import { redirect } from '@sveltejs/kit';
 import { createHmac } from 'node:crypto';
 import prisma from '$lib/server/prisma';
 
@@ -25,15 +26,15 @@ export const load = (async ({ locals: { user }, url: { origin } }) => {
 
 	// Prepare payment details
 	const paymentDetails = {
-		apiClientID: '22', // Your Pesaflow API Client ID
+		apiClientID: API_CLIENT_ID, // Your Pesaflow API Client ID
 		amountExpected: totalPrice,
-		serviceID: '2396159', // Your service ID
+		serviceID: SERVICE_ID, // Your service ID
 		clientIDNumber: cart.user.idNumber || '0',
 		currency: 'KES',
 		billRefNumber: `ORDER-${Date.now()}`, // Unique order reference
 		billDesc: 'Product Purchase',
 		clientName: cart.user.name || cart.user.email,
-		secret: 'Pesaflow_Secret'
+		secret: SECRET
 	};
 
 	// Data string for secure hash
@@ -50,7 +51,7 @@ export const load = (async ({ locals: { user }, url: { origin } }) => {
 	].join('');
 
 	// Generate secure hash
-	const secureHash = generateSecureHash(dataString, 'my_key_here');
+	const secureHash = generateSecureHash(dataString, KEY);
 
 	return {
 		paymentDetails: {
@@ -69,7 +70,21 @@ export const load = (async ({ locals: { user }, url: { origin } }) => {
 export const actions: Actions = {
 	default: async ({ request }) => {
 		const data = await request.json();
-		console.log('Data from callback: \n', data);
+		console.log('Data from pesaflow callback: \n', data);
+
+		if (data.success) {
+			console.log('Payment successful, yet to updating order status...');
+			//update order status to COMPLETED
+			// await prisma.order.update({
+			// 	data: {
+			// 		status: 'COMPLETED'
+			// 	},
+			// 	where: {
+
+			// 	}
+			// })
+			// data.data.match(/<input type="hidden" name="billRefNumber" value="([^"]+)"/)[1]s
+		}
 	}
 };
 
