@@ -34,6 +34,7 @@
 		if (res.ok) {
 			console.log(resData.message);
 			cart.cartItems = [];
+			await cart.saveCart(); // TODO
 			// submit payment
 			const form = document.getElementById('payment-form') as HTMLFormElement;
 			if (form) {
