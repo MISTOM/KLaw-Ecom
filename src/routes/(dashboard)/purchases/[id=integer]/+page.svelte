@@ -1,7 +1,12 @@
 <!-- Purchase Details -->
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { getToastState } from '$lib/Toast.svelte.js';
+
 	const { data } = $props();
 	const order = $derived(data.order);
+
+	const toast = getToastState();
 
 	function formatDate(date: Date) {
 		return new Date(date).toLocaleDateString('en-KE', {
@@ -10,6 +15,25 @@
 			day: 'numeric'
 		});
 	}
+
+	const cancelOrder = async (orderId: number) => {
+		const res = await fetch(`/api/orders/${orderId}/cancel`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		if (res.ok) {
+			toast.add('Success', 'Order has been cancelled', 'success');
+			goto('/purchases');
+		} else if (res.status === 401) {
+			goto('/login');
+		} else {
+			const data = await res.json();
+			console.log(data);
+			toast.add('Error', data.message || 'Error cancelling order', 'error');
+		}
+	};
 </script>
 
 {#if order}
@@ -34,7 +58,7 @@
 
 						<div>
 							<p class="text-sm text-gray-500">Status</p>
-							<p class="font-medium">NOT/Issued</p>
+							<p class="font-medium capitalize">{order.status.toLowerCase()}</p>
 						</div>
 					</div>
 				</div>
@@ -50,7 +74,7 @@
 										<h3 class="font-semibold">{product.product.name}</h3>
 										<p class="text-sm text-gray-600">Quantity: {product.quantity}</p>
 										<p class="mt-1 text-sm">
-											Status:
+											Issued Status:
 											<span class={product.isIssued ? 'text-green-600' : 'text-orange-600'}>
 												{product.isIssued ? 'Issued' : 'Pending'}
 											</span>

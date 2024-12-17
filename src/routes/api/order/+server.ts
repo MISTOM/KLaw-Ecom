@@ -86,16 +86,13 @@ interface OrderItem {
 }
 
 export const POST: RequestHandler = async ({ locals: { user }, request }) => {
-	if (!user) {
-		throw error(401, 'Unauthorized: No user logged in');
-	}
+	if (!user) throw error(401, 'Unauthorized: No user logged in');
 
 	try {
 		const cartOrderItems: CartItem[] = await request.json();
 
-		if (!Array.isArray(cartOrderItems) || cartOrderItems.length === 0) {
+		if (!Array.isArray(cartOrderItems) || cartOrderItems.length === 0)
 			throw error(400, 'Invalid cart data: Empty or invalid cart');
-		}
 
 		// Map cart items to order items format
 		const orderedItems: OrderItem[] = cartOrderItems.map((item) => ({
@@ -108,9 +105,7 @@ export const POST: RequestHandler = async ({ locals: { user }, request }) => {
 			async (tx) => {
 				// Fetch all products in a single query
 				const products = await tx.product.findMany({
-					where: {
-						id: { in: orderedItems.map((item) => item.productId) }
-					},
+					where: { id: { in: orderedItems.map((item) => item.productId) } },
 					select: {
 						id: true,
 						name: true,
@@ -120,9 +115,7 @@ export const POST: RequestHandler = async ({ locals: { user }, request }) => {
 				});
 
 				// Validate product existence
-				if (products.length !== orderedItems.length) {
-					throw error(400, 'Some products not found');
-				}
+				if (products.length !== orderedItems.length) throw error(400, 'Some products not found');
 
 				// Create a map for efficient product lookup O(1)
 				const productMap = new Map(products.map((p) => [p.id, p]));
@@ -135,9 +128,8 @@ export const POST: RequestHandler = async ({ locals: { user }, request }) => {
 					})
 					.map((item) => productMap.get(item.productId)?.name);
 
-				if (productsNotInStock.length > 0) {
+				if (productsNotInStock.length > 0)
 					throw error(400, `Products out of stock: ${productsNotInStock.join(', ')}`);
-				}
 
 				// Calculate total price using the product map
 				const totalPrice = orderedItems.reduce((total, item) => {

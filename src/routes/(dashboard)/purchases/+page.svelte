@@ -39,7 +39,7 @@
 						<!-- Payment status -->
 						<p>
 							Payment:
-							{#if order.status === 'COMPLETED'}	
+							{#if order.status === 'COMPLETED'}
 								<span class="text-green-600">Paid</span>
 							{:else if order.status === 'PENDING'}
 								<span class="text-yellow-600">Pending</span>

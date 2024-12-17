@@ -77,7 +77,6 @@
 				toast.add('Error', data.message, 'error');
 
 				console.error('Product is on order');
-				console.log(data);
 			} else {
 				console.error('Failed to delete product');
 			}

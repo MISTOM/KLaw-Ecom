@@ -2,6 +2,7 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { getToastState } from '$lib/Toast.svelte';
 	import { fade } from 'svelte/transition';
+
 	const { data } = $props();
 	const orders = $derived(data?.orders || []);
 
