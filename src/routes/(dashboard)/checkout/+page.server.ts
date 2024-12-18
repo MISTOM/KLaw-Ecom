@@ -59,7 +59,7 @@ export const load = (async ({ locals: { user }, url: { origin } }) => {
 			secureHash,
 			callBackURLOnSuccess: `${origin}/checkout`,
 			callBackURLOnFail: `${origin}/checkout`,
-			notificationURL: `${origin}/api/checkout`, //TODO: Implement this endpoint
+			notificationURL: `${origin}/api/checkout`,
 			clientEmail: cart.user.email,
 			clientMSISDN: cart.user.phoneNumber || '0700000000',
 			pictureURL: `${origin}/kLawLogo.png`

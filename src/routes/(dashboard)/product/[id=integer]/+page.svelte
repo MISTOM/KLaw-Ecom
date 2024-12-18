@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { getCartState } from '$lib/Cart.svelte';
 	import { getToastState } from '$lib/Toast.svelte';
 
@@ -6,11 +7,16 @@
 	const product = $derived(data.product);
 	const cart = getCartState();
 	const toast = getToastState();
+
+	let categoryParam = $derived.by(() => page.url.searchParams.get('category') || 'all');
 </script>
 
 <div class="container mx-auto px-4 py-8">
 	<div class="mb-8 flex items-center gap-4">
-		<a href="/product" class="rounded-md bg-gray-100 px-4 py-2 text-sm transition-colors hover:bg-gray-200">
+		<a
+			href="/product/?category={categoryParam}"
+			class="rounded-md bg-gray-100 px-4 py-2 text-sm transition-colors hover:bg-gray-200"
+		>
 			← Back to Products
 		</a>
 		<h1 class="text-3xl font-bold">{product?.name}</h1>

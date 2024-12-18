@@ -19,9 +19,7 @@
 
 		const res = await fetch('/api/order', {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
+			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(
 				cart.cartItems.map((item) => ({
 					quantity: item.quantity,
@@ -34,7 +32,7 @@
 		if (res.ok) {
 			console.log(resData.message);
 			cart.cartItems = [];
-			await cart.saveCart(); // TODO
+			await cart.saveCart();
 			// submit payment
 			const form = document.getElementById('payment-form') as HTMLFormElement;
 			if (form) {

@@ -30,12 +30,11 @@
 	method="POST"
 	use:enhance={({ cancel }) => {
 		loading = true;
-		// TODO - Implement Loading state
 		formErrors = '';
 		if (!passwordMatch) {
+			loading = false;
 			toast.add('Error', 'Passwords do not match', 'error');
 			cancel();
-			loading = false;
 		}
 
 		return async ({ result }) => {

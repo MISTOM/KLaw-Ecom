@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { page } from '$app/state';
+	import { replaceState } from '$app/navigation';
 	import { getCartState } from '$lib/Cart.svelte.js';
 	import { getToastState } from '$lib/Toast.svelte';
 
@@ -13,7 +16,21 @@
 	const cart = getCartState();
 	const toast = getToastState();
 
+	// Initialize selected category from URL
+	onMount(() => {
+		const urlCategoryId = page.url.searchParams.get('category') || 'all';
+		selectedCategoryId = urlCategoryId;
+	});
+
 	let filteredProducts = $derived.by(() => {
+		// Update the URL with the selected category changes
+		if (selectedCategoryId && typeof window !== 'undefined') {
+			const url = new URL(window.location.href);
+			if (url.searchParams.get('category') !== selectedCategoryId) {
+				url.searchParams.set('category', selectedCategoryId);
+				window.history.replaceState({}, '', url); // TODO
+			}
+		}
 		if (selectedCategoryId === 'all') return products;
 		return products.filter((product) =>
 			product.categories.some((category) => category.id === parseInt(selectedCategoryId))
@@ -21,8 +38,7 @@
 	});
 	// TODO - Save the selected category in the URL
 
-	let selectedCategoryIds = $state<number[]>([]);
-
+	// let selectedCategoryIds = $state<number[]>([]);
 	// Allow filtering by multiple categories
 	//   let filteredProducts = $derived.by(() => {
 	//     if (selectedCategoryIds.length === 0) {
@@ -80,7 +96,7 @@
 		{:else}
 			{#each filteredProducts as product (product.id)}
 				<div class="group overflow-hidden rounded-md border transition-all hover:shadow-lg">
-					<a href="/product/{product.id}">
+					<a href="/product/{product.id}?category={selectedCategoryId}">
 						<div class="mx-auto aspect-square overflow-hidden">
 							<img
 								src={product.Image[0]?.url || '/kLawPillers.png'}

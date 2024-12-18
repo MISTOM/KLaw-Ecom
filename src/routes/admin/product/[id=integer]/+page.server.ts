@@ -46,7 +46,7 @@ export const actions = {
 		const pageCountData = formData.get('pageCount')?.toString();
 		const categoryIds = formData.getAll('categoryIds').map((id) => parseInt(id.toString()));
 
-		// console.log('update product data fromEntries: ', Object.fromEntries(formData.entries())); TODO: use Object.fromEntries to get all form data
+		// console.log('update product data fromEntries: ', Object.fromEntries(formData.entries())); : use Object.fromEntries to get all form data
 
 		const price = priceData ? parseFloat(priceData) : undefined;
 		const quantity = quantityData ? parseInt(quantityData) : undefined;
