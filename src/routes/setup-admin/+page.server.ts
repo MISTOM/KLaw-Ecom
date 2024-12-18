@@ -1,17 +1,25 @@
 import { fail, redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
-import type { Actions } from './$types';
+import type { PageServerLoad, Actions } from './$types';
 import auth from '$lib/server/auth';
 import prisma from '$lib/server/prisma';
 import { maxAge, refreshTokenMaxAge, secure } from '$lib/server/utils';
 
-export const load = (() => {
-	// if (locals.user) { throw redirect(303, '/') }
+export const load = (async () => {
+	// Check if there's an existing admin user
+	let userAdmin;
+	try {
+		userAdmin = await prisma.user.findFirst({
+			where: { role: { name: 'ADMIN' } }
+		});
+	} catch (e) {
+		console.error(e);
+		redirect(303, '/login');
+	}
+
+	if (userAdmin) redirect(303, '/login');
 }) satisfies PageServerLoad;
 
-// TODO - protect this route. Only allow access to admin if theres no initial admin
-
-export const actions = {
+export const actions: Actions = {
 	default: async ({ request, cookies }) => {
 		const formData = await request.formData();
 		console.log(formData);
@@ -46,7 +54,6 @@ export const actions = {
 					errors: 'Invalid email or password'
 				});
 			}
-			// TODO - check if theres an admin user already
 			const hashedPassword = await auth.hash(password.toString());
 			const newUser = await prisma.user.create({
 				data: {
@@ -79,4 +86,4 @@ export const actions = {
 		}
 		throw redirect(303, '/admin/product');
 	}
-} satisfies Actions;
+};
