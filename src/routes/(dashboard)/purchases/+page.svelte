@@ -1,6 +1,4 @@
 <script lang="ts">
-	import type { Order } from '@prisma/client';
-
 	const { data } = $props();
 	const orders = $derived(data?.orders || []);
 	// $inspect(orders);

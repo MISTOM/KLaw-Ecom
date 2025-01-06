@@ -13,7 +13,7 @@ export const actions: Actions = {
 
 		const id = Number(user?.id);
 		const formData = Object.fromEntries(await request.formData());
-		const { name, email, oldPassword, password, confirmPassword } = formData;
+		const { name, email, phoneNumber, oldPassword, password, confirmPassword } = formData;
 
 		if (!name || !email) {
 			return fail(400, { data: formData, errors: 'All fields are required' });
@@ -42,6 +42,7 @@ export const actions: Actions = {
 				data: {
 					name: name.toString(),
 					email: email.toString(),
+					phoneNumber: phoneNumber?.toString(),
 					...(newPassword && { password: newPassword })
 				}
 			});

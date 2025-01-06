@@ -11,6 +11,7 @@
 
 	let name = $state(data.user?.name || '');
 	let email = $state(data.user?.email || '');
+	let phoneNumber = $state(data.user?.phoneNumber || '');
 	let password = $state('');
 	let oldPassword = $state('');
 	let confirmPassword = $state('');
@@ -78,6 +79,21 @@
 					name="email"
 					class="w-full rounded-md border p-2"
 					bind:value={email}
+					class:border={isEditMode}
+					class:border-none={!isEditMode}
+					class:bg-transparent={!isEditMode}
+					disabled={!isEditMode}
+				/>
+			</div>
+			<!-- Phone number -->
+			<div class="mb-4">
+				<label for="phone" class="block text-sm font-semibold">Phone Number</label>
+				<input
+					type="tel"
+					id="phone"
+					name="phoneNumber"
+					class="w-full rounded-md border p-2"
+					bind:value={phoneNumber}
 					class:border={isEditMode}
 					class:border-none={!isEditMode}
 					class:bg-transparent={!isEditMode}
