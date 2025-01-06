@@ -89,7 +89,8 @@ export const POST: RequestHandler = async ({ locals: { user }, request }) => {
 	if (!user) throw error(401, 'Unauthorized: No user logged in');
 
 	try {
-		const cartOrderItems: CartItem[] = await request.json();
+		const req = await request.json()
+		const cartOrderItems: CartItem[] = req.cartItems
 
 		if (!Array.isArray(cartOrderItems) || cartOrderItems.length === 0)
 			throw error(400, 'Invalid cart data: Empty or invalid cart');
@@ -151,6 +152,7 @@ export const POST: RequestHandler = async ({ locals: { user }, request }) => {
 					data: {
 						userId: user.id,
 						totalPrice,
+						transactionId: req?.billRefNumber, //TODO: Naming and should be required
 						ProductOnOrder: {
 							createMany: {
 								data: orderedItems

@@ -17,15 +17,18 @@
 	const createOrder = async () => {
 		if (!confirm('Are you sure you want to purchase these items?')) return;
 
+		const data = JSON.stringify({
+			cartItems: cart.cartItems.map((item) => ({
+				quantity: item.quantity,
+				product: item.product
+			})),
+			billRefNumber: paymentDetails?.billRefNumber
+		});
+
 		const res = await fetch('/api/order', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(
-				cart.cartItems.map((item) => ({
-					quantity: item.quantity,
-					product: item.product
-				}))
-			)
+			body: data
 		});
 
 		const resData = await res.json();
