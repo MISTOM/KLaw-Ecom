@@ -59,34 +59,13 @@ export const load = (async ({ locals: { user }, url: { origin } }) => {
 			secureHash,
 			callBackURLOnSuccess: `${origin}/checkout`,
 			callBackURLOnFail: `${origin}/checkout`,
-			notificationURL: `${origin}/api/checkout`,
+			notificationURL: `${origin}/api/order/notification_url`,
 			clientEmail: cart.user.email,
 			clientMSISDN: cart.user.phoneNumber || '0700000000',
 			pictureURL: `${origin}/kLawLogo.png`
 		}
 	};
 }) satisfies PageServerLoad;
-
-export const actions: Actions = {
-	default: async ({ request }) => {
-		const data = await request.json();
-		console.log('Data from pesaflow callback: \n', data);
-
-		if (data.success) {
-			console.log('Payment successful, yet to updating order status...');
-			//update order status to COMPLETED
-			// await prisma.order.update({
-			// 	data: {
-			// 		status: 'COMPLETED'
-			// 	},
-			// 	where: {
-
-			// 	}
-			// })
-			// data.data.match(/<input type="hidden" name="billRefNumber" value="([^"]+)"/)[1]s
-		}
-	}
-};
 
 /**
  * Generate a secure hash using HMAC with SHA256

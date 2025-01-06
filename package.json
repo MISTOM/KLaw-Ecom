@@ -1,7 +1,11 @@
 {
 	"name": "kenyalawecom",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"private": true,
+	"author": {
+		"name": "Kigarde",
+		"email": "thomas.kigarde@bsl.co.ke"
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "npx prisma generate && vite build",

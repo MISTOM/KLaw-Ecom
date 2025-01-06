@@ -105,7 +105,7 @@ model Order {
   id             Int              @id @default(autoincrement())
   totalPrice     Float
   status         OrderStatus      @default(PENDING)
-  transactionId  String?
+  billRefNumber  String?         @unique
   description    String?
   userId         Int
   user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
