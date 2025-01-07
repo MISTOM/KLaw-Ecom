@@ -1,4 +1,4 @@
-import { goto } from '$app/navigation';
+import { goto, invalidate } from '$app/navigation';
 import { getContext, setContext } from 'svelte';
 import type { Product } from '@prisma/client';
 import { getToastState } from './Toast.svelte';
@@ -55,6 +55,7 @@ class Cart {
 
 	async saveCart() {
 		this.isLoading = true;
+		invalidate('update:paymentDetails');
 		const cartItems = this.cartItems.map((item) => {
 			return {
 				productId: item.product.id,

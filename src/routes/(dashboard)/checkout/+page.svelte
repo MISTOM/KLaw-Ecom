@@ -1,18 +1,22 @@
 <script lang="ts">
+	import { tick } from 'svelte';
+	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { getCartState } from '$lib/Cart.svelte.js';
 	import Spinner from '$lib/components/Spinner.svelte';
-	import { tick } from 'svelte';
-	import { fade } from 'svelte/transition';
+
 	const { data } = $props();
 
 	const paymentDetails = $derived(data.paymentDetails);
+	const convenienceFee = $derived(data.convenienceFee);
 
 	const cart = getCartState();
 
 	let errors = $state('');
 	let showPaymentModal = $state(false);
 	let loading = $state(false);
+
+	let totalPrice = $derived(cart.cartStats.total + (convenienceFee?.amount || 0));
 
 	const createOrder = async () => {
 		if (!confirm('Are you sure you want to purchase these items?')) return;
@@ -104,13 +108,13 @@
 				<span class="font-medium">KES 0</span>
 			</div>
 			<div class="flex justify-between">
-				<span class="text-gray-600">Shipping</span>
-				<span class="font-medium">KES 0</span>
+				<span class="text-gray-600">ConvenienceFee</span>
+				<span class="font-medium">KES {convenienceFee?.amount}</span>
 			</div>
 			<div class="my-2 border-t"></div>
 			<div class="flex justify-between">
 				<span class="font-semibold">Total</span>
-				<span class="font-bold">KES {cart.cartStats.total.toLocaleString()}</span>
+				<span class="font-bold">KES {totalPrice}</span>
 			</div>
 		</div>
 		<hr />

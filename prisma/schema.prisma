@@ -106,6 +106,7 @@ model Order {
   totalPrice     Float
   status         OrderStatus      @default(PENDING)
   billRefNumber  String?         @unique
+  invoiceNumber String?         @unique
   description    String?
   userId         Int
   user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -118,12 +119,19 @@ model ProductOnOrder {
   orderId   Int
   productId Int
   quantity  Int
+  isIssued  Boolean @default(false)
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id])
-  isIssued  Boolean @default(false)
 
   @@id([orderId, productId])
 }
+ model ConvenienceFee {
+  id        Int      @id @default(autoincrement())
+  name      String?
+  amount    Float   @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ }
 
 enum OrderStatus {
   PENDING

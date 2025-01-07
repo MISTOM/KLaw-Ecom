@@ -4,7 +4,26 @@ import prisma from '$lib/server/prisma';
 
 export const POST: RequestHandler = async ({ request }) => {
 	// Update the order status if the payment is successful
-	/**
+	// TODO: verify the secure hash
+
+	const data = await request.json();
+	console.log('Notification data', data);
+
+	// Update the order status
+	if (data.status === 'settled' && data.client_invoice_ref) {
+		const order = await prisma.order.update({
+			where: { billRefNumber: data.client_invoice_ref },
+			data: { status: 'COMPLETED', invoiceNumber: data.invoice_number }
+		});
+
+		return json({ message: 'Order status updated', order });
+	} else {
+		console.error(`Order status not updated:: billRefNumber: ${data.client_invoice_ref}`);
+		return json({ message: 'Order status not updated' });
+	}
+};
+
+/**
 	 * Sample data from the notification url
 	 *  {
   status: 'settled',
@@ -29,22 +48,3 @@ export const POST: RequestHandler = async ({ request }) => {
   amount_paid: '1'
 }
 	 */
-
-	// TODO: verify the secure hash
-
-	const data = await request.json();
-	console.log('Notification data', data);
-
-	// Update the order status
-	if (data.status === 'settled' && data.client_invoice_ref) {
-		const order = await prisma.order.update({
-			where: { billRefNumber: data.client_invoice_ref },
-			data: { status: 'COMPLETED' }
-		});
-
-		return json({ message: 'Order status updated', order });
-	} else {
-		console.error(`Order status not updated:: billRefNumber: ${data.client_invoice_ref}`);
-		return json({ message: 'Order status not updated' });
-	}
-};
