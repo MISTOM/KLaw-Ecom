@@ -30,7 +30,7 @@ export const load = (async ({ locals: { user }, url: { origin }, depends }) => {
 		const paymentDetails = {
 			apiClientID: API_CLIENT_ID, // Your Pesaflow API Client ID
 			amountExpected: totalPrice + convenienceFee.amount,
-			serviceID: SERVICE_ID, // Your service ID
+			serviceID: SERVICE_ID,
 			clientIDNumber: cart.user.idNumber || '0',
 			currency: 'KES',
 			billRefNumber: `ORDER-${Date.now()}`, // Unique order reference

@@ -25,9 +25,7 @@ export const actions: Actions = {
 		try {
 			// Check if there's already a convenience fee
 			const feeExists = await prisma.convenienceFee.findFirst();
-			if (feeExists) {
-				return fail(400, { errors: 'A convenience fee is already set.' });
-			}
+			if (feeExists) return fail(400, { errors: 'A convenience fee is already set.' });
 
 			// Create the new fee
 			const createdFee = await prisma.convenienceFee.create({
@@ -47,14 +45,10 @@ export const actions: Actions = {
 		const formData = Object.fromEntries(await request.formData());
 		const { id, amount } = formData;
 
-		if (!id || !amount) {
-			return fail(400, { errors: 'Invalid form data.' });
-		}
+		if (!amount) return fail(400, { errors: 'Please enter a fee amount' });
 
 		const feeId = Number(id);
-		if (isNaN(feeId)) {
-			return fail(400, { errors: 'Invalid convenience fee ID.' });
-		}
+		if (isNaN(feeId)) return fail(400, { errors: 'Invalid convenience fee ID.' });
 
 		try {
 			const updatedFee = await prisma.convenienceFee.update({

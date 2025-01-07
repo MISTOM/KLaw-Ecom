@@ -96,7 +96,7 @@ model CartItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  //TODO: Add indexes
+  // Performance: Add indexes
   // @@index([cartId])
   // @@index([productId])
 }
@@ -105,8 +105,8 @@ model Order {
   id             Int              @id @default(autoincrement())
   totalPrice     Float
   status         OrderStatus      @default(PENDING)
-  billRefNumber  String?         @unique
-  invoiceNumber String?         @unique
+  billRefNumber  String           @unique
+  invoiceNumber  String?          @unique
   description    String?
   userId         Int
   user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -125,18 +125,13 @@ model ProductOnOrder {
 
   @@id([orderId, productId])
 }
- model ConvenienceFee {
+
+model ConvenienceFee {
   id        Int      @id @default(autoincrement())
   name      String?
-  amount    Float   @default(0)
+  amount    Float    @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
- }
-
-enum OrderStatus {
-  PENDING
-  COMPLETED
-  CANCELLED
 }
 
 model Role {
@@ -145,6 +140,12 @@ model Role {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   User      User[]
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
 }
 
 enum Roles {
