@@ -78,6 +78,14 @@ export default {
 	},
 
 	/**
+	 * Generate Email Verification token
+	 */
+	generateEmailVerificationToken(email: User['email']) {
+		const maxAge = 60 * 60; // 1 hour
+		return jwt.sign({ email }, SECRET_KEY, { expiresIn: maxAge });
+	},
+
+	/**
 	 * Compare Passwords to it's hash
 	 */
 	async compare(password: string | Buffer, hash: string) {

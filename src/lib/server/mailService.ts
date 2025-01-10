@@ -3,6 +3,7 @@ import { render } from 'svelte/server';
 import nodemailer from 'nodemailer';
 import WelcomeEmail from '$lib/templates/welcomeEmail.svelte';
 import PasswordResetEmail from '$lib/templates/passwordResetEmail.svelte';
+import VerifyEmail from '$lib/templates/verifyEmail.svelte';
 
 interface MailConfig {
 	host: string;
@@ -47,7 +48,6 @@ function getTransport(config?: Partial<MailConfig>) {
 
 /**
  * Sends an email using the specified template and properties.
- *
  * @param to - The recipient's email address.
  * @param subject - The subject of the email.
  * @param templateName - The name of the email template to use [ welcome | password-reset ].
@@ -98,6 +98,10 @@ async function renderEmail(templateName: string, props: any): Promise<string> {
 
 		case 'password-reset':
 			return render(PasswordResetEmail, { props }).body;
+
+		case 'verify-email':
+			return render(VerifyEmail, { props }).body;
+
 		// Add more template types as needed
 		default:
 			throw new Error(`Unknown email template: ${templateName}`);

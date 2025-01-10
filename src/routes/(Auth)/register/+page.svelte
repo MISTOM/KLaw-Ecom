@@ -39,8 +39,9 @@
 
 		return async ({ result }) => {
 			console.log('form result ->  ', result);
-			if (result.type === 'redirect') {
-				await goto(result.location, { invalidateAll: true });
+			if (result.type === 'success') {
+				toast.add('Success', 'Please check your email to verify your account', 'success', 7000);
+				goto('/login');
 			} else if (result.type === 'failure') {
 				formErrors = result?.data?.errors ? result.data.errors : 'Error registering user';
 			}

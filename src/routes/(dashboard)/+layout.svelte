@@ -57,14 +57,14 @@
 			class="rounded-md p-1 transition-colors hover:border-b hover:border-secondary"
 			onclick={() => (cart.cartopen = !cart.cartopen)}
 		>
-			Cart: {cart.cartStats.quantity}</button
+			My Cart: {cart.cartStats.quantity}</button
 		>
 		{#if user}
 			<button
 				class="mx-4 transition-colors hover:text-secondary"
 				onclick={() => {
 					handleLogout();
-				}}>Log out</button
+				}}>Logout</button
 			>
 		{:else}
 			<a class="mx-4 transition-colors hover:text-secondary" href="/login">Log in or Register</a>
@@ -79,6 +79,7 @@
 		in:fade={{ duration: 200 }}
 		out:fade={{ duration: 100 }}
 	>
+		<div class="fixed inset-0" aria-hidden="true" onclick={() => (cart.cartopen = false)}></div>
 		<div class="relative p-4">
 			<h2 class="text-lg font-bold">Your cart</h2>
 			<button

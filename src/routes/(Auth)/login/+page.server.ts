@@ -45,6 +45,16 @@ export const actions: Actions = {
 				errors: 'Invalid email or password'
 			});
 		}
+		const isAdmin = await auth.isAdmin(user);
+
+		// Check if user is verified
+		if (!isAdmin && !user.isVerified) {
+			return fail(401, {
+				data: { email },
+				errors: 'Your account is not verified, please check your email for verification link'
+			});
+		}
+
 		const token = auth.sign(user);
 		const refreshToken = await auth.generateRefreshToken(user);
 
@@ -57,6 +67,6 @@ export const actions: Actions = {
 			maxAge: refreshTokenMaxAge
 		});
 
-		(await auth.isAdmin(user)) ? redirect(303, '/admin/product') : redirect(303, '/product');
+		isAdmin ? redirect(303, '/admin/product') : redirect(303, '/product');
 	}
 };

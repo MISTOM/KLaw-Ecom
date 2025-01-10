@@ -11,7 +11,7 @@ export const load = (async ({ locals }) => {
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	default: async ({ request, cookies, url }) => {
 		const formData = await request.formData();
 		console.log(formData);
 		const name = formData.get('name');
@@ -40,8 +40,8 @@ export const actions: Actions = {
 			if (user) {
 				return fail(400, {
 					data: { name, email },
-					errors: 'Invalid email or password'
-				});
+					errors: 'Invalid email or password.'
+				}); // TODO: Redirect to login page or 'Email already exists'
 			}
 			const hashedPassword = await auth.hash(password.toString());
 			const newUser = await prisma.user.create({
@@ -53,22 +53,34 @@ export const actions: Actions = {
 				}
 			});
 
-			// Register user and Login immediately
-			const token = auth.sign(newUser);
-			const refreshToken = await auth.generateRefreshToken(newUser);
-
-			cookies.set('token', token, { httpOnly: true, secure: secure, path: '/', maxAge });
-			cookies.set('refreshToken', refreshToken, {
-				httpOnly: true,
-				secure: secure,
-				path: '/',
-				maxAge: refreshTokenMaxAge
+			//Send email verification
+			const token = auth.generateEmailVerificationToken(newUser.email);
+			const link = url.origin + `/verify?token=${token}`;
+			const isEmailSent = await sendEmail(newUser.email, `${newUser.name}, Veriry Your Email`, 'verify-email', {
+				username: name,
+				origin: url.origin,
+				link
 			});
+			console.log('Email Sent?: ', isEmailSent);
 
-			console.log(
-				'is Email Sent: --\n',
-				await sendEmail(newUser.email, `Welcome ${newUser.name}`, 'welcome', { username: name, email })
-			);
+			return { status: 200, body: { message: 'User created successfully', isEmailSent } };
+
+			// Register user and Login immediately
+			// const token = auth.sign(newUser);
+			// const refreshToken = await auth.generateRefreshToken(newUser);
+
+			// cookies.set('token', token, { httpOnly: true, secure: secure, path: '/', maxAge });
+			// cookies.set('refreshToken', refreshToken, {
+			// 	httpOnly: true,
+			// 	secure: secure,
+			// 	path: '/',
+			// 	maxAge: refreshTokenMaxAge
+			// });
+
+			// console.log(
+			// 	'is Email Sent: --\n',
+			// 	await sendEmail(newUser.email, `Welcome ${newUser.name}`, 'welcome', { username: name, email })
+			// );
 		} catch (e) {
 			console.log(e);
 			return fail(500, {
@@ -76,6 +88,5 @@ export const actions: Actions = {
 				errors: 'An error occurred'
 			});
 		}
-		throw redirect(303, '/product');
 	}
 };
