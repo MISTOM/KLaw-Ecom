@@ -6,6 +6,22 @@ import prisma from '$lib/server/prisma';
 import { maxAge, secure } from '$lib/server/utils';
 
 export const handle: Handle = async ({ event, resolve }) => {
+	// const ALLOWED_ORIGINS = ['http://localhost:3000', 'https://sneaker-empire-ten.vercel.app'];
+	// const ALLOWED_METHODS = 'GET, POST, PUT, DELETE, OPTIONS';
+	// const ALLOWED_HEADERS = 'Content-Type, Authorization';
+	// const origin = event.request.headers.get('origin') || '';
+
+	// // Apply cors headers
+	// if (event.request.method === 'OPTIONS') {
+	// 	return new Response(null, {
+	// 		headers: {
+	// 			'Access-Control-Allow-Origin': '*',
+	// 			'Access-Control-Allow-Methods': ALLOWED_METHODS,
+	// 			'Access-Control-Allow-Headers': ALLOWED_HEADERS
+	// 		}
+	// 	});
+	// }
+
 	const token = event.cookies.get('token');
 	const refreshToken = event.cookies.get('refreshToken');
 

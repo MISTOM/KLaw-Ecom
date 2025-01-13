@@ -9,7 +9,7 @@ import { maxAge, refreshTokenMaxAge, secure } from '$lib/server/utils';
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {
 		const formData = await request.formData();
-		const email = formData.get('email');
+		const email = formData.get('email')?.toString().toLocaleLowerCase();
 		const password = formData.get('password');
 
 		if (!email || !password) {
@@ -22,7 +22,7 @@ export const actions: Actions = {
 		let user;
 		try {
 			user = await prisma.user.findUnique({
-				where: { email: email.toString() }
+				where: { email: email }
 			});
 			if (!user) {
 				return fail(400, {

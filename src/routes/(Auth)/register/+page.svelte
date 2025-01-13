@@ -8,17 +8,37 @@
 
 	let name = $state(form?.data?.name);
 	let email = $state(form?.data?.email);
+	let phoneNumber = $state(form?.data?.phoneNumber);
+	let idNumber = $state(form?.data?.idNumber);
 	let password = $state('');
 	let confirmPassword = $state('');
 	let passwordMatch = $derived(password === confirmPassword ? true : false);
 	let formErrors = $state();
 	let loading = $state(false);
+	let passwordVisible = $state(false);
+
+	let recaptchaToken = '';
 
 	const toast = getToastState();
+
+	// function getReCaptchaToken(action: string): Promise<string> {
+	// 	return new Promise((resolve) => {
+	// 		if (typeof grecaptcha !== 'undefined') {
+	// 			grecaptcha.ready(() => {
+	// 				grecaptcha.execute('6LdOOLYqAAAAAL1ESyvDEeIIZRx_SNbps4Hq1Ds1', { action }).then((token: string) => {
+	// 					resolve(token);
+	// 				});
+	// 			});
+	// 		} else {
+	// 			resolve('');
+	// 		}
+	// 	});
+	// }
 </script>
 
 <svelte:head>
 	<title>Register</title>
+	<!-- <script src="https://www.google.com/recaptcha/api.js?render=6LdOOLYqAAAAAL1ESyvDEeIIZRx_SNbps4Hq1Ds1"></script> -->
 </svelte:head>
 
 <h2 class="text-center text-2xl font-bold">Welcome, Please Register</h2>
@@ -28,7 +48,7 @@
 <form
 	class="mt-4"
 	method="POST"
-	use:enhance={({ cancel }) => {
+	use:enhance={async ({ formData, cancel }) => {
 		loading = true;
 		formErrors = '';
 		if (!passwordMatch) {
@@ -36,6 +56,16 @@
 			toast.add('Error', 'Passwords do not match', 'error');
 			cancel();
 		}
+		// Acquire token just before form submission
+		// recaptchaToken = await getReCaptchaToken('register');
+		// if (!recaptchaToken) {
+		// 	console.error('Recaptcha token not found');
+		// 	loading = false;
+		// 	toast.add('Error', 'Recaptcha not found', 'error');
+		// 	cancel();
+		// 	return;
+		// }
+		// formData.set('g-recaptcha-response', recaptchaToken);
 
 		return async ({ result }) => {
 			console.log('form result ->  ', result);
@@ -57,27 +87,78 @@
 		<label for="email" class="block text-sm font-semibold">Email</label>
 		<input type="email" id="email" name="email" class="w-full rounded-md border p-2" bind:value={email} required />
 	</div>
+	<!-- phonenumber -->
 	<div class="mb-4">
+		<label for="phoneNumber" class="block text-sm font-semibold">Phone Number</label>
+		<input
+			type="tel"
+			id="phoneNumber"
+			name="phoneNumber"
+			class="w-full rounded-md border p-2"
+			bind:value={phoneNumber}
+			placeholder="07..."
+			required
+		/>
+	</div>
+
+	<!-- id number -->
+	<div class="mb-4">
+		<label for="idNumber" class="block text-sm font-semibold">ID Number</label>
+		<input
+			type="number"
+			id="idNumber"
+			name="idNumber"
+			class="w-full rounded-md border p-2"
+			bind:value={idNumber}
+			required
+		/>
+	</div>
+
+	<div class="group relative mb-4">
 		<label for="password" class="block text-sm font-semibold">Password</label>
 		<input
-			type="password"
+			type={passwordVisible ? 'text' : 'password'}
 			id="password"
 			name="password"
 			class="w-full rounded-md border p-2"
 			bind:value={password}
 			required
 		/>
+		<button
+			type="button"
+			class="absolute right-3 top-9 hidden text-xs text-gray-400 group-hover:flex"
+			onmousedown={() => (passwordVisible = true)}
+			onmouseup={() => (passwordVisible = false)}
+			onmouseleave={() => (passwordVisible = false)}
+			ontouchstart={() => (passwordVisible = true)}
+			ontouchend={() => (passwordVisible = false)}
+			tabindex="-1"
+		>
+			{passwordVisible ? 'Hide' : 'Show'}
+		</button>
 	</div>
-	<div class="mb-4">
+	<div class="group relative mb-4">
 		<label for="confirmPassword" class="block text-sm font-semibold">Confirm Password</label>
 		<input
-			type="password"
+			type={passwordVisible ? 'text' : 'password'}
 			id="confirmPassword"
 			class="w-full rounded-md border p-2"
 			name="confirmPassword"
 			bind:value={confirmPassword}
 			required
 		/>
+		<button
+			type="button"
+			class="absolute right-3 top-9 hidden text-xs text-gray-400 group-hover:flex"
+			onmousedown={() => (passwordVisible = true)}
+			onmouseup={() => (passwordVisible = false)}
+			onmouseleave={() => (passwordVisible = false)}
+			ontouchstart={() => (passwordVisible = true)}
+			ontouchend={() => (passwordVisible = false)}
+			tabindex="-1"
+		>
+			{passwordVisible ? 'Hide' : 'Show'}
+		</button>
 		{#if !passwordMatch}
 			<span class="text-xs text-red-600" in:fade={{ duration: 100 }}>Passwords do not match</span>
 		{/if}
@@ -92,4 +173,5 @@
 		Register</button
 	>
 	<span class="text-xs text-gray-400 hover:text-secondary/70"><a href="/login">Back to login</a></span>
+	<!-- <div class="g-recaptcha" data-sitekey="6LdOOLYqAAAAAL1ESyvDEeIIZRx_SNbps4Hq1Ds1"></div> -->
 </form>

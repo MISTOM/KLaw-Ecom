@@ -88,9 +88,9 @@
 	>
 
 	<div class="mt-3 flex justify-between">
-		<a href="/register" class="text-xs text-gray-400 transition-colors hover:text-secondary hover:underline"
-			>If you dont have an account,Register</a
-		>
+		<div class="text-xs text-gray-400">
+			If you dont have an account, <a href="/register" class="hover:text-secondary hover:underline">Register</a>
+		</div>
 
 		<a href="/forgotPassword" class="text-xs text-gray-400 transition-colors hover:text-secondary hover:underline"
 			>Forgot Passowrd</a

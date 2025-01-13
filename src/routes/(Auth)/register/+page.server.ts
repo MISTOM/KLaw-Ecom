@@ -1,46 +1,89 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import type { Actions } from './$types';
 import auth from '$lib/server/auth';
 import prisma from '$lib/server/prisma';
-import { maxAge, refreshTokenMaxAge, secure } from '$lib/server/utils';
+import { validateAndFormatPhoneNumber } from '$lib/server/utils';
 import { sendEmail } from '$lib/server/mailService';
+// import { RECAPTCHA_SECRET_KEY } from '$env/static/private';
 
 export const load = (async ({ locals }) => {
 	// if (locals.user) { throw redirect(303, '/') }
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-	default: async ({ request, cookies, url }) => {
+	default: async ({ request, url, fetch }) => {
 		const formData = await request.formData();
 		console.log(formData);
 		const name = formData.get('name');
 		const email = formData.get('email');
+		const phoneNumber = formData.get('phoneNumber');
+		const idNumber = formData.get('idNumber');
 		const password = formData.get('password');
 		const confirmPassword = formData.get('confirmPassword');
+		const recaptchaToken = formData.get('g-recaptcha-response');
 
-		if (!name || !email || !password) {
+		if (!name || !email || !password || !phoneNumber || !idNumber) {
 			return fail(400, {
-				data: { name, email },
+				data: { name, email, phoneNumber, idNumber },
 				errors: 'Please fill in all fields'
 			});
 		}
 
+		const validPhoneNumber = validateAndFormatPhoneNumber(phoneNumber.toString());
+		if (!validPhoneNumber)
+			return fail(400, {
+				data: { name, email, phoneNumber, idNumber },
+				errors: 'Invalid phone number'
+			});
+
 		if (password !== confirmPassword) {
 			return fail(400, {
-				data: { name, email },
+				data: { name, email, phoneNumber, idNumber },
 				errors: 'Passwords do not match'
 			});
 		}
 
+		// if (!recaptchaToken) {
+		// 	return fail(400, {
+		// 		data: { name, email, phoneNumber, idNumber },
+		// 		errors: 'Missing reCAPTCHA token'
+		// 	});
+		// }
+
 		try {
+			// const secret = RECAPTCHA_SECRET_KEY;
+			// if (!secret) {
+			// 	console.error('No reCAPTCHA secret found in environment variables.');
+			// 	return fail(500, { data: { name, email, phoneNumber, idNumber }, errors: 'Server configuration error.' });
+			// }
+
+			// // Verify token with Google
+			// const verificationURL = 'https://www.google.com/recaptcha/api/siteverify';
+			// const response = await fetch(verificationURL, {
+			// 	method: 'POST',
+			// 	body: new URLSearchParams({
+			// 		secret,
+			// 		response: recaptchaToken.toString()
+			// 	})
+			// });
+			// const verificationData = await response.json();
+			// console.log('reCAPTCHA verification data: \n ', verificationData);
+
+			// if (!verificationData.success) {
+			// 	return fail(400, {
+			// 		data: { name, email, phoneNumber, idNumber },
+			// 		errors: 'reCAPTCHA verification failed.'
+			// 	});
+			// }
+
 			const user = await prisma.user.findUnique({
 				where: { email: email.toString() }
 			});
 			if (user) {
 				return fail(400, {
-					data: { name, email },
-					errors: 'Invalid email or password.'
+					data: { name, email, phoneNumber, idNumber },
+					errors: 'This account already exists, please login'
 				}); // TODO: Redirect to login page or 'Email already exists'
 			}
 			const hashedPassword = await auth.hash(password.toString());
@@ -48,6 +91,8 @@ export const actions: Actions = {
 				data: {
 					name: name.toString(),
 					email: email.toString(),
+					idNumber: parseInt(idNumber.toString()),
+					phoneNumber: phoneNumber.toString(),
 					password: hashedPassword,
 					role: { connect: { name: 'USER' } }
 				}
@@ -84,7 +129,7 @@ export const actions: Actions = {
 		} catch (e) {
 			console.log(e);
 			return fail(500, {
-				data: { name, email, password },
+				data: { name, email, password, phoneNumber, idNumber },
 				errors: 'An error occurred'
 			});
 		}
