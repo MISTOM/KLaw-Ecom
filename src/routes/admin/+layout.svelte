@@ -30,7 +30,7 @@
 				<a href="/admin/product">Products</a>
 			</li>
 			<li class="transition-colors hover:text-secondary"><a href="/admin/order">Orders</a></li>
-			<li class="transition-colors hover:text-secondary"><a href="/admin/users">Users</a></li>
+			<!-- <li class="transition-colors hover:text-secondary"><a href="/admin/users">Users</a></li> -->
 			<li class="transition-colors hover:text-secondary"><a href="/admin/category">Categories</a></li>
 			<li class="transition-colors hover:text-secondary"><a href="/admin/convenienceFee">Convenience Fee</a></li>
 		</ul>

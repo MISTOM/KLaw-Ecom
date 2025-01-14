@@ -9,7 +9,7 @@ import { maxAge, refreshTokenMaxAge, secure } from '$lib/server/utils';
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {
 		const formData = await request.formData();
-		const email = formData.get('email')?.toString().toLocaleLowerCase();
+		const email = formData.get('email')?.toString().trim().toLocaleLowerCase();
 		const password = formData.get('password');
 
 		if (!email || !password) {
@@ -24,12 +24,7 @@ export const actions: Actions = {
 			user = await prisma.user.findUnique({
 				where: { email: email }
 			});
-			if (!user) {
-				return fail(400, {
-					data: { email },
-					errors: 'Invalid email or password'
-				});
-			}
+			if (!user) return fail(400, { data: { email }, errors: 'Invalid email or password' });
 		} catch (e) {
 			console.log(e);
 			return fail(500, {
@@ -39,12 +34,8 @@ export const actions: Actions = {
 		}
 
 		const isvalidPassword = await auth.compare(password.toString(), user.password);
-		if (!isvalidPassword) {
-			return fail(401, {
-				data: { email },
-				errors: 'Invalid email or password'
-			});
-		}
+		if (!isvalidPassword) return fail(401, { data: { email }, errors: 'Invalid email or password' });
+
 		const isAdmin = await auth.isAdmin(user);
 
 		// Check if user is verified

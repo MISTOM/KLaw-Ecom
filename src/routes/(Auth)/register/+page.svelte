@@ -172,6 +172,10 @@
 		{/if}
 		Register</button
 	>
-	<span class="text-xs text-gray-400 hover:text-secondary/70"><a href="/login">Back to login</a></span>
+	<div class="mt-3 flex justify-between text-xs text-gray-400">
+		<span class=" hover:text-secondary/70"><a href="/login">Back to login</a></span>
+
+		<a href="/verify" class=" transition-colors hover:text-secondary hover:underline">Resend Verification Email</a>
+	</div>
 	<!-- <div class="g-recaptcha" data-sitekey="6LdOOLYqAAAAAL1ESyvDEeIIZRx_SNbps4Hq1Ds1"></div> -->
 </form>
