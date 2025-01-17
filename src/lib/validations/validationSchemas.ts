@@ -17,6 +17,7 @@ export const userSchema = z
 				required_error: 'Email is required',
 				invalid_type_error: 'Invalid email format'
 			})
+			.min(1, 'Email is Required')
 			.email('Please enter a valid email address'),
 
 		idNumber: z
@@ -31,6 +32,7 @@ export const userSchema = z
 			.string({
 				required_error: 'Phone number is required'
 			})
+			.min(1, 'Phone number is required')
 			.regex(phoneRegex, 'Please enter a valid phone number')
 			.transform((val) => {
 				if (val.startsWith('+254')) return val.slice(1);
@@ -53,7 +55,13 @@ export const userSchema = z
 
 		confirmPassword: z.string({
 			required_error: 'Please confirm your password'
-		})
+		}),
+
+		'g-recaptcha-response': z
+			.string({
+				required_error: 'reCAPTCHA is required'
+			})
+			.min(1, 'reCAPTCHA is required')
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		message: 'Passwords do not match',

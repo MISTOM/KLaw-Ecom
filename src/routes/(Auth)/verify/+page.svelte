@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import Spinner from '$lib/components/Spinner.svelte';
 	import { getToastState } from '$lib/Toast.svelte';
 
 	let { data } = $props();
 	let formErrors = $state();
+
+	let loading = $state(false);
 
 	const toast = getToastState();
 </script>
@@ -13,6 +16,7 @@
 		method="POST"
 		class="mb-4 w-full"
 		use:enhance={() => {
+			loading = true;
 			return ({ result }) => {
 				if (result.status === 200) {
 					formErrors = '';
@@ -20,6 +24,7 @@
 				} else if (result.type === 'failure') {
 					formErrors = result?.data?.error ? result.data.error : 'An error occurred';
 				}
+				loading = false;
 			};
 		}}
 	>
@@ -32,9 +37,15 @@
 			placeholder="Please enter your email..."
 			class="mb-2 w-full rounded border px-3 py-2"
 		/>
-		<button type="submit" class="w-full rounded bg-primary px-4 py-2 text-white hover:bg-primary/90">
-			Send
-		</button>
+		<button
+			type="submit"
+			class="group flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:bg-primary hover:text-white"
+		>
+			{#if loading}
+				<Spinner />
+			{/if}
+			Submit</button
+		>
 	</form>
 {/snippet}
 
@@ -76,7 +87,7 @@
 				</div>
 			</div>
 		{:else if data.error === 'Token is required'}
-			<h1 class="mb-4 text-center text-xl font-bold text-gray-500 lg:text-2xl">Resend Verification Email</h1>
+			<h1 class="mb-4 text-center text-xl font-bold text-primary lg:text-2xl">Resend Verification Email</h1>
 			<p class="mb-4 text-center text-gray-700">Please enter your email to resend the verification email.</p>
 			<div class="flex w-full flex-col items-center">
 				<!-- form for resending verification -->

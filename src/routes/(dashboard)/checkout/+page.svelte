@@ -65,10 +65,15 @@
 <svelte:head>
 	<title>Checkout</title>
 </svelte:head>
-
 <!-- Checkout page -->
 <main class="m-4 grid grid-cols-1 gap-6 lg:grid-cols-3">
 	<section class="col-span-2">
+		<a
+			href="/"
+			class="mb-2 flex w-28 items-center rounded-md bg-gray-100 px-2 py-1 text-sm text-gray-600 transition-colors hover:bg-gray-200"
+		>
+			← Back
+		</a>
 		<h1 class="text-4xl">Checkout</h1>
 		<hr />
 		<ul>

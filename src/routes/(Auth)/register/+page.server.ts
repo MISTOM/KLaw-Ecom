@@ -3,9 +3,8 @@ import type { PageServerLoad } from './$types';
 import type { Actions } from './$types';
 import auth from '$lib/server/auth';
 import prisma from '$lib/server/prisma';
-import { validateAndFormatPhoneNumber } from '$lib/server/utils';
 import { sendEmail } from '$lib/server/mailService';
-// import { RECAPTCHA_SECRET_KEY } from '$env/static/private'; // TODO
+import { RECAPTCHA_SECRET_KEY } from '$env/static/private';
 import { validateRegistration } from '$lib/validations/index';
 
 export const load = (async ({ locals }) => {
@@ -14,16 +13,6 @@ export const load = (async ({ locals }) => {
 
 export const actions: Actions = {
 	default: async ({ request, url, fetch }) => {
-		// const formData = await request.formData();
-		// console.log(formData);
-		// const name = formData.get('name');
-		// const email = formData.get('email');
-		// const phoneNumber = formData.get('phoneNumber');
-		// const idNumber = formData.get('idNumber');
-		// const password = formData.get('password');
-		// const confirmPassword = formData.get('confirmPassword');
-		// const recaptchaToken = formData.get('g-recaptcha-response');
-
 		const formData = Object.fromEntries(await request.formData());
 		const validation = validateRegistration(formData);
 
@@ -33,40 +22,43 @@ export const actions: Actions = {
 				errors: validation.errors
 			});
 		}
-		const { name, email, phoneNumber, idNumber, password } = validation.data!; // or = validation.data ?? {}
-
-		// if (!recaptchaToken) {
-		// 	return fail(400, {
-		// 		data: { name, email, phoneNumber, idNumber },
-		// 		errors: 'Missing reCAPTCHA token'
-		// 	});
-		// }
+		const {
+			name,
+			email,
+			phoneNumber,
+			idNumber,
+			password,
+			'g-recaptcha-response': recaptchaToken
+		} = validation.data!; // or = validation.data ?? {}
 
 		try {
-			// const secret = RECAPTCHA_SECRET_KEY;
-			// if (!secret) {
-			// 	console.error('No reCAPTCHA secret found in environment variables.');
-			// 	return fail(500, { data: { name, email, phoneNumber, idNumber }, errors: 'Server configuration error.' });
-			// }
+			const secret = RECAPTCHA_SECRET_KEY;
+			if (!secret) {
+				console.error('No reCAPTCHA secret found in environment variables.');
+				return fail(500, {
+					data: { name, email, phoneNumber, idNumber },
+					errors: { _errors: ['reCAPTCHA Error'] }
+				});
+			}
 
-			// // Verify token with Google
-			// const verificationURL = 'https://www.google.com/recaptcha/api/siteverify';
-			// const response = await fetch(verificationURL, {
-			// 	method: 'POST',
-			// 	body: new URLSearchParams({
-			// 		secret,
-			// 		response: recaptchaToken.toString()
-			// 	})
-			// });
-			// const verificationData = await response.json();
-			// console.log('reCAPTCHA verification data: \n ', verificationData);
+			// Verify token with Google
+			const verificationURL = 'https://www.google.com/recaptcha/api/siteverify';
+			const response = await fetch(verificationURL, {
+				method: 'POST',
+				body: new URLSearchParams({
+					secret,
+					response: recaptchaToken
+				})
+			});
+			const verificationRes = await response.json();
+			console.log('reCAPTCHA verification data: \n ', verificationRes);
 
-			// if (!verificationData.success) {
-			// 	return fail(400, {
-			// 		data: { name, email, phoneNumber, idNumber },
-			// 		errors: 'reCAPTCHA verification failed.'
-			// 	});
-			// }
+			if (!verificationRes.success) {
+				return fail(400, {
+					data: { name, email, phoneNumber, idNumber },
+					errors: { 'g-recaptcha-response': ['reCAPTCHA verification failed.'] }
+				});
+			}
 
 			const user = await prisma.user.findUnique({
 				where: { email: email.toString() }

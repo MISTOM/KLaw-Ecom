@@ -29,6 +29,7 @@
 		idNumber?: string[];
 		password?: string[];
 		confirmPassword?: string[];
+		'g-recaptcha-response'?: string[];
 		_errors?: string[];
 	}
 
@@ -52,7 +53,7 @@
 
 <svelte:head>
 	<title>Register</title>
-	<!-- <script src="https://www.google.com/recaptcha/api.js?render=6LdOOLYqAAAAAL1ESyvDEeIIZRx_SNbps4Hq1Ds1"></script> -->
+	<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </svelte:head>
 
 <h2 class="text-center text-2xl font-bold">Welcome, Please Register</h2>
@@ -270,5 +271,8 @@
 
 		<a href="/verify" class=" transition-colors hover:text-secondary hover:underline">Resend Verification Email</a>
 	</div>
-	<!-- <div class="g-recaptcha" data-sitekey="6LdOOLYqAAAAAL1ESyvDEeIIZRx_SNbps4Hq1Ds1"></div> -->
+	{#if formErrors['g-recaptcha-response']}
+		<p class="text-sm text-red-600">{formErrors['g-recaptcha-response']}</p>
+	{/if}
+	<div class="g-recaptcha" data-sitekey="6LfCSboqAAAAAONEp8MMiyAHZycy2b99b2VhHPHD"></div>
 </form>
