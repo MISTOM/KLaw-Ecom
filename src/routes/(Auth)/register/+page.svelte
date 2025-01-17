@@ -13,14 +13,28 @@
 	let password = $state('');
 	let confirmPassword = $state('');
 	let passwordMatch = $derived(password === confirmPassword ? true : false);
-	let formErrors = $state();
 	let loading = $state(false);
 	let passwordVisible = $state(false);
 
+	let formErrors = $state<FormErrors>(form?.errors || {});
 	let recaptchaToken = '';
 
 	const toast = getToastState();
 
+	// Typed interface for form errors
+	interface FormErrors {
+		name?: string[];
+		email?: string[];
+		phoneNumber?: string[];
+		idNumber?: string[];
+		password?: string[];
+		confirmPassword?: string[];
+		_errors?: string[];
+	}
+
+	const getFieldError = (field: keyof FormErrors) => {
+		return formErrors[field]?.[0] || '';
+	};
 	// function getReCaptchaToken(action: string): Promise<string> {
 	// 	return new Promise((resolve) => {
 	// 		if (typeof grecaptcha !== 'undefined') {
@@ -42,17 +56,16 @@
 </svelte:head>
 
 <h2 class="text-center text-2xl font-bold">Welcome, Please Register</h2>
-{#if formErrors}
-	<span class="text-sm text-red-600">{formErrors}</span>
-{/if}
+
 <form
-	class="mt-4"
+	class="mt-4 space-y-3"
 	method="POST"
 	use:enhance={async ({ formData, cancel }) => {
 		loading = true;
-		formErrors = '';
+		formErrors = {};
 		if (!passwordMatch) {
 			loading = false;
+			formErrors.confirmPassword = ['Passwords do not match'];
 			toast.add('Error', 'Passwords do not match', 'error');
 			cancel();
 		}
@@ -73,57 +86,128 @@
 				toast.add('Success', 'Please check your email to verify your account', 'success', 7000);
 				goto('/login');
 			} else if (result.type === 'failure') {
-				formErrors = result?.data?.errors ? result.data.errors : 'Error registering user';
+				formErrors = result.data?.errors || { _errors: ['Error registering user'] };
 			}
 			loading = false;
 		};
 	}}
 >
-	<div class="mb-4">
-		<label for="email" class="block text-sm font-semibold">Full Name</label>
-		<input type="text" id="name" name="name" class="w-full rounded-md border p-2" bind:value={name} required />
+	{#if formErrors._errors}
+		<div class="mb-4 rounded-md bg-red-50 p-4" role="alert">
+			<p class="text-sm text-red-700">{formErrors._errors[0]}</p>
+		</div>
+	{/if}
+
+	<div class="">
+		<label for="email" class="block text-sm font-semibold">Full Name <span class="text-red-500">*</span></label>
+
+		<input
+			type="text"
+			id="name"
+			name="name"
+			class={{
+				'w-full rounded-md border p-2': true,
+				'border-red-500': !!getFieldError('name')
+			}}
+			bind:value={name}
+			aria-invalid={!!getFieldError('name')}
+			aria-describedby={getFieldError('name') ? 'name-error' : undefined}
+			required
+		/>
+		{#if getFieldError('name')}
+			<p id="name-error" class="mt-1 text-xs text-red-600" transition:fade>
+				{getFieldError('name')}
+			</p>
+		{/if}
 	</div>
-	<div class="mb-4">
-		<label for="email" class="block text-sm font-semibold">Email</label>
-		<input type="email" id="email" name="email" class="w-full rounded-md border p-2" bind:value={email} required />
+	<div class="">
+		<label for="email" class="block text-sm font-semibold">
+			Email
+			<span class="text-red-500">*</span>
+		</label>
+		<input
+			type="email"
+			id="email"
+			name="email"
+			class={{ 'w-full rounded-md border p-2': true, 'border-red-500': !!getFieldError('email') }}
+			bind:value={email}
+			aria-invalid={!!getFieldError('email')}
+			aria-describedby={getFieldError('email') ? 'email-error' : undefined}
+			required
+		/>
+		{#if getFieldError('email')}
+			<p id="email-error" class="mt-1 text-xs text-red-600" transition:fade>
+				{getFieldError('email')}
+			</p>
+		{/if}
 	</div>
 	<!-- phonenumber -->
-	<div class="mb-4">
+	<div class="">
 		<label for="phoneNumber" class="block text-sm font-semibold">Phone Number</label>
 		<input
 			type="tel"
 			id="phoneNumber"
 			name="phoneNumber"
-			class="w-full rounded-md border p-2"
+			class={{
+				'w-full rounded-md border p-2': true,
+				'border-red-500': !!getFieldError('phoneNumber')
+			}}
 			bind:value={phoneNumber}
+			aria-invalid={!!getFieldError('phoneNumber')}
+			aria-describedby={getFieldError('phoneNumber') ? 'phoneNumber-error' : undefined}
 			placeholder="07..."
 			required
 		/>
+		{#if getFieldError('phoneNumber')}
+			<p id="phoneNumber-error" class="mt-1 text-xs text-red-600" transition:fade>
+				{getFieldError('phoneNumber')}
+			</p>
+		{/if}
 	</div>
 
 	<!-- id number -->
-	<div class="mb-4">
+	<div class="">
 		<label for="idNumber" class="block text-sm font-semibold">ID Number</label>
 		<input
 			type="number"
 			id="idNumber"
 			name="idNumber"
-			class="w-full rounded-md border p-2"
+			class={{
+				'w-full rounded-md border p-2': true,
+				'border-red-500': !!getFieldError('idNumber')
+			}}
 			bind:value={idNumber}
+			aria-invalid={!!getFieldError('idNumber')}
+			aria-describedby={getFieldError('idNumber') ? 'idNumber-error' : undefined}
 			required
 		/>
+		{#if getFieldError('idNumber')}
+			<p id="idNumber-error" class="mt-1 text-xs text-red-600" transition:fade>
+				{getFieldError('idNumber')}
+			</p>
+		{/if}
 	</div>
 
-	<div class="group relative mb-4">
+	<div class="group relative">
 		<label for="password" class="block text-sm font-semibold">Password</label>
 		<input
 			type={passwordVisible ? 'text' : 'password'}
 			id="password"
 			name="password"
-			class="w-full rounded-md border p-2"
+			class={{
+				'w-full rounded-md border p-2': true,
+				'border-red-500': !!getFieldError('password')
+			}}
 			bind:value={password}
+			aria-invalid={!!getFieldError('password')}
+			aria-describedby={getFieldError('password') ? 'password-error' : undefined}
 			required
 		/>
+		{#if getFieldError('password')}
+			<p id="password-error" class="mt-1 text-xs text-red-600" transition:fade>
+				{getFieldError('password')}
+			</p>
+		{/if}
 		<button
 			type="button"
 			class="absolute right-3 top-9 hidden text-xs text-gray-400 group-hover:flex"
@@ -137,16 +221,27 @@
 			{passwordVisible ? 'Hide' : 'Show'}
 		</button>
 	</div>
-	<div class="group relative mb-4">
+	<div class="group relative">
 		<label for="confirmPassword" class="block text-sm font-semibold">Confirm Password</label>
 		<input
 			type={passwordVisible ? 'text' : 'password'}
 			id="confirmPassword"
-			class="w-full rounded-md border p-2"
 			name="confirmPassword"
+			class={{
+				'w-full rounded-md border p-2': true,
+				'border-red-500': !!getFieldError('confirmPassword')
+			}}
 			bind:value={confirmPassword}
+			aria-invalid={!!getFieldError('confirmPassword')}
+			aria-describedby={getFieldError('confirmPassword') ? 'confirmPassword-error' : undefined}
 			required
 		/>
+		{#if getFieldError('confirmPassword')}
+			<p id="confirmPassword-error" class="mt-1 text-xs text-red-600" transition:fade>
+				{getFieldError('confirmPassword')}
+			</p>
+		{/if}
+
 		<button
 			type="button"
 			class="absolute right-3 top-9 hidden text-xs text-gray-400 group-hover:flex"
@@ -159,10 +254,8 @@
 		>
 			{passwordVisible ? 'Hide' : 'Show'}
 		</button>
-		{#if !passwordMatch}
-			<span class="text-xs text-red-600" in:fade={{ duration: 100 }}>Passwords do not match</span>
-		{/if}
 	</div>
+
 	<button
 		type="submit"
 		class="group flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:bg-primary hover:text-white"

@@ -1,17 +1,27 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import { goto, invalidateAll } from '$app/navigation';
-	import Spinner from '$lib/components/Spinner.svelte';
-	import { error } from '@sveltejs/kit';
 	import { fade } from 'svelte/transition';
+	import { enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
+	import Spinner from '$lib/components/Spinner.svelte';
 
 	const { form } = $props();
 
-	let formErrors = $state();
 	let email = $state(form?.data?.email);
 	let password = $state('');
 	let passwordVisible = $state(false);
 	let loading = $state(false);
+
+	let formErrors = $state<FormErrors>(form?.errors || {});
+	// Typed interface for form errors
+	interface FormErrors {
+		email?: string[];
+		password?: string[];
+		_errors?: string[];
+	}
+
+	const getFieldError = (field: keyof FormErrors) => {
+		return formErrors[field]?.[0] || '';
+	};
 </script>
 
 <svelte:head>
@@ -20,7 +30,7 @@
 
 <h2 class="text-center text-2xl font-bold">Login</h2>
 <form
-	class="mt-4"
+	class="mt-4 space-y-4"
 	method="POST"
 	use:enhance={() => {
 		loading = true;
@@ -30,39 +40,50 @@
 				await goto(result.location, { invalidateAll: true });
 			} else if (result.type === 'failure') {
 				password = '';
-				formErrors = result?.data?.errors ? result.data.errors : 'Error logging in';
+				formErrors = result?.data?.errors || { _errors: ['An error occurred. Please try again.'] };
 			}
 			loading = false;
 		};
 	}}
 >
-	{#if formErrors}
-		<span class="text-sm text-red-600" in:fade={{ duration: 150 }}> {formErrors}</span>
+	{#if formErrors._errors}
+		<div class="mb-4 rounded-md bg-red-50 p-4" role="alert">
+			<p class="text-sm text-red-700">{formErrors._errors[0]}</p>
+		</div>
 	{/if}
-	<div class="mb-4">
+	<div class="">
 		<label for="email" class="block text-sm font-semibold">Email</label>
 		<input
 			type="email"
 			id="email"
 			name="email"
-			class="w-full rounded-md border p-2"
+			class={{ 'w-full rounded-md border p-2': true, 'border-red-500': !!getFieldError('email') }}
 			bind:value={email}
-			oninput={() => (formErrors ? (formErrors = '') : null)}
+			aria-invalid={!!getFieldError('email')}
+			aria-describedby={getFieldError('email') ? 'email-error' : undefined}
+			oninput={() => (formErrors ? (formErrors = {}) : null)}
 			required
 		/>
-		<label for="email" class="label"> </label>
+		{#if getFieldError('email')}
+			<p id="email-error" class="mt-1 text-xs text-red-500" transition:fade>{getFieldError('email')}</p>
+		{/if}
 	</div>
-	<div class="group relative mb-4">
+	<div class="group relative">
 		<label for="password" class="block text-sm font-semibold">Password</label>
 		<input
 			type={passwordVisible ? 'text' : 'password'}
 			id="password"
 			name="password"
-			class="w-full rounded-md border p-2"
+			class={{ 'w-full rounded-md border p-2': true, 'border-red-500': !!getFieldError('password') }}
 			bind:value={password}
-			oninput={() => (formErrors ? (formErrors = '') : null)}
+			aria-invalid={!!getFieldError('password')}
+			aria-describedby={getFieldError('password') ? 'password-error' : undefined}
+			oninput={() => (formErrors ? (formErrors = {}) : null)}
 			required
 		/>
+		{#if getFieldError('password')}
+			<p id="password-error" class="mt-1 text-xs text-red-500" transition:fade>{getFieldError('password')}</p>
+		{/if}
 
 		<button
 			type="button"
