@@ -4,7 +4,10 @@
 	import Spinner from '$lib/components/Spinner.svelte';
 	import { getToastState } from '$lib/Toast.svelte.js';
 	import { fade } from 'svelte/transition';
+
 	const { form } = $props();
+
+	const SITE_KEY = '6LfCSboqAAAAAONEp8MMiyAHZycy2b99b2VhHPHD';
 
 	let name = $state(form?.data?.name);
 	let email = $state(form?.data?.email);
@@ -70,16 +73,6 @@
 			toast.add('Error', 'Passwords do not match', 'error');
 			cancel();
 		}
-		// Acquire token just before form submission
-		// recaptchaToken = await getReCaptchaToken('register');
-		// if (!recaptchaToken) {
-		// 	console.error('Recaptcha token not found');
-		// 	loading = false;
-		// 	toast.add('Error', 'Recaptcha not found', 'error');
-		// 	cancel();
-		// 	return;
-		// }
-		// formData.set('g-recaptcha-response', recaptchaToken);
 
 		return async ({ result }) => {
 			console.log('form result ->  ', result);
@@ -122,10 +115,7 @@
 		{/if}
 	</div>
 	<div class="">
-		<label for="email" class="block text-sm font-semibold">
-			Email
-			<span class="text-red-500">*</span>
-		</label>
+		<label for="email" class="block text-sm font-semibold">Email <span class="text-red-500">*</span> </label>
 		<input
 			type="email"
 			id="email"
@@ -144,7 +134,9 @@
 	</div>
 	<!-- phonenumber -->
 	<div class="">
-		<label for="phoneNumber" class="block text-sm font-semibold">Phone Number</label>
+		<label for="phoneNumber" class="block text-sm font-semibold"
+			>Phone Number <span class="text-red-500">*</span></label
+		>
 		<input
 			type="tel"
 			id="phoneNumber"
@@ -168,7 +160,7 @@
 
 	<!-- id number -->
 	<div class="">
-		<label for="idNumber" class="block text-sm font-semibold">ID Number</label>
+		<label for="idNumber" class="block text-sm font-semibold">ID Number <span class="text-red-500">*</span></label>
 		<input
 			type="number"
 			id="idNumber"
@@ -190,7 +182,7 @@
 	</div>
 
 	<div class="group relative">
-		<label for="password" class="block text-sm font-semibold">Password</label>
+		<label for="password" class="block text-sm font-semibold">Password <span class="text-red-500">*</span></label>
 		<input
 			type={passwordVisible ? 'text' : 'password'}
 			id="password"
@@ -223,7 +215,9 @@
 		</button>
 	</div>
 	<div class="group relative">
-		<label for="confirmPassword" class="block text-sm font-semibold">Confirm Password</label>
+		<label for="confirmPassword" class="block text-sm font-semibold"
+			>Confirm Password <span class="text-red-500">*</span></label
+		>
 		<input
 			type={passwordVisible ? 'text' : 'password'}
 			id="confirmPassword"
@@ -274,5 +268,5 @@
 	{#if formErrors['g-recaptcha-response']}
 		<p class="text-sm text-red-600">{formErrors['g-recaptcha-response']}</p>
 	{/if}
-	<div class="g-recaptcha" data-sitekey="6LfCSboqAAAAAONEp8MMiyAHZycy2b99b2VhHPHD"></div>
+	<div class="g-recaptcha" data-sitekey={SITE_KEY}></div>
 </form>

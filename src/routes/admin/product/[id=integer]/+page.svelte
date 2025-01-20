@@ -32,6 +32,7 @@
 
 	const togglePublish = async () => {
 		console.log('Publishing product');
+		if (!confirm('Are you sure you want to publish/not publish this product?')) return;
 		if (data?.product?.id) {
 			const res = await fetch(`/api/product/${data.product.id}/publish`, {
 				method: 'PUT',
@@ -44,7 +45,6 @@
 			});
 
 			if (res.ok) {
-				await invalidate('update:product');
 			} else if (res.status === 401) {
 				console.error('Unauthorized');
 				await goto(`/login?redirect=${window.location.pathname}`);
@@ -52,6 +52,7 @@
 				console.error('Failed to publish product');
 			}
 		}
+		await invalidate('update:product');
 	};
 
 	const deleteProduct = async () => {
@@ -384,7 +385,7 @@
 									</div>
 
 									<!-- Select categories section -->
-									<div class="space-y-2">
+									<!-- <div class="space-y-2">
 										<label for="categories" class="text-sm font-medium text-gray-700">Select Categories</label>
 
 										<div class="grid gap-2 sm:grid-cols-2">
@@ -425,6 +426,29 @@
 												bind:value={description}
 												class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
 											></textarea>
+										</div>
+									</div> -->
+									<!-- Improved Select Categories Section -->
+									<div class="mb-4 space-y-2">
+										<label for="categories" class="text-sm font-medium text-gray-700">Select Categories</label>
+
+										<div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+											{#each categories as category}
+												<label
+													for={`${category.id}`}
+													class="flex cursor-pointer items-center space-x-2 rounded-md border border-gray-200 px-3 py-2 transition-colors hover:bg-gray-50"
+												>
+													<input
+														id={`${category.id}`}
+														type="checkbox"
+														name="categoryIds"
+														value={category.id}
+														checked={!!product?.categories?.find((c) => c.id === category.id)}
+														class="form-checkbox h-4 w-4 text-primary focus:ring-primary"
+													/>
+													<span class="text-sm font-medium text-gray-700">{category.name}</span>
+												</label>
+											{/each}
 										</div>
 									</div>
 									<div>

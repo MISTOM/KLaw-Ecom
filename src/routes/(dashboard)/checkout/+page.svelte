@@ -70,7 +70,7 @@
 	<section class="col-span-2">
 		<a
 			href="/"
-			class="mb-2 flex w-28 items-center rounded-md bg-gray-100 px-2 py-1 text-sm text-gray-600 transition-colors hover:bg-gray-200"
+			class="mb-2 flex w-28 items-center rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-200"
 		>
 			← Back
 		</a>
@@ -91,7 +91,14 @@
 						<p>Quantity: {item.quantity}</p>
 					</div>
 
-					<div class="flex space-x-2"></div>
+					<div class="flex space-x-2">
+						<button
+							class="rounded-md bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+							onclick={() => cart.removeItem(item.id)}
+						>
+							Remove
+						</button>
+					</div>
 				</li>
 			{/each}
 		</ul>
@@ -127,7 +134,7 @@
 		<form
 			id="payment-form"
 			method="post"
-			action={/*'https://payments.ecitizen.go.ke/PaymentAPI/iframev2.1.php'*/ 'https://test.pesaflow.com/PaymentAPI/iframev2.1.php'}
+			action="https://test.pesaflow.com/PaymentAPI/iframev2.1.php"
 			target="my_frame"
 		>
 			<input type="hidden" name="apiClientID" value={paymentDetails?.apiClientID} />

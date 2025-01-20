@@ -67,7 +67,10 @@
 				}}>Logout</button
 			>
 		{:else}
-			<a class="mx-4 transition-colors hover:text-secondary" href="/login">Log in or Register</a>
+			<div class="mx-4 transition-colors">
+				<a href="/login" class="hover:text-secondary">Login</a> or
+				<a href="/register" class="hover:text-secondary">Register</a>
+			</div>
 		{/if}
 	</div>
 </header>

@@ -74,7 +74,8 @@ export const loginSchema = z.object({
 			required_error: 'Email is required',
 			invalid_type_error: 'Invalid email format'
 		})
-		.email('Please enter a valid email address'),
+		.email('Please enter a valid email address')
+		.transform((val) => val.toLowerCase()),
 
 	password: z
 		.string({
