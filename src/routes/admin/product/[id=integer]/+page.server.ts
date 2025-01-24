@@ -53,8 +53,6 @@ export const actions = {
 		const publicationDate = publicationDateData ? new Date(publicationDateData) : undefined;
 		const pageCount = pageCountData ? parseInt(pageCountData) : undefined;
 
-		console.log('serviceCode ', serviceCode);
-
 		if (
 			!name ||
 			!description ||
@@ -63,10 +61,11 @@ export const actions = {
 			!serviceCode ||
 			!author ||
 			!publicationDate ||
-			!pageCount
+			!pageCount ||
+			!categoryIds.length
 		) {
 			return fail(400, {
-				data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
+				data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount, categoryIds },
 				errors: 'All fields and atleast one category are required'
 			});
 		}
@@ -78,7 +77,17 @@ export const actions = {
 			});
 			if (isProductExist && isProductExist.id !== id)
 				return fail(400, {
-					data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
+					data: {
+						name,
+						description,
+						price,
+						quantity,
+						serviceCode,
+						author,
+						publicationDate,
+						pageCount,
+						categoryIds
+					},
 					errors: 'Product with this service code already exists'
 				});
 
@@ -86,7 +95,17 @@ export const actions = {
 			const categories = await prisma.category.findMany({ where: { id: { in: categoryIds } } });
 			if (categories.length !== categoryIds.length) {
 				return fail(400, {
-					data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
+					data: {
+						name,
+						description,
+						price,
+						quantity,
+						serviceCode,
+						author,
+						publicationDate,
+						pageCount,
+						categoryIds
+					},
 					errors: 'Invalid category ids'
 				});
 			}
@@ -103,9 +122,7 @@ export const actions = {
 					author,
 					publicationDate,
 					pageCount,
-					categories: {
-						set: categoryIds.map((id) => ({ id }))
-					}
+					categories: { set: categoryIds.map((id) => ({ id })) }
 				}
 			});
 
@@ -114,7 +131,7 @@ export const actions = {
 			console.log('editProd: ', e);
 
 			//@ts-ignore
-			return fail(500, { error: 'Internal server error adding product' });
+			return fail(500, { errors: 'Internal server error adding product' });
 		}
 	}
 };

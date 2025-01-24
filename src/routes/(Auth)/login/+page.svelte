@@ -113,6 +113,6 @@
 			If you dont have an account, <a href="/register" class="hover:text-secondary hover:underline">Register</a>
 		</div>
 
-		<a href="/forgotPassword" class=" transition-colors hover:text-secondary hover:underline">Forgot Passowrd</a>
+		<a href="/forgotPassword" class=" transition-colors hover:text-secondary hover:underline">Forgot Password</a>
 	</div>
 </form>

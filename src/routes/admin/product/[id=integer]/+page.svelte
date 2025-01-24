@@ -309,9 +309,9 @@
 							}}
 							class="space-y-6"
 						>
-							{#if form?.error}
+							{#if form?.errors}
 								<div class="rounded-md bg-red-50 p-3 text-sm text-red-500">
-									{form.error}
+									{form.errors}
 								</div>
 							{/if}
 
@@ -404,30 +404,30 @@
 													/>
 												</div>
 											{/each}
-										</div>
+										</div> -->
 
-										<div>
-											<label for="pageCount" class="text-sm font-medium text-gray-700">Page Count</label>
-											<input
-												id="pageCount"
-												type="number"
-												name="pageCount"
-												bind:value={pageCount}
-												class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-											/>
-										</div>
+									<div>
+										<label for="pageCount" class="text-sm font-medium text-gray-700">Page Count</label>
+										<input
+											id="pageCount"
+											type="number"
+											name="pageCount"
+											bind:value={pageCount}
+											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+										/>
+									</div>
 
-										<div>
-											<label for="" class="text-sm font-medium text-gray-700">Description</label>
-											<textarea
-												id="description"
-												name="description"
-												rows="3"
-												bind:value={description}
-												class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-											></textarea>
-										</div>
-									</div> -->
+									<div>
+										<label for="" class="text-sm font-medium text-gray-700">Description</label>
+										<textarea
+											id="description"
+											name="description"
+											rows="3"
+											bind:value={description}
+											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+										></textarea>
+									</div>
+
 									<!-- Improved Select Categories Section -->
 									<div class="mb-4 space-y-2">
 										<label for="categories" class="text-sm font-medium text-gray-700">Select Categories</label>

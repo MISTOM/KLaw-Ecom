@@ -32,7 +32,7 @@
 </script>
 
 <div class="m-5">
-	<img src="/kLawLogo.png" alt="logo" class="h-10 md:h-12 lg:h-20" />
+	<a href="/"><img src="/kLawLogo.png" alt="logo" class="h-10 md:h-12 lg:h-20" /> </a>
 </div>
 
 <header class="flex justify-between bg-fadeblack p-2 text-white">
