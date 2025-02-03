@@ -63,10 +63,12 @@ export const userSchema = z
 			})
 			.min(1, 'reCAPTCHA is required')
 	})
-	.refine((data) => data.password === data.confirmPassword, {
-		message: 'Passwords do not match',
-		path: ['confirmPassword']
-	});
+
+
+	// .refine((data) => data.password === data.confirmPassword, {
+	// 	message: 'Passwords do not match',
+	// 	path: ['confirmPassword']
+	// });
 
 export const loginSchema = z.object({
 	email: z

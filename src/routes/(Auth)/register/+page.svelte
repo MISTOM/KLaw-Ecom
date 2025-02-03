@@ -3,6 +3,8 @@
 	import { goto } from '$app/navigation';
 	import Spinner from '$lib/components/Spinner.svelte';
 	import { getToastState } from '$lib/Toast.svelte.js';
+	import { validateRegistration } from '$lib/validations/index.js';
+	import { userSchema, type UserRegistration } from '$lib/validations/validationSchemas.js';
 	import { fade } from 'svelte/transition';
 
 	const { form } = $props();
@@ -39,6 +41,30 @@
 	const getFieldError = (field: keyof FormErrors) => {
 		return formErrors[field]?.[0] || '';
 	};
+
+	// Validate a single field
+	function validateField<K extends keyof UserRegistration>(field: K, value: UserRegistration[K]) {
+		// pick the field from the schema
+		const fieldSchema = userSchema.shape[field];
+		const result = fieldSchema.safeParse(value);
+		formErrors[field] = result.success ? '' : result.error.issues[0].message;
+	}
+
+	// Validate entire form on submit
+
+	function validateAll(formData: FormData): boolean {
+		const result = userSchema.safeParse(formData);
+		if (!result.success) {
+			// flatten errors
+			const fieldErrors = result.error.flatten().fieldErrors;
+			for (const key in fieldErrors) {
+				formErrors[key] = fieldErrors[key]?.[0] || '';
+			}
+			return false;
+		}
+		return true;
+	}
+
 	// function getReCaptchaToken(action: string): Promise<string> {
 	// 	return new Promise((resolve) => {
 	// 		if (typeof grecaptcha !== 'undefined') {
@@ -67,7 +93,7 @@
 	use:enhance={async ({ formData, cancel }) => {
 		loading = true;
 		formErrors = {};
-		if (!passwordMatch) {
+		if (!passwordMatch || !validateAll(formData)) {
 			loading = false;
 			formErrors.confirmPassword = ['Passwords do not match'];
 			toast.add('Error', 'Passwords do not match', 'error');
@@ -106,12 +132,16 @@
 			bind:value={name}
 			aria-invalid={!!getFieldError('name')}
 			aria-describedby={getFieldError('name') ? 'name-error' : undefined}
+			oninput={(e) => validateField('name', e.currentTarget.value)}
 			required
 		/>
-		{#if getFieldError('name')}
+		<!-- {#if getFieldError('name')}
 			<p id="name-error" class="mt-1 text-xs text-red-600" transition:fade>
 				{getFieldError('name')}
 			</p>
+		{/if} -->
+		{#if formErrors.name}
+			<p class="text-sm text-red-600">{formErrors.name}</p>
 		{/if}
 	</div>
 	<div class="">
@@ -203,7 +233,7 @@
 		{/if}
 		<button
 			type="button"
-			class="absolute right-3 top-9 hidden text-xs text-gray-400 group-hover:flex"
+			class="absolute top-9 right-3 hidden text-xs text-gray-400 group-hover:flex"
 			onmousedown={() => (passwordVisible = true)}
 			onmouseup={() => (passwordVisible = false)}
 			onmouseleave={() => (passwordVisible = false)}
@@ -239,7 +269,7 @@
 
 		<button
 			type="button"
-			class="absolute right-3 top-9 hidden text-xs text-gray-400 group-hover:flex"
+			class="absolute top-9 right-3 hidden text-xs text-gray-400 group-hover:flex"
 			onmousedown={() => (passwordVisible = true)}
 			onmouseup={() => (passwordVisible = false)}
 			onmouseleave={() => (passwordVisible = false)}
@@ -251,9 +281,13 @@
 		</button>
 	</div>
 
+	{#if formErrors['g-recaptcha-response']}
+		<p class="text-sm text-red-600">{formErrors['g-recaptcha-response']}</p>
+	{/if}
+	<div class="g-recaptcha" data-sitekey={SITE_KEY}></div>
 	<button
 		type="submit"
-		class="group flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:bg-primary hover:text-white"
+		class="group hover:bg-primary flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:text-white"
 	>
 		{#if loading}
 			<Spinner />
@@ -263,10 +297,6 @@
 	<div class="mt-3 flex justify-between text-xs text-gray-400">
 		<span class=" hover:text-secondary/70"><a href="/login">Back to login</a></span>
 
-		<a href="/verify" class=" transition-colors hover:text-secondary hover:underline">Resend Verification Email</a>
+		<a href="/verify" class=" hover:text-secondary transition-colors hover:underline">Resend Verification Email</a>
 	</div>
-	{#if formErrors['g-recaptcha-response']}
-		<p class="text-sm text-red-600">{formErrors['g-recaptcha-response']}</p>
-	{/if}
-	<div class="g-recaptcha" data-sitekey={SITE_KEY}></div>
 </form>

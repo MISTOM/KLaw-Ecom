@@ -77,10 +77,7 @@
 							</li>
 						</ul>
 					</div>
-					<div>
-						<p class="mb-2 font-medium">Returns</p>
-						<p class="text-sm text-gray-600">30-day returns. See our return policy for details.</p>
-					</div>
+					
 				</div>
 			</div>
 		</div>
