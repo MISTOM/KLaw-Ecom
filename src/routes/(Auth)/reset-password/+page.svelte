@@ -51,7 +51,7 @@
 			/>
 			<button
 				type="button"
-				class="absolute right-3 top-9 hidden text-xs text-gray-400 group-hover:flex"
+				class="absolute top-9 right-3 hidden text-xs text-gray-400 group-hover:flex"
 				onmousedown={() => (passwordVisible = true)}
 				onmouseup={() => (passwordVisible = false)}
 				onmouseleave={() => (passwordVisible = false)}
@@ -73,7 +73,7 @@
 			/>
 			<button
 				type="button"
-				class="absolute right-3 top-9 hidden text-xs text-gray-400 group-hover:flex"
+				class="absolute top-9 right-3 hidden text-xs text-gray-400 group-hover:flex"
 				onmousedown={() => (passwordVisible = true)}
 				onmouseup={() => (passwordVisible = false)}
 				onmouseleave={() => (passwordVisible = false)}
@@ -89,7 +89,7 @@
 		{#if !passwordMatch}
 			<span class="text-xs text-red-600" in:fade={{ duration: 100 }}>Passwords do not match</span>
 		{/if}
-		<button type="submit" class="w-full rounded-md border p-2 transition-colors hover:bg-primary hover:text-white">
+		<button type="submit" class="hover:bg-primary w-full rounded-md border p-2 transition-colors hover:text-white">
 			Reset Password
 		</button>
 	</form>

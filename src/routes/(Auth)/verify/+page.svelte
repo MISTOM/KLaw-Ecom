@@ -35,11 +35,11 @@
 			type="email"
 			name="email"
 			placeholder="Please enter your email..."
-			class="mb-2 w-full rounded border px-3 py-2"
+			class="mb-2 w-full rounded-sm border px-3 py-2"
 		/>
 		<button
 			type="submit"
-			class="group flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:bg-primary hover:text-white"
+			class="group hover:bg-primary flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:text-white"
 		>
 			{#if loading}
 				<Spinner />
@@ -58,7 +58,10 @@
 		</h1>
 		<p class="mb-6 text-center text-gray-700">Your email has been verified successfully.</p>
 		<div class="flex justify-center">
-			<a href="/login" class="inline-block rounded bg-primary px-4 py-2 text-white shadow hover:bg-primary/90">
+			<a
+				href="/login"
+				class="bg-primary hover:bg-primary/90 inline-block rounded-sm px-4 py-2 text-white shadow-sm"
+			>
 				Proceed to Login
 			</a>
 		</div>
@@ -68,7 +71,10 @@
 			<h1 class="mb-4 text-center text-2xl font-bold text-blue-600">Email already verified</h1>
 			<p class="mb-6 text-center text-gray-700">Your email address has already been verified.</p>
 			<div class="flex justify-center">
-				<a href="/login" class="inline-block rounded bg-primary px-4 py-2 text-white shadow hover:bg-primary/90">
+				<a
+					href="/login"
+					class="bg-primary hover:bg-primary/90 inline-block rounded-sm px-4 py-2 text-white shadow-sm"
+				>
 					Proceed to Login
 				</a>
 			</div>
@@ -82,19 +88,19 @@
 				{@render formInput?.()}
 				<div class="w-full text-right">
 					<a href="/">
-						<button class="rounded bg-primary px-3 py-1 text-white hover:bg-primary/90"> Go Home </button>
+						<button class="bg-primary hover:bg-primary/90 rounded-sm px-3 py-1 text-white"> Go Home </button>
 					</a>
 				</div>
 			</div>
 		{:else if data.error === 'Token is required'}
-			<h1 class="mb-4 text-center text-xl font-bold text-primary lg:text-2xl">Resend Verification Email</h1>
+			<h1 class="text-primary mb-4 text-center text-xl font-bold lg:text-2xl">Resend Verification Email</h1>
 			<p class="mb-4 text-center text-gray-700">Please enter your email to resend the verification email.</p>
 			<div class="flex w-full flex-col items-center">
 				<!-- form for resending verification -->
 				{@render formInput?.()}
 				<div class="w-full text-right">
 					<a href="/">
-						<button class="rounded bg-primary px-3 py-1 text-white hover:bg-primary/90"> Go Home </button>
+						<button class="bg-primary hover:bg-primary/90 rounded-sm px-3 py-1 text-white"> Go Home </button>
 					</a>
 				</div>
 			</div>
@@ -102,7 +108,7 @@
 			<h1 class="mb-4 text-center text-2xl font-bold text-red-600">Error</h1>
 			<p class="mb-4 text-center text-gray-700">{data.error}</p>
 			<div class="flex justify-center">
-				<a href="/" class="inline-block rounded bg-primary px-4 py-2 text-white shadow hover:bg-primary/90">
+				<a href="/" class="bg-primary hover:bg-primary/90 inline-block rounded-sm px-4 py-2 text-white shadow-sm">
 					Go Home
 				</a>
 			</div>

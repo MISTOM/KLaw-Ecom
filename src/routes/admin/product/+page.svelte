@@ -46,10 +46,10 @@
 		<hr />
 		{#each products as product, i}
 			<a href={`/admin/product/${product.id}`}>
-				<div class="my-3 flex items-center rounded-md border p-1 hover:shadow-sm">
+				<div class="my-3 flex items-center rounded-md border p-1 hover:shadow-xs">
 					<span class="m-5">{i}</span>
 					<img src={product.Image[0]?.url} alt="product" class="mr-4 size-14" />
-					<div class="flex-grow">
+					<div class="grow">
 						<h2 class="text-lg font-semibold">{product.name}</h2>
 						<p>Price: KES {product.price}</p>
 						<p>Quantity: {product.quantity}</p>
@@ -141,7 +141,7 @@
 						type="text"
 						bind:value={searchQuery}
 						placeholder="Search books..."
-						class="w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-4 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+						class="focus:border-primary focus:ring-primary w-full rounded-lg border border-gray-200 bg-white py-2 pr-4 pl-10 focus:ring-1 focus:outline-hidden"
 					/>
 				</div>
 			</div>
@@ -155,15 +155,15 @@
 							class="group relative rounded-lg border border-gray-200 bg-white p-4 transition-all hover:shadow-md"
 						>
 							<div class="flex gap-4">
-								<div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md">
+								<div class="h-24 w-24 shrink-0 overflow-hidden rounded-md">
 									<img
 										src={book.Image[0]?.url || '/kLawPillers.png'}
 										alt={book.name}
-										class="h-full w-full bg-primary object-cover"
+										class="bg-primary h-full w-full object-cover"
 									/>
 								</div>
 
-								<div class="flex-grow">
+								<div class="grow">
 									<div class="flex items-start justify-between">
 										<div>
 											<h3 class="font-semibold capitalize">{book.name}</h3>
@@ -200,7 +200,7 @@
 							</div>
 
 							<!-- Action Buttons -->
-							<div class="absolute bottom-4 right-4 hidden gap-2 group-hover:flex">
+							<div class="absolute right-4 bottom-4 hidden gap-2 group-hover:flex">
 								<a
 									href={`/admin/product/${book.id}`}
 									class="rounded-md bg-gray-100 p-2 text-gray-600 transition-colors hover:bg-gray-200"
@@ -246,7 +246,7 @@
 						name="name"
 						bind:value={name}
 						required
-						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+						class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 					/>
 				</div>
 
@@ -260,7 +260,7 @@
 							bind:value={price}
 							required
 							min="0"
-							class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+							class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 						/>
 					</div>
 
@@ -273,7 +273,7 @@
 							bind:value={quantity}
 							required
 							min="0"
-							class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+							class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 						/>
 					</div>
 				</div>
@@ -286,7 +286,7 @@
 						bind:value={description}
 						required
 						rows="3"
-						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+						class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 					>
 					</textarea>
 				</div>
@@ -298,7 +298,7 @@
 						name="serviceCode"
 						bind:value={serviceCode}
 						required
-						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary"
 					/>
 				</div> -->
 				<div class="space-y-2">
@@ -309,7 +309,7 @@
 						name="author"
 						bind:value={author}
 						required
-						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+						class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 					/>
 				</div>
 				<div class="space-y-2">
@@ -321,7 +321,7 @@
 						bind:value={pageCount}
 						min="0"
 						required
-						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+						class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 					/>
 				</div>
 
@@ -333,7 +333,7 @@
 						name="publicationDate"
 						bind:value={publicationDate}
 						required
-						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+						class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 					/>
 				</div>
 
@@ -348,7 +348,7 @@
 									name="categoryIds"
 									value={category.id}
 									id={`category-${category.id}`}
-									class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+									class="text-primary focus:ring-primary h-4 w-4 rounded-sm border-gray-300"
 								/>
 								<label for={`category-${category.id}`} class="ml-2 text-sm text-gray-700">
 									{category.name}
@@ -365,7 +365,7 @@
 						id="image"
 						name="image"
 						accept={allowedExtensions.join(',')}
-						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+						class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 					/>
 					<p class="text-xs text-gray-500">
 						Accepted formats: {allowedExtensions.join(', ')}
@@ -374,7 +374,7 @@
 
 				<button
 					type="submit"
-					class="mt-4 w-full rounded-md bg-primary px-4 py-2 text-white transition-colors hover:bg-primary/90"
+					class="bg-primary hover:bg-primary/90 mt-4 w-full rounded-md px-4 py-2 text-white transition-colors"
 				>
 					Add Book
 				</button>

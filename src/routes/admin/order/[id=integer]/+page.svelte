@@ -47,7 +47,7 @@
 		</div>
 		<div>
 			{#each productsOnOrder as productOnOrder}
-				<div class="mb-4 rounded-md border p-4 shadow-sm">
+				<div class="mb-4 rounded-md border p-4 shadow-xs">
 					<h3 class="text-xl font-semibold">{productOnOrder.product.name}</h3>
 					<p><strong>Price:</strong> KES {productOnOrder.product.price}</p>
 					<p><strong>Quantity:</strong> {productOnOrder.quantity}</p>

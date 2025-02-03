@@ -3,6 +3,7 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import Spinner from '$lib/components/Spinner.svelte';
+	import { eye, eyeSlash } from '$lib/components/icons.js';
 
 	const { form } = $props();
 
@@ -87,20 +88,19 @@
 
 		<button
 			type="button"
-			class="absolute right-3 top-9 hidden text-xs text-gray-400 group-hover:flex"
-			onmousedown={() => (passwordVisible = true)}
-			onmouseup={() => (passwordVisible = false)}
-			onmouseleave={() => (passwordVisible = false)}
-			ontouchstart={() => (passwordVisible = true)}
-			ontouchend={() => (passwordVisible = false)}
-			tabindex="-1"
+			class="absolute top-7 right-3 text-xs text-gray-400"
+			onclick={() => (passwordVisible = !passwordVisible)}
 		>
-			{passwordVisible ? 'Hide' : 'Show'}
+			{#if passwordVisible}
+				{@html eye}
+			{:else}
+				{@html eyeSlash}
+			{/if}
 		</button>
 	</div>
 	<button
 		type="submit"
-		class="group flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:bg-primary hover:text-white"
+		class="group hover:bg-primary flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:text-white"
 	>
 		{#if loading}
 			<Spinner />
@@ -113,6 +113,6 @@
 			If you dont have an account, <a href="/register" class="hover:text-secondary hover:underline">Register</a>
 		</div>
 
-		<a href="/forgotPassword" class=" transition-colors hover:text-secondary hover:underline">Forgot Password</a>
+		<a href="/forgotPassword" class=" hover:text-secondary transition-colors hover:underline">Forgot Password</a>
 	</div>
 </form>

@@ -114,7 +114,7 @@
 				</div>
 				<button
 					type="submit"
-					class="w-full rounded-md bg-fadeblack p-2 text-white transition-colors hover:bg-black"
+					class="bg-fadeblack w-full rounded-md p-2 text-white transition-colors hover:bg-black"
 				>
 					Save
 				</button>
@@ -122,7 +122,7 @@
 				<button
 					type="button"
 					onclick={toggleEditMode}
-					class="w-20 rounded-md bg-fadeblack p-2 text-white transition-colors hover:bg-black"
+					class="bg-fadeblack w-20 rounded-md p-2 text-white transition-colors hover:bg-black"
 				>
 					Edit
 				</button>

@@ -183,12 +183,12 @@
 				</div>
 				<div class="flex space-x-2">
 					{#if isEditMode}
-						<button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white transition-colors">Save</button>
+						<button type="submit" class="rounded-sm bg-blue-500 px-4 py-2 text-white transition-colors">Save</button>
 					{:else}
 						<button
 							type="button"
 							onclick={toggleEditMode}
-							class="rounded bg-green-500 px-4 py-2 text-white transition-colors">Edit</button
+							class="rounded-sm bg-green-500 px-4 py-2 text-white transition-colors">Edit</button
 						>
 
 						<div class="flex items-center space-x-2">
@@ -208,7 +208,7 @@
 						<button
 							type="button"
 							onclick={deleteProduct}
-							class="rounded bg-red-500 px-4 py-2 text-white transition-colors hover:bg-red-600">Delete</button
+							class="rounded-sm bg-red-500 px-4 py-2 text-white transition-colors hover:bg-red-600">Delete</button
 						>
 					{/if}
 				</div>
@@ -229,7 +229,7 @@
 			<img
 				src={imageUrl || '/kLawPillers.png'}
 				alt="product"
-				class="h-32 w-32 rounded bg-primary object-cover shadow-sm"
+				class="bg-primary h-32 w-32 rounded-sm object-cover shadow-xs"
 			/>
 			<div>
 				<h1 class="text-2xl font-bold">{name}</h1>
@@ -324,7 +324,7 @@
 											type="text"
 											name="name"
 											bind:value={name}
-											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 										/>
 									</div>
 									<!-- <div>
@@ -334,7 +334,7 @@
 											type="text"
 											name="serviceCode"
 											bind:value={serviceCode}
-											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary"
 										/>
 									</div> -->
 								</div>
@@ -348,7 +348,7 @@
 											name="price"
 											bind:value={price}
 											min="0"
-											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 										/>
 									</div>
 									<div>
@@ -359,7 +359,7 @@
 											name="quantity"
 											bind:value={quantity}
 											min="0"
-											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 										/>
 									</div>
 									<div>
@@ -369,7 +369,7 @@
 											type="text"
 											name="author"
 											bind:value={author}
-											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 										/>
 									</div>
 
@@ -380,7 +380,7 @@
 											type="date"
 											name="publicationDate"
 											bind:value={publicationDate}
-											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 										/>
 									</div>
 
@@ -413,7 +413,7 @@
 											type="number"
 											name="pageCount"
 											bind:value={pageCount}
-											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 										/>
 									</div>
 
@@ -424,7 +424,7 @@
 											name="description"
 											rows="3"
 											bind:value={description}
-											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 										></textarea>
 									</div>
 
@@ -444,7 +444,7 @@
 														name="categoryIds"
 														value={category.id}
 														checked={!!product?.categories?.find((c) => c.id === category.id)}
-														class="form-checkbox h-4 w-4 text-primary focus:ring-primary"
+														class="form-checkbox text-primary focus:ring-primary h-4 w-4"
 													/>
 													<span class="text-sm font-medium text-gray-700">{category.name}</span>
 												</label>
@@ -461,14 +461,14 @@
 											name="isPublished"
 											checked={data.product?.isPublished}
 											onchange={togglePublish}
-											class="block h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+											class="text-primary focus:ring-primary block h-4 w-4 rounded-sm border-gray-300"
 										/>
 									</div>
 
 									<div class="flex justify-end">
 										<button
 											type="submit"
-											class="rounded-md bg-primary px-4 py-2 text-white transition-colors hover:bg-primary/90"
+											class="bg-primary hover:bg-primary/90 rounded-md px-4 py-2 text-white transition-colors"
 										>
 											Save
 										</button>

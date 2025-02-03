@@ -61,7 +61,7 @@
 	<div class="mb-6 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
 		<select
 			bind:value={selectedCategoryId}
-			class="rounded-lg border border-gray-200 bg-white px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+			class="focus:border-primary focus:ring-primary rounded-lg border border-gray-200 bg-white px-4 py-2 focus:ring-1 focus:outline-hidden"
 		>
 			<option value="all">All Categories</option>
 			{#each categories as category}
@@ -80,7 +80,7 @@
 							bind:group={selectedCategoryIds}
 							value={category.id}
 							id={`category-${category.id}`}
-							class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+							class="h-4 w-4 rounded-sm border-gray-300 text-primary focus:ring-primary"
 						/>
 						<label for={`category-${category.id}`} class="ml-2 text-sm text-gray-700">
 							{category.name}
@@ -101,7 +101,7 @@
 							<img
 								src={product.Image[0]?.url || '/kLawPillers.png'}
 								alt={product.name}
-								class="h-full bg-primary object-cover transition-transform group-hover:scale-105"
+								class="bg-primary h-full object-cover transition-transform group-hover:scale-105"
 							/>
 						</div>
 					</a>
@@ -114,7 +114,7 @@
 								KES {product.price.toLocaleString()}
 							</span>
 							<button
-								class="rounded-md bg-primary px-3 py-2 text-sm text-white transition-colors hover:bg-primary/90"
+								class="bg-primary hover:bg-primary/90 rounded-md px-3 py-2 text-sm text-white transition-colors"
 								onclick={async () => {
 									if (await cart.addItem(product)) {
 										console.log('product added to cart');

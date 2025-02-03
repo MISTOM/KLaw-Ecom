@@ -8,14 +8,14 @@
 	setToastState();
 </script>
 
-<div class="flex min-h-screen flex-col font-optima">
+<div class="font-optima flex min-h-screen flex-col">
 	<noscript>Please Enable Javascript for this app to run</noscript>
 	<Toaster />
-	<div class="flex-grow">
+	<div class="grow">
 		{@render children?.()}
 	</div>
 
-	<footer class="mt-7 rounded-sm bg-gray-50 pb-4 font-optima lg:mx-12">
+	<footer class="font-optima mt-7 rounded-xs bg-gray-50 pb-4 lg:mx-12">
 		<div class="container mx-auto px-4">
 			<hr class="mb-4 border-gray-400" />
 			<div class="mb-4 flex flex-wrap justify-between">
@@ -30,7 +30,7 @@
 					<a
 						href="https://new.kenyalaw.org/about/#contact"
 						target="_blank"
-						class="mb-2 rounded-md bg-primary px-4 py-2 text-white hover:bg-primary/90 md:mb-0 md:mr-4"
+						class="bg-primary hover:bg-primary/90 mb-2 rounded-md px-4 py-2 text-white md:mr-4 md:mb-0"
 					>
 						Contact Us
 					</a>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import { eye, eyeSlash } from '$lib/components/icons.js';
 	import Spinner from '$lib/components/Spinner.svelte';
 	import { getToastState } from '$lib/Toast.svelte.js';
 	import { validateRegistration } from '$lib/validations/index.js';
@@ -43,27 +44,24 @@
 	};
 
 	// Validate a single field
-	function validateField<K extends keyof UserRegistration>(field: K, value: UserRegistration[K]) {
+	const validateField = <K extends keyof UserRegistration>(field: K, value: UserRegistration[K]) => {
 		// pick the field from the schema
 		const fieldSchema = userSchema.shape[field];
 		const result = fieldSchema.safeParse(value);
-		formErrors[field] = result.success ? '' : result.error.issues[0].message;
-	}
+		formErrors[field] = result.success ? [] : result.error?.flatten().formErrors || [];
+	};
 
 	// Validate entire form on submit
-
-	function validateAll(formData: FormData): boolean {
-		const result = userSchema.safeParse(formData);
+	const validateAll = (formData: FormData) => {
+		const result = userSchema.safeParse(Object.fromEntries(formData.entries()));
+		console.log('Validate all', result);
 		if (!result.success) {
-			// flatten errors
 			const fieldErrors = result.error.flatten().fieldErrors;
-			for (const key in fieldErrors) {
-				formErrors[key] = fieldErrors[key]?.[0] || '';
-			}
+			formErrors = fieldErrors;
 			return false;
 		}
 		return true;
-	}
+	};
 
 	// function getReCaptchaToken(action: string): Promise<string> {
 	// 	return new Promise((resolve) => {
@@ -132,17 +130,17 @@
 			bind:value={name}
 			aria-invalid={!!getFieldError('name')}
 			aria-describedby={getFieldError('name') ? 'name-error' : undefined}
-			oninput={(e) => validateField('name', e.currentTarget.value)}
+			onkeyup={(e) => validateField('name', e.currentTarget.value)}
 			required
 		/>
-		<!-- {#if getFieldError('name')}
+		{#if getFieldError('name')}
 			<p id="name-error" class="mt-1 text-xs text-red-600" transition:fade>
 				{getFieldError('name')}
 			</p>
-		{/if} -->
-		{#if formErrors.name}
-			<p class="text-sm text-red-600">{formErrors.name}</p>
 		{/if}
+		<!-- {#if formErrors.name}
+			<p class="text-sm text-red-600">{formErrors.name}</p>
+		{/if} -->
 	</div>
 	<div class="">
 		<label for="email" class="block text-sm font-semibold">Email <span class="text-red-500">*</span> </label>
@@ -154,6 +152,7 @@
 			bind:value={email}
 			aria-invalid={!!getFieldError('email')}
 			aria-describedby={getFieldError('email') ? 'email-error' : undefined}
+			onkeyup={(e) => validateField('email', e.currentTarget.value)}
 			required
 		/>
 		{#if getFieldError('email')}
@@ -179,6 +178,7 @@
 			aria-invalid={!!getFieldError('phoneNumber')}
 			aria-describedby={getFieldError('phoneNumber') ? 'phoneNumber-error' : undefined}
 			placeholder="07..."
+			onkeyup={(e) => validateField('phoneNumber', e.currentTarget.value)}
 			required
 		/>
 		{#if getFieldError('phoneNumber')}
@@ -202,6 +202,7 @@
 			bind:value={idNumber}
 			aria-invalid={!!getFieldError('idNumber')}
 			aria-describedby={getFieldError('idNumber') ? 'idNumber-error' : undefined}
+			onkeyup={(e) => validateField('idNumber', e.currentTarget.value)}
 			required
 		/>
 		{#if getFieldError('idNumber')}
@@ -224,6 +225,7 @@
 			bind:value={password}
 			aria-invalid={!!getFieldError('password')}
 			aria-describedby={getFieldError('password') ? 'password-error' : undefined}
+			onkeyup={(e) => validateField('password', e.currentTarget.value)}
 			required
 		/>
 		{#if getFieldError('password')}
@@ -231,17 +233,17 @@
 				{getFieldError('password')}
 			</p>
 		{/if}
+
 		<button
 			type="button"
-			class="absolute top-9 right-3 hidden text-xs text-gray-400 group-hover:flex"
-			onmousedown={() => (passwordVisible = true)}
-			onmouseup={() => (passwordVisible = false)}
-			onmouseleave={() => (passwordVisible = false)}
-			ontouchstart={() => (passwordVisible = true)}
-			ontouchend={() => (passwordVisible = false)}
-			tabindex="-1"
+			class="absolute top-7 right-3 text-xs text-gray-400"
+			onclick={() => (passwordVisible = !passwordVisible)}
 		>
-			{passwordVisible ? 'Hide' : 'Show'}
+			{#if passwordVisible}
+				{@html eye}
+			{:else}
+				{@html eyeSlash}
+			{/if}
 		</button>
 	</div>
 	<div class="group relative">
@@ -269,15 +271,14 @@
 
 		<button
 			type="button"
-			class="absolute top-9 right-3 hidden text-xs text-gray-400 group-hover:flex"
-			onmousedown={() => (passwordVisible = true)}
-			onmouseup={() => (passwordVisible = false)}
-			onmouseleave={() => (passwordVisible = false)}
-			ontouchstart={() => (passwordVisible = true)}
-			ontouchend={() => (passwordVisible = false)}
-			tabindex="-1"
+			class="absolute top-7 right-3 text-xs text-gray-400"
+			onclick={() => (passwordVisible = !passwordVisible)}
 		>
-			{passwordVisible ? 'Hide' : 'Show'}
+			{#if passwordVisible}
+				{@html eye}
+			{:else}
+				{@html eyeSlash}
+			{/if}
 		</button>
 	</div>
 

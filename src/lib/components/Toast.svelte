@@ -53,7 +53,7 @@
 </script>
 
 <div
-	class="relative flex h-16 w-80 items-center justify-between rounded-md bg-gray-50 px-4 py-2 shadow-sm"
+	class="relative flex h-16 w-80 items-center justify-between rounded-md bg-gray-50 px-4 py-2 shadow-xs"
 	in:slide
 	out:slide={{ duration: 100 }}
 >
@@ -69,7 +69,7 @@
 		</div>
 	</div>
 	<button
-		class="w-7 rounded-full bg-gray-200 pb-1 text-gray-600 hover:bg-gray-300 focus:outline-none"
+		class="w-7 rounded-full bg-gray-200 pb-1 text-gray-600 hover:bg-gray-300 focus:outline-hidden"
 		onclick={() => toastState.remove(toast.id)}
 	>
 		<span class="sr-only">Close toast</span>

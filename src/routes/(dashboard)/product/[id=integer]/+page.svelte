@@ -28,7 +28,7 @@
 				<img
 					src={product.Image[0]?.url || '/kLawPillers.png'}
 					alt={product.name}
-					class="h-full w-full bg-primary object-cover transition-transform group-hover:scale-105"
+					class="bg-primary h-full w-full object-cover transition-transform group-hover:scale-105"
 				/>
 			</div>
 
@@ -38,7 +38,7 @@
 				<div class="mb-4 flex items-center justify-between">
 					<span class="text-2xl font-bold">KES {product.price.toLocaleString()}</span>
 					<button
-						class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm text-white transition-colors hover:bg-primary/90"
+						class="bg-primary hover:bg-primary/90 flex items-center gap-2 rounded-md px-4 py-2 text-sm text-white transition-colors"
 						onclick={async () => {
 							if (await cart.addItem(product)) toast.add('Success', 'Product added to cart', 'success', 2000);
 						}}
@@ -77,7 +77,6 @@
 							</li>
 						</ul>
 					</div>
-					
 				</div>
 			</div>
 		</div>

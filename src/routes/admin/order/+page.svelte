@@ -88,7 +88,7 @@
 						type="text"
 						bind:value={searchQuery}
 						placeholder="Search by customer name..."
-						class="w-full rounded-lg border border-gray-200 bg-white p-2 px-4 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+						class="focus:border-primary focus:ring-primary w-full rounded-lg border border-gray-200 bg-white p-2 px-4 focus:ring-1 focus:outline-hidden"
 					/>
 				</div>
 			</div>
@@ -119,7 +119,7 @@
 								class="flex w-full items-center justify-between bg-gray-50 p-4 text-left"
 								onclick={() => toggleOrderExpansion(order.id)}
 							>
-								<div class="flex-grow">
+								<div class="grow">
 									<h3 class="font-semibold">Order #{order.id}</h3>
 									<p class="text-sm text-gray-600">
 										Ordered by {order.user.name} on {formatDate(order.createdAt)}
@@ -143,7 +143,7 @@
 												<div class="flex items-center space-x-4">
 													<input
 														type="checkbox"
-														class="h-4 w-4 rounded border-gray-300"
+														class="h-4 w-4 rounded-sm border-gray-300"
 														checked={ProductOnOrder.isIssued}
 														onchange={async () =>
 															await issueProduct(order.id, ProductOnOrder.product.id, ProductOnOrder.isIssued)}
@@ -217,10 +217,10 @@
 		{#if href={`/admin/ord}{#each d}`}>
  as order, i}<a href={ flex items-center rounded}>
 					<div
-						class="my-3 flex items-center rounded-md border p-1 transition-colors hover:bg-amber-50 hover:shadow"
+						class="my-3 flex items-center rounded-md border p-1 transition-colors hover:bg-amber-50 hover:shadow-sm"
 					>
 						<span class="m-5">{3 class=}</span>
-						<div class="flex-grow">
+						<div class="grow">
 							<h3 class="font-semibold">Ordered by {								Order D}</h3>
 							<h2 class="font-semibold">
 								Order Date: {									day: 'numeric',

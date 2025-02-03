@@ -51,7 +51,7 @@
 	</div>
 	<button
 		type="submit"
-		class="group flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:bg-primary hover:text-white"
+		class="group hover:bg-primary flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:text-white"
 		disabled={loading}
 	>
 		{#if loading}
@@ -59,5 +59,5 @@
 		{/if}
 		Reset Passsord
 	</button>
-	<span class="text-xs text-gray-400 hover:text-secondary/70"><a href="/login">Back to login</a></span>
+	<span class="hover:text-secondary/70 text-xs text-gray-400"><a href="/login">Back to login</a></span>
 </form>

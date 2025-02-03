@@ -32,7 +32,7 @@
 			<!-- Edit Category Form -->
 			<form
 				method="POST"
-				class="rounded-lg bg-white p-6 shadow"
+				class="rounded-lg bg-white p-6 shadow-sm"
 				use:enhance={() => {
 					return async ({ result }) => {
 						if (result.type === 'success') {
@@ -53,13 +53,13 @@
 						type="text"
 						name="name"
 						bind:value={name}
-						class="w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary"
+						class="focus:ring-primary w-full rounded-lg border px-3 py-2 focus:ring-1 focus:outline-hidden"
 						required
 					/>
 				</div>
 				<input type="hidden" name="id" bind:value={id} />
 
-				<button type="submit" class="rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90">
+				<button type="submit" class="bg-primary hover:bg-primary/90 rounded-lg px-4 py-2 text-white">
 					Save Changes
 				</button>
 			</form>

@@ -14,7 +14,7 @@
 
 	<!-- go to history navigation back -->
 	<button
-		class=" mt-4 rounded-sm p-2 outline outline-[0.3px] transition-colors hover:bg-gray-200 hover:outline-primary"
+		class=" hover:outline-primary mt-4 rounded-xs p-2 outline outline-[0.3px] transition-colors hover:bg-gray-200"
 		onclick={() => history.back()}>Go back</button
 	>
 </main>

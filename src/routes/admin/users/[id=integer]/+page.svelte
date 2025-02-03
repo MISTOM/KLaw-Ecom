@@ -62,7 +62,7 @@
 				</button>
 				<button
 					onclick={resetPassword}
-					class="rounded-lg border border-primary px-4 py-2 text-primary hover:bg-primary/10"
+					class="border-primary text-primary hover:bg-primary/10 rounded-lg border px-4 py-2"
 				>
 					Reset Password
 				</button>
@@ -75,7 +75,7 @@
 				<div class="rounded-lg border border-gray-200 bg-white p-6">
 					<div class="mb-6 flex items-center space-x-4">
 						<div
-							class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-2xl capitalize text-primary"
+							class="bg-primary/10 text-primary flex h-16 w-16 items-center justify-center rounded-full text-2xl capitalize"
 						>
 							{user.name.charAt(0)}
 						</div>

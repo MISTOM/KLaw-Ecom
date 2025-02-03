@@ -78,14 +78,14 @@
 		<hr />
 		<ul>
 			{#each cart.cartItems as item, i}
-				<li class="my-3 flex items-center rounded-md border p-1 hover:shadow-sm">
+				<li class="my-3 flex items-center rounded-md border p-1 hover:shadow-xs">
 					<span class="m-5">{i + 1}</span>
 					<img
 						src={item.product.Image[0]?.url || '/kLawPillers.png'}
 						alt={item.product.name}
 						class="mr-4 size-14"
 					/>
-					<div class="flex-grow">
+					<div class="grow">
 						<h2 class="text-lg font-semibold">{item.product.name}</h2>
 						<p>Price: KES {item.product.price}</p>
 						<p>Quantity: {item.quantity}</p>
@@ -156,7 +156,7 @@
 
 		{#if paymentDetails}
 			<button
-				class="transition-color m-1 w-full rounded bg-green-600 p-1 text-white hover:opacity-90"
+				class="transition-color m-1 w-full rounded-sm bg-green-600 p-1 text-white hover:opacity-90"
 				onclick={createOrder}
 				>Pay
 			</button>
@@ -167,7 +167,7 @@
 </main>
 {#if showPaymentModal}
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+		class="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black backdrop-blur-xs"
 		role="button"
 		tabindex="-1"
 		onclick={() => (showPaymentModal = false)}
@@ -186,7 +186,7 @@
 		>
 			<!-- Close Button -->
 			<button
-				class="absolute right-6 top-2 text-2xl text-gray-500 hover:text-gray-700"
+				class="absolute top-2 right-6 text-2xl text-gray-500 hover:text-gray-700"
 				aria-label="Close"
 				onclick={() => (showPaymentModal = false)}
 			>
@@ -195,7 +195,7 @@
 
 			<!-- Loading Overlay -->
 			{#if loading}
-				<div class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75">
+				<div class="bg-opacity-75 absolute inset-0 z-10 flex items-center justify-center bg-white">
 					<Spinner />
 				</div>
 			{/if}

@@ -7,7 +7,7 @@
 	const tableHeaderClasses =
 		'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer';
 	const formControlClasses =
-		' py-2 px-4 rounded-lg border border-gray-200 bg-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary';
+		' py-2 px-4 rounded-lg border border-gray-200 bg-white focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary';
 	const tableDataClasses = 'whitespace-nowrap px-6 py-4 text-sm text-gray-500';
 
 	let searchQuery = $state('');
@@ -68,13 +68,13 @@
 					type="text"
 					bind:value={searchQuery}
 					placeholder="Search users..."
-					class="w-full rounded-lg border border-gray-200 bg-white py-2 pl-4 pr-4 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+					class="w-full rounded-lg border border-gray-200 bg-white py-2 pl-4 pr-4 focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary"
 				/>
 			</div>
 
 			<select
 				bind:value={filterRole}
-				class="rounded-lg border border-gray-200 bg-white px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+				class="rounded-lg border border-gray-200 bg-white px-4 py-2 focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary"
 			>
 				<option value="all">All Roles</option>
 				<option value="ADMIN">Admin</option>
@@ -83,7 +83,7 @@
 
 			<select
 				bind:value={filterStatus}
-				class="rounded-lg border border-gray-200 bg-white px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+				class="rounded-lg border border-gray-200 bg-white px-4 py-2 focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary"
 			>
 				<option value="all">All Status</option>
 				<option value="active">Active</option>
@@ -133,7 +133,7 @@
 						<tr class="hover:bg-gray-50">
 							<td class="whitespace-nowrap px-6 py-4">
 								<div class="flex items-center">
-									<div class="h-10 w-10 flex-shrink-0">
+									<div class="h-10 w-10 shrink-0">
 										<div
 											class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary"
 										>
@@ -188,7 +188,7 @@
 	<div class="mb-6">
 		<div class="mb-4 flex items-center justify-between">
 			<h1 class="text-3xl font-bold">Users Management</h1>
-			<a href="/admin/users/new" class="rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90">
+			<a href="/admin/users/new" class="bg-primary hover:bg-primary/90 rounded-lg px-4 py-2 text-white">
 				Add New User
 			</a>
 		</div>
@@ -231,8 +231,8 @@
 							</div>
 						</th>
 
-						<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"> Role </th>
-						<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+						<th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"> Role </th>
+						<th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
 							Status
 						</th>
 						<th class={tableHeaderClasses} onclick={() => handleSort('createdAt')}>
@@ -243,7 +243,7 @@
 								{/if}
 							</div>
 						</th>
-						<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+						<th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
 							Actions
 						</th>
 					</tr>
@@ -253,9 +253,9 @@
 						<tr class="hover:bg-gray-50">
 							<td class={tableDataClasses}>
 								<div class="flex items-center">
-									<div class="h-10 w-10 flex-shrink-0">
+									<div class="h-10 w-10 shrink-0">
 										<div
-											class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary"
+											class="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-full"
 										>
 											{user.name.charAt(0)}
 										</div>
@@ -268,7 +268,7 @@
 							</td>
 							<td class={tableDataClasses}>
 								<span
-									class={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+									class={`inline-flex rounded-full px-2 text-xs leading-5 font-semibold ${
 										user.role.name === 'ADMIN'
 											? 'bg-purple-100 text-purple-800'
 											: user.role.name === 'USER'
@@ -281,7 +281,7 @@
 							</td>
 							<td class={tableDataClasses}>
 								<span
-									class={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+									class={`inline-flex rounded-full px-2 text-xs leading-5 font-semibold ${
 										user.isVerified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
 									}`}
 								>
@@ -291,7 +291,7 @@
 							<td class={`${tableDataClasses} text-sm text-gray-500`}>
 								{formatDate(user.createdAt)}
 							</td>
-							<td class={`whitespace-nowrap px-6 py-4 text-right text-sm font-medium`}>
+							<td class={`px-6 py-4 text-right text-sm font-medium whitespace-nowrap`}>
 								<a href={`/admin/users/${user.id}`} class="text-primary hover:text-primary/80"> View Details </a>
 							</td>
 						</tr>

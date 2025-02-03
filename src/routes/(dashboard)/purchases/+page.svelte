@@ -79,7 +79,7 @@
 				<div class="mt-4 flex justify-end">
 					<a
 						href="/purchases/{order.id}"
-						class="rounded-md bg-primary px-4 py-2 text-sm text-white transition-colors hover:bg-primary/90"
+						class="bg-primary hover:bg-primary/90 rounded-md px-4 py-2 text-sm text-white transition-colors"
 					>
 						View Order
 					</a>

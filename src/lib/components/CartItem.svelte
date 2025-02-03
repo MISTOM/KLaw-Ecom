@@ -8,7 +8,7 @@
 </script>
 
 <div
-	class="flex items-center justify-between border-b border-fadeblack py-2"
+	class="border-fadeblack flex items-center justify-between border-b py-2"
 	in:fade={{ duration: 100 }}
 	out:fade={{ duration: 100 }}
 >
@@ -16,7 +16,7 @@
 		<img
 			src={item.product.Image[0]?.url || '/kLawPillers.png'}
 			alt="Product"
-			class="mr-4 size-12 rounded object-cover"
+			class="mr-4 size-12 rounded-sm object-cover"
 		/>
 		<div>
 			<h4>{item.product.name}</h4>
@@ -26,7 +26,7 @@
 
 	<div class="flex items-center">
 		<button
-			class="rounded p-1 hover:bg-gray-200"
+			class="rounded-sm p-1 hover:bg-gray-200"
 			aria-label="Subtract 1 from quantity"
 			onclick={async () => {
 				if (item.quantity === 1) return;
@@ -36,7 +36,7 @@
 		>
 		<span class="p-1">{item.quantity}</span>
 		<button
-			class="rounded p-1 hover:bg-gray-200"
+			class="rounded-sm p-1 hover:bg-gray-200"
 			aria-label="Add 1 to quantity"
 			onclick={async () => {
 				item.quantity++;
@@ -44,7 +44,7 @@
 			}}>+</button
 		>
 		<button
-			class="ml-4 rounded p-1 hover:bg-red-200"
+			class="ml-4 rounded-sm p-1 hover:bg-red-200"
 			onclick={async () => {
 				await cart.removeItem(item.id);
 			}}>🗑️</button

@@ -27,7 +27,7 @@
 	<div class="mb-6">
 		<div class="mb-4 flex items-center justify-between">
 			<h1 class="text-3xl font-bold">Categories Management</h1>
-			<button class="rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90" onclick={toggleAddForm}>
+			<button class="bg-primary hover:bg-primary/90 rounded-lg px-4 py-2 text-white" onclick={toggleAddForm}>
 				{showAddForm ? 'Cancel' : 'Add Category'}
 			</button>
 		</div>
@@ -37,7 +37,7 @@
 			<form
 				action="?/add_category"
 				method="POST"
-				class="mb-6 rounded-lg bg-white p-6 shadow"
+				class="mb-6 rounded-lg bg-white p-6 shadow-sm"
 				in:slide
 				out:slide={{ duration: 150 }}
 				use:enhance={() => {
@@ -63,12 +63,12 @@
 						type="text"
 						name="name"
 						bind:value={newCategoryName}
-						class="w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary"
+						class="focus:ring-primary w-full rounded-lg border px-3 py-2 focus:ring-1 focus:outline-hidden"
 						oninput={() => (formErrors ? (formErrors = '') : null)}
 						required
 					/>
 				</div>
-				<button type="submit" class="rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90">
+				<button type="submit" class="bg-primary hover:bg-primary/90 rounded-lg px-4 py-2 text-white">
 					Save Category
 				</button>
 			</form>
@@ -79,8 +79,8 @@
 			<table class="min-w-full divide-y divide-gray-200">
 				<thead class="bg-gray-50">
 					<tr>
-						<th class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Name</th>
-						<th class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Actions</th>
+						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
 					</tr>
 				</thead>
 				<tbody class="divide-y divide-gray-200">
