@@ -155,7 +155,7 @@
 							class="group relative rounded-lg border border-gray-200 bg-white p-4 transition-all hover:shadow-md"
 						>
 							<div class="flex gap-4">
-								<div class="h-24 w-24 shrink-0 overflow-hidden rounded-md">
+								<div class="h-28 w-28 shrink-0 overflow-hidden">
 									<img
 										src={book.Image[0]?.url || '/kLawPillers.png'}
 										alt={book.name}

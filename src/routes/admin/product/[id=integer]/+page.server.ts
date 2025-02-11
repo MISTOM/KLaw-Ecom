@@ -48,22 +48,11 @@ export const actions = {
 
 		// console.log('update product data fromEntries: ', Object.fromEntries(formData.entries())); : use Object.fromEntries to get all form data
 
-		const price = priceData ? parseFloat(priceData) : undefined;
-		const quantity = quantityData ? parseInt(quantityData) : undefined;
+		const price = priceData ? parseFloat(priceData) : 0;
+		const quantity = quantityData ? parseInt(quantityData) : 0;
 		const publicationDate = publicationDateData ? new Date(publicationDateData) : undefined;
-		const pageCount = pageCountData ? parseInt(pageCountData) : undefined;
-
-		if (
-			!name ||
-			!description ||
-			!price ||
-			!quantity ||
-			!serviceCode ||
-			!author ||
-			!publicationDate ||
-			!pageCount ||
-			!categoryIds.length
-		) {
+		const pageCount = pageCountData ? parseInt(pageCountData) : 0;
+		if (!name || !description || !serviceCode || !author || !publicationDate || !categoryIds.length) {
 			return fail(400, {
 				data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount, categoryIds },
 				errors: 'All fields and atleast one category are required'

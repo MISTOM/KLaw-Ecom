@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { goto, invalidate } from '$app/navigation';
 	import { getToastState } from '$lib/Toast.svelte';
+	import { fade } from 'svelte/transition';
 
 	const { data, form } = $props();
 	const toast = getToastState();
@@ -20,6 +21,8 @@
 	let pageCount = $state(data.product?.pageCount);
 	let imageUrl = $state(data.product?.Image[0]?.url);
 	let showDeleteModal = $state(false);
+
+	let selectedCategories = $state(data.product?.categories || []);
 
 	// Format publication date to bind to date input
 	let publicationDate = $state(publicationDateISO ? new Date(publicationDateISO).toISOString().split('T')[0] : '');
@@ -45,11 +48,14 @@
 			});
 
 			if (res.ok) {
+				const message = data.product.isPublished ? 'Product unpublished' : 'Product published';
+				toast.add('Success', message, 'success');
 			} else if (res.status === 401) {
 				console.error('Unauthorized');
 				await goto(`/login?redirect=${window.location.pathname}`);
 			} else {
 				console.error('Failed to publish product');
+				toast.add('Error', 'Failed to publish product', 'error');
 			}
 		}
 		await invalidate('update:product');
@@ -83,6 +89,27 @@
 			}
 		}
 	};
+
+	// When the user selects a category from the dropdown
+	function addCategory(event: Event) {
+		const select = event.currentTarget as HTMLSelectElement;
+		const selectedId = parseInt(select.value);
+
+		if (!selectedId) return;
+		// Prevent duplicate selections
+		if (selectedCategories.find((c) => c.id === selectedId)) return;
+		const cat = categories.find((c) => c.id === selectedId);
+		if (cat) {
+			selectedCategories = [...selectedCategories, cat];
+		}
+		// Reset select to default prompt
+		select.value = '';
+	}
+
+	// When user clicks remove button
+	function removeCategory(categoryId: number) {
+		selectedCategories = selectedCategories.filter((c) => c.id !== categoryId);
+	}
 </script>
 
 <svelte:head>
@@ -282,22 +309,17 @@
 					<div class="border-b p-6">
 						<div class="flex items-center justify-between">
 							<h1 class="text-2xl font-bold">{name}</h1>
-							<div class="flex items-center gap-2">
-								<button
-									class="rounded-md bg-red-100 p-2 text-red-600 transition-colors hover:bg-red-200"
-									onclick={() => (showDeleteModal = true)}
-								>
-									<!-- <Trash2 size={16} /> -->
-									delete
-								</button>
-							</div>
 						</div>
 					</div>
 
 					<div class="p-6">
 						<form
 							method="POST"
-							use:enhance={() => {
+							use:enhance={({ formData }) => {
+								formData.delete('categoryIds');
+								selectedCategories.forEach((c) => {
+									formData.append('categoryIds', c.id.toString());
+								});
 								return async ({ update, result }) => {
 									console.log('form result ->  ', result);
 									if (result.status === 200) {
@@ -316,18 +338,17 @@
 							{/if}
 
 							<div class="space-y-4">
-								<div class="grid gap-4 sm:grid-cols-2">
-									<div>
-										<label for="name" class="text-sm font-medium text-gray-700">Book Title</label>
-										<input
-											id="name"
-											type="text"
-											name="name"
-											bind:value={name}
-											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
-										/>
-									</div>
-									<!-- <div>
+								<div>
+									<label for="name" class="text-sm font-medium text-gray-700">Book Title</label>
+									<input
+										id="name"
+										type="text"
+										name="name"
+										bind:value={name}
+										class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
+									/>
+								</div>
+								<!-- <div>
 										<label for="servicecode" class="text-sm font-medium text-gray-700">Service Code</label>
 										<input
 											id="servicecode"
@@ -337,7 +358,6 @@
 											class="mt-1 w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary"
 										/>
 									</div> -->
-								</div>
 
 								<div class="grid gap-4 sm:grid-cols-2">
 									<div>
@@ -406,6 +426,45 @@
 											{/each}
 										</div> -->
 
+									<div class="mb-4 space-y-2">
+										<label for="categories" class="text-sm font-medium text-gray-700">Select Categories</label>
+
+										<!-- Dropdown: Only show categories that are not already selected -->
+										<select
+											name="categoryIds"
+											class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-none"
+											onchange={addCategory}
+										>
+											<option value="">Select a category</option>
+											{#each categories as category (category.id)}
+												{#if !selectedCategories.find((c) => c.id === category.id)}
+													<option value={category.id}>{category.name}</option>
+												{/if}
+											{/each}
+										</select>
+
+										<!-- Display selected categories -->
+										<div class="flex flex-wrap gap-2">
+											<h6 class="w-full text-sm font-medium text-gray-600">Selected Categories:</h6>
+											{#each selectedCategories as category (category.id)}
+												<div
+													class="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-1"
+													in:fade={{ duration: 100 }}
+													out:fade={{ duration: 50 }}
+												>
+													<span class="text-sm">{category.name}</span>
+													<button
+														type="button"
+														class="text-gray-500 hover:text-gray-700"
+														onclick={() => removeCategory(category.id)}
+													>
+														x
+													</button>
+												</div>
+											{/each}
+										</div>
+									</div>
+
 									<div>
 										<label for="pageCount" class="text-sm font-medium text-gray-700">Page Count</label>
 										<input
@@ -418,7 +477,7 @@
 									</div>
 
 									<div>
-										<label for="" class="text-sm font-medium text-gray-700">Description</label>
+										<label for="description" class="text-sm font-medium text-gray-700">Description</label>
 										<textarea
 											id="description"
 											name="description"
@@ -427,52 +486,36 @@
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 										></textarea>
 									</div>
-
-									<!-- Improved Select Categories Section -->
-									<div class="mb-4 space-y-2">
-										<label for="categories" class="text-sm font-medium text-gray-700">Select Categories</label>
-
-										<div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-											{#each categories as category}
-												<label
-													for={`${category.id}`}
-													class="flex cursor-pointer items-center space-x-2 rounded-md border border-gray-200 px-3 py-2 transition-colors hover:bg-gray-50"
-												>
-													<input
-														id={`${category.id}`}
-														type="checkbox"
-														name="categoryIds"
-														value={category.id}
-														checked={!!product?.categories?.find((c) => c.id === category.id)}
-														class="form-checkbox text-primary focus:ring-primary h-4 w-4"
-													/>
-													<span class="text-sm font-medium text-gray-700">{category.name}</span>
-												</label>
-											{/each}
-										</div>
-									</div>
+								</div>
+								<div class="flex justify-end gap-4">
 									<div>
-										<label for="isPublished" class="text-sm font-black text-gray-700">
-											{data.product?.isPublished ? 'Published' : 'Publish'}
-										</label>
-										<input
-											id="isPublished"
-											type="checkbox"
-											name="isPublished"
-											checked={data.product?.isPublished}
-											onchange={togglePublish}
-											class="text-primary focus:ring-primary block h-4 w-4 rounded-sm border-gray-300"
-										/>
-									</div>
-
-									<div class="flex justify-end">
 										<button
-											type="submit"
-											class="bg-primary hover:bg-primary/90 rounded-md px-4 py-2 text-white transition-colors"
+											type="button"
+											onclick={togglePublish}
+											class={`rounded-md px-4 py-2 text-white transition-colors ${
+												data.product?.isPublished
+													? 'bg-amber-500 hover:bg-amber-600'
+													: 'bg-green-500 hover:bg-green-600'
+											}`}
 										>
-											Save
+											{data.product?.isPublished ? 'Unpublish' : 'Publish'}
 										</button>
 									</div>
+
+									<button
+										type="submit"
+										class="bg-primary hover:bg-primary/90 cursor-pointer rounded-md px-4 py-2 text-white transition-colors"
+									>
+										Save
+									</button>
+									<button
+										type="button"
+										class="rounded-md bg-red-100 p-2 text-red-600 transition-colors hover:bg-red-200"
+										onclick={() => (showDeleteModal = true)}
+									>
+										<!-- <Trash2 size={16} /> -->
+										Delete
+									</button>
 								</div>
 							</div>
 						</form>

@@ -100,7 +100,7 @@
 	</div>
 	<button
 		type="submit"
-		class="group hover:bg-primary flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:text-white"
+		class="group bg-primary hover:bg-primary/90 flex w-full items-center justify-center rounded-md border p-2 text-white transition-colors hover:cursor-pointer"
 	>
 		{#if loading}
 			<Spinner />
