@@ -73,9 +73,14 @@ class Cart {
 			if (!response.ok) throw error(response.status, await response.json());
 
 			return true;
-		} catch (e) {
+		} catch (e: any) {
 			console.error(e);
-			//TODO- Rethrow error to handle it in the UI
+			if (e?.status === 401) {
+				return true;
+			}
+
+			// if failed to add to cart, remove the item from the cart
+			// this.cartItems = this.cartItems.filter((item) => item.productId !== currentProductId);
 
 			return false;
 		} finally {

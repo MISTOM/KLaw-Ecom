@@ -114,18 +114,23 @@
 								KES {product.price.toLocaleString()}
 							</span>
 							<button
-								class="bg-primary hover:bg-primary/90 rounded-md px-3 py-2 text-sm text-white transition-colors"
+								class="rounded-md px-3 py-2 text-sm text-white transition-colors {product.quantity > 0
+									? 'bg-primary hover:bg-primary/90'
+									: 'cursor-not-allowed bg-gray-400'}"
 								onclick={async () => {
+									if (product.quantity <= 0) {
+										toast.add('Error', 'Product is out of stock', 'warning', 2000);
+										return;
+									}
 									if (await cart.addItem(product)) {
-										console.log('product added to cart');
 										toast.add('Success', 'Product added to cart', 'success', 2000);
 									} else {
 										console.log('product not added to cart');
-										// if (data.user) toast.add('Error', 'Failed to add product to cart', 'error', 2000);
+										if (data.user) toast.add('Error', 'Failed to Save Cart', 'error', 2000);
 									}
 								}}
 							>
-								Add to Cart
+								{product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
 							</button>
 						</div>
 					</div>

@@ -69,7 +69,7 @@ export async function sendEmail(
 	// console.log('Email HTML:', emailHtml);
 
 	const mailOptions = {
-		from: 'Kenya Law E-commerce <alerts@briskbusiness.co.ke>',
+		from: 'Kenya Law E-commerce <alert@briskbusiness.co.ke>',
 		to,
 		subject,
 		html: emailHtml

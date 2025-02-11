@@ -205,6 +205,7 @@
 			onkeyup={(e) => validateField('idNumber', e.currentTarget.value)}
 			required
 		/>
+
 		{#if getFieldError('idNumber')}
 			<p id="idNumber-error" class="mt-1 text-xs text-red-600" transition:fade>
 				{getFieldError('idNumber')}
@@ -301,3 +302,15 @@
 		<a href="/verify" class=" hover:text-secondary transition-colors hover:underline">Resend Verification Email</a>
 	</div>
 </form>
+
+<style>
+	input[type='number'] {
+		-moz-appearance: textfield;
+		appearance: textfield;
+	}
+	input[type='number']::-webkit-inner-spin-button,
+	input[type='number']::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+</style>
