@@ -58,7 +58,7 @@
 			type="email"
 			id="email"
 			name="email"
-			class={{ 'w-full rounded-md border p-2': true, 'border-red-500': !!getFieldError('email') }}
+			class={{ 'w-full rounded-md border-2 p-2': true, 'border-red-500': !!getFieldError('email') }}
 			bind:value={email}
 			aria-invalid={!!getFieldError('email')}
 			aria-describedby={getFieldError('email') ? 'email-error' : undefined}
@@ -75,7 +75,7 @@
 			type={passwordVisible ? 'text' : 'password'}
 			id="password"
 			name="password"
-			class={{ 'w-full rounded-md border p-2': true, 'border-red-500': !!getFieldError('password') }}
+			class={{ 'w-full rounded-md border-2 p-2': true, 'border-red-500': !!getFieldError('password') }}
 			bind:value={password}
 			aria-invalid={!!getFieldError('password')}
 			aria-describedby={getFieldError('password') ? 'password-error' : undefined}
@@ -89,6 +89,7 @@
 		<button
 			type="button"
 			class="absolute top-7 right-3 text-xs text-gray-400"
+			tabindex="-1"
 			onclick={() => (passwordVisible = !passwordVisible)}
 		>
 			{#if passwordVisible}

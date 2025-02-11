@@ -142,6 +142,34 @@
 			<p class="text-sm text-red-600">{formErrors.name}</p>
 		{/if} -->
 	</div>
+
+
+	<!-- id number -->
+	<div class="">
+		<label for="idNumber" class="block text-sm font-semibold">ID Number <span class="text-red-500">*</span></label>
+		<input
+			type="number"
+			id="idNumber"
+			name="idNumber"
+			class={{
+				'w-full rounded-md border p-2': true,
+				'border-red-500': !!getFieldError('idNumber')
+			}}
+			bind:value={idNumber}
+			aria-invalid={!!getFieldError('idNumber')}
+			aria-describedby={getFieldError('idNumber') ? 'idNumber-error' : undefined}
+			onkeyup={(e) => validateField('idNumber', e.currentTarget.value)}
+			required
+		/>
+
+		{#if getFieldError('idNumber')}
+			<p id="idNumber-error" class="mt-1 text-xs text-red-600" transition:fade>
+				{getFieldError('idNumber')}
+			</p>
+		{/if}
+	</div>
+
+
 	<div class="">
 		<label for="email" class="block text-sm font-semibold">Email <span class="text-red-500">*</span> </label>
 		<input
@@ -188,30 +216,7 @@
 		{/if}
 	</div>
 
-	<!-- id number -->
-	<div class="">
-		<label for="idNumber" class="block text-sm font-semibold">ID Number <span class="text-red-500">*</span></label>
-		<input
-			type="number"
-			id="idNumber"
-			name="idNumber"
-			class={{
-				'w-full rounded-md border p-2': true,
-				'border-red-500': !!getFieldError('idNumber')
-			}}
-			bind:value={idNumber}
-			aria-invalid={!!getFieldError('idNumber')}
-			aria-describedby={getFieldError('idNumber') ? 'idNumber-error' : undefined}
-			onkeyup={(e) => validateField('idNumber', e.currentTarget.value)}
-			required
-		/>
-
-		{#if getFieldError('idNumber')}
-			<p id="idNumber-error" class="mt-1 text-xs text-red-600" transition:fade>
-				{getFieldError('idNumber')}
-			</p>
-		{/if}
-	</div>
+	
 
 	<div class="group relative">
 		<label for="password" class="block text-sm font-semibold">Password <span class="text-red-500">*</span></label>
@@ -238,6 +243,7 @@
 		<button
 			type="button"
 			class="absolute top-7 right-3 text-xs text-gray-400"
+			tabindex="-1"
 			onclick={() => (passwordVisible = !passwordVisible)}
 		>
 			{#if passwordVisible}
@@ -273,6 +279,7 @@
 		<button
 			type="button"
 			class="absolute top-7 right-3 text-xs text-gray-400"
+			tabindex="-1"
 			onclick={() => (passwordVisible = !passwordVisible)}
 		>
 			{#if passwordVisible}
