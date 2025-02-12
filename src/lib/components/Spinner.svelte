@@ -4,7 +4,7 @@
 
 <svg
 	in:fade
-	class="text-primary mr-3 -ml-3 h-5 w-5 animate-spin group-hover:text-white"
+	class="mr-3 -ml-3 h-5 w-5 animate-spin text-white"
 	xmlns="http://www.w3.org/2000/svg"
 	fill="none"
 	viewBox="0 0 24 24"

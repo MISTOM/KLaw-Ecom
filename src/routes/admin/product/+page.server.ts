@@ -127,8 +127,8 @@ export const actions: Actions = {
 			// Delete the image if it was saved
 			imagePath
 				? unlink(imagePath, (err) => {
-						if (err) console.error('Failed to delete image', err);
-					})
+					if (err) console.error('Failed to delete image', err);
+				})
 				: null;
 
 			return fail(500, {

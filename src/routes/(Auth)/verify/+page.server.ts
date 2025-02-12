@@ -53,7 +53,7 @@ export const actions: Actions = {
 
 			const token = auth.generateEmailVerificationToken(user.email);
 			const link = url.origin + `/verify?token=${token}`;
-			const isEmailSent = await sendEmail(user.email, `${user.name}, Veriry Your Email`, 'verify-email', {
+			const isEmailSent = await sendEmail(user.email, `${user.name}, Verify Your Email`, 'verify-email', {
 				username: user.name,
 				origin: url.origin,
 				link

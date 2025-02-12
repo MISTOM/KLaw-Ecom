@@ -109,11 +109,11 @@
 		Login</button
 	>
 
-	<div class="mt-3 flex justify-between text-xs text-gray-400">
+	<div class="text-primary mt-3 flex justify-between text-xs">
 		<div>
-			If you dont have an account, <a href="/register" class="hover:text-secondary hover:underline">Register</a>
+			If you dont have an account, <a href="/register" class="hover:underline">Register</a>
 		</div>
 
-		<a href="/forgotPassword" class=" hover:text-secondary transition-colors hover:underline">Forgot Password</a>
+		<a href="/forgotPassword" class="transition-colors hover:underline">Forgot Password</a>
 	</div>
 </form>

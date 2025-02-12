@@ -107,9 +107,9 @@
 					</a>
 					<div class="p-4">
 						<h3 class="text-lg font-semibold">{product.name}</h3>
-						<p class="mt-2 line-clamp-2 text-sm text-gray-600">{product.description}</p>
+						<p class="mt-2 line-clamp-1 text-sm text-gray-600">{product.description}</p>
 
-						<div class="mt-4 flex items-center justify-between">
+						<div class="mt-auto flex items-center justify-between pt-4">
 							<span class="text-lg font-bold">
 								KES {product.price.toLocaleString()}
 							</span>

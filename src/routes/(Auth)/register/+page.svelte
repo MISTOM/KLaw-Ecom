@@ -85,6 +85,11 @@
 
 <h2 class="text-center text-2xl font-bold">Welcome, Please Register</h2>
 
+<div class="text-primary mt-3 flex flex-col text-xs">
+	<span class="hover:underline"><a href="/login">Back to login</a></span>
+	<span><a href="/verify" class="transition-colors hover:underline">Resend Verification Email</a></span>
+</div>
+
 <form
 	class="mt-4 space-y-3"
 	method="POST"
@@ -143,7 +148,6 @@
 		{/if} -->
 	</div>
 
-
 	<!-- id number -->
 	<div class="">
 		<label for="idNumber" class="block text-sm font-semibold">ID Number <span class="text-red-500">*</span></label>
@@ -168,7 +172,6 @@
 			</p>
 		{/if}
 	</div>
-
 
 	<div class="">
 		<label for="email" class="block text-sm font-semibold">Email <span class="text-red-500">*</span> </label>
@@ -215,8 +218,6 @@
 			</p>
 		{/if}
 	</div>
-
-	
 
 	<div class="group relative">
 		<label for="password" class="block text-sm font-semibold">Password <span class="text-red-500">*</span></label>
@@ -296,18 +297,13 @@
 	<div class="g-recaptcha" data-sitekey={SITE_KEY}></div>
 	<button
 		type="submit"
-		class="group hover:bg-primary flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:text-white"
+		class="group bg-primary flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:bg-primary/90 text-white"
 	>
 		{#if loading}
 			<Spinner />
 		{/if}
 		Register</button
 	>
-	<div class="mt-3 flex justify-between text-xs text-gray-400">
-		<span class=" hover:text-secondary/70"><a href="/login">Back to login</a></span>
-
-		<a href="/verify" class=" hover:text-secondary transition-colors hover:underline">Resend Verification Email</a>
-	</div>
 </form>
 
 <style>

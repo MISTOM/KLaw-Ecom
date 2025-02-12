@@ -39,7 +39,7 @@
 		/>
 		<button
 			type="submit"
-			class="group hover:bg-primary flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:text-white"
+			class="group bg-primary flex w-full items-center justify-center rounded-md border p-2 transition-colors text-white hover:cursor-pointer hover:bg-primary/90"
 		>
 			{#if loading}
 				<Spinner />

@@ -21,6 +21,7 @@
 	let pageCount = $state(data.product?.pageCount);
 	let imageUrl = $state(data.product?.Image[0]?.url);
 	let showDeleteModal = $state(false);
+	let showPublishModal = $state(false);
 
 	let selectedCategories = $state(data.product?.categories || []);
 
@@ -35,7 +36,6 @@
 
 	const togglePublish = async () => {
 		console.log('Publishing product');
-		if (!confirm('Are you sure you want to publish/not publish this product?')) return;
 		if (data?.product?.id) {
 			const res = await fetch(`/api/product/${data.product.id}/publish`, {
 				method: 'PUT',
@@ -293,6 +293,38 @@
 			</div>
 		{/if}
 
+		<!-- Publish confirmation Modal -->
+		{#if showPublishModal}
+			<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+				<div class="w-full max-w-md rounded-lg bg-white p-6">
+					<h3 class="mb-4 text-xl font-bold">
+						{data.product?.isPublished ? 'Unpublish' : 'Publish'} Book
+					</h3>
+					<p class="mb-6 text-gray-600">
+						Are you sure you want to {data.product?.isPublished ? 'unpublish' : 'publish'} "{name}"?
+					</p>
+					<div class="flex justify-end gap-4">
+						<button
+							class="rounded-md px-4 py-2 text-gray-600 hover:bg-gray-100"
+							onclick={() => (showPublishModal = false)}
+						>
+							Cancel
+						</button>
+						<button
+							type="button"
+							class="border-primary text-primary hover:bg-primary/10 rounded-sm border-2 px-4 py-2 transition-colors"
+							onclick={async () => {
+								showPublishModal = false;
+								await togglePublish();
+							}}
+						>
+							{data.product?.isPublished ? 'Unpublish' : 'Publish'}
+						</button>
+					</div>
+				</div>
+			</div>
+		{/if}
+
 		<div class="mb-6 flex items-center gap-4">
 			<a
 				href="/admin/product"
@@ -324,7 +356,7 @@
 									console.log('form result ->  ', result);
 									if (result.status === 200) {
 										isEditMode = false;
-										await update({ reset: false });
+										goto('/admin/product');
 										toast.add('Success', 'Product updated', 'success');
 									} else await update();
 								};
@@ -446,22 +478,26 @@
 										<!-- Display selected categories -->
 										<div class="flex flex-wrap gap-2">
 											<h6 class="w-full text-sm font-medium text-gray-600">Selected Categories:</h6>
-											{#each selectedCategories as category (category.id)}
-												<div
-													class="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-1"
-													in:fade={{ duration: 100 }}
-													out:fade={{ duration: 50 }}
-												>
-													<span class="text-sm">{category.name}</span>
-													<button
-														type="button"
-														class="text-gray-500 hover:text-gray-700"
-														onclick={() => removeCategory(category.id)}
+											{#if selectedCategories.length === 0}
+												<p class="text-sm text-gray-500">No categories selected</p>
+											{:else}
+												{#each selectedCategories as category (category.id)}
+													<div
+														class="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-1"
+														in:fade={{ duration: 100 }}
+														out:fade={{ duration: 50 }}
 													>
-														x
-													</button>
-												</div>
-											{/each}
+														<span class="text-sm">{category.name}</span>
+														<button
+															type="button"
+															class="text-gray-500 hover:text-gray-700"
+															onclick={() => removeCategory(category.id)}
+														>
+															x
+														</button>
+													</div>
+												{/each}
+											{/if}
 										</div>
 									</div>
 
@@ -491,12 +527,8 @@
 									<div>
 										<button
 											type="button"
-											onclick={togglePublish}
-											class={`rounded-md px-4 py-2 text-white transition-colors ${
-												data.product?.isPublished
-													? 'bg-amber-500 hover:bg-amber-600'
-													: 'bg-green-500 hover:bg-green-600'
-											}`}
+											onclick={() => (showPublishModal = true)}
+											class="border-primary text-primary hover:bg-primary/10 rounded-sm border-2 px-4 py-2 transition-colors"
 										>
 											{data.product?.isPublished ? 'Unpublish' : 'Publish'}
 										</button>
