@@ -58,6 +58,6 @@
 		{#if loading}
 			<Spinner />
 		{/if}
-		Reset Passsord
+		Reset Password
 	</button>
 </form>

@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-	<link rel="preload" href="/banner-bg.jpg" as="image" />
+	<link rel="preload" href="/theJudiciary.jpeg" as="image" />
 </svelte:head>
 <div class="loginbg fixed inset-0 -z-10">
 	<div class="overlay absolute inset-0"></div>
@@ -11,7 +11,7 @@
 <div class="flex min-h-screen items-center justify-center">
 	<main class="w-1/3 min-w-72 overflow-y-auto rounded-sm bg-white p-6 shadow-lg backdrop-blur-md">
 		<div class="mb-4 flex justify-start">
-			<img src="/kenyaLawLogo.png" alt="Logo" class="h-10" />
+			<a href="/"><img src="/kenyaLawLogo.png" alt="Logo" class="h-10" /></a>
 		</div>
 		{@render children?.()}
 	</main>

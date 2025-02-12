@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { fade } from 'svelte/transition';
 	import { getToastState } from '$lib/Toast.svelte';
 
 	const { data, form } = $props();
@@ -12,18 +13,39 @@
 	const toast = getToastState();
 
 	let name = $state(form?.data?.name);
-	let description = $state(form?.data?.description);
+	let description = $state(form?.data?.description || '');
 	let price = $state(form?.data?.price);
 	let quantity = $state(form?.data?.quantity);
 	let serviceCode = $state(form?.data?.serviceCode);
 	let author = $state(form?.data?.author);
 	let pageCount = $state(form?.data?.pageCount);
 	let publicationDateISO = $state(form?.data?.publicationDate);
+	let searchQuery = $state('');
+	let selectedCategories = $state<{ id: number; name: string }[]>([]);
 
 	// Format publication date to bind to date input
 	let publicationDate = $state(publicationDateISO ? new Date(publicationDateISO).toISOString().split('T')[0] : '');
 
-	let searchQuery = $state('');
+	// When the user selects a category from the dropdown
+	function addCategory(event: Event) {
+		const select = event.currentTarget as HTMLSelectElement;
+		const selectedId = parseInt(select.value);
+
+		if (!selectedId) return;
+		// Prevent duplicate selections
+		if (selectedCategories.find((c) => c.id === selectedId)) return;
+		const cat = categories.find((c) => c.id === selectedId);
+		if (cat) {
+			selectedCategories = [...selectedCategories, cat];
+		}
+		// Reset select to default prompt
+		select.value = '';
+	}
+
+	// When user clicks remove button
+	function removeCategory(categoryId: number) {
+		selectedCategories = selectedCategories.filter((c) => c.id !== categoryId);
+	}
 
 	const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
 
@@ -222,11 +244,17 @@
 				method="POST"
 				enctype="multipart/form-data"
 				class="space-y-4"
-				use:enhance={() => {
+				use:enhance={({ formData }) => {
+					formData.delete('categoryIds');
+					selectedCategories.forEach((c) => {
+						formData.append('categoryIds', c.id.toString());
+					});
+
 					return async ({ update, result }) => {
 						if (result.type === 'success') {
 							toast.add('Success', 'Book added successfully', 'success', 2000);
 							await update({ reset: true });
+							selectedCategories = [];
 						}
 						await update({ reset: false });
 					};
@@ -337,24 +365,45 @@
 					/>
 				</div>
 
-				<!-- Select Categories Section -->
-				<div class="space-y-2">
+				<div class="mb-4 space-y-2">
 					<label for="categories" class="text-sm font-medium text-gray-700">Select Categories</label>
-					<div class="flex flex-wrap gap-4">
-						{#each categories as category}
-							<div class="flex items-center">
-								<input
-									type="checkbox"
-									name="categoryIds"
-									value={category.id}
-									id={`category-${category.id}`}
-									class="text-primary focus:ring-primary h-4 w-4 rounded-sm border-gray-300"
-								/>
-								<label for={`category-${category.id}`} class="ml-2 text-sm text-gray-700">
-									{category.name}
-								</label>
-							</div>
+
+					<!-- Dropdown: Only show categories that are not already selected -->
+					<select
+						name="categoryIds"
+						class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-none"
+						onchange={addCategory}
+					>
+						<option value="">--</option>
+						{#each categories as category (category.id)}
+							{#if !selectedCategories.find((c) => c.id === category.id)}
+								<option value={category.id}>{category.name}</option>
+							{/if}
 						{/each}
+					</select>
+
+					<!-- Display selected categories -->
+					<div class="flex flex-wrap gap-2">
+						{#if selectedCategories.length === 0}
+							<p class="text-sm text-gray-500">No categories selected</p>
+						{:else}
+							{#each selectedCategories as category (category.id)}
+								<div
+									class="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-1"
+									in:fade={{ duration: 100 }}
+									out:fade={{ duration: 50 }}
+								>
+									<span class="text-sm">{category.name}</span>
+									<button
+										type="button"
+										class="text-gray-500 hover:text-gray-700"
+										onclick={() => removeCategory(category.id)}
+									>
+										x
+									</button>
+								</div>
+							{/each}
+						{/if}
 					</div>
 				</div>
 

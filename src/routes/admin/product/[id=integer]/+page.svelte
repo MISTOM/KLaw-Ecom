@@ -467,7 +467,7 @@
 											class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-none"
 											onchange={addCategory}
 										>
-											<option value="">Select a category</option>
+											<option value="">--</option>
 											{#each categories as category (category.id)}
 												{#if !selectedCategories.find((c) => c.id === category.id)}
 													<option value={category.id}>{category.name}</option>
@@ -477,7 +477,6 @@
 
 										<!-- Display selected categories -->
 										<div class="flex flex-wrap gap-2">
-											<h6 class="w-full text-sm font-medium text-gray-600">Selected Categories:</h6>
 											{#if selectedCategories.length === 0}
 												<p class="text-sm text-gray-500">No categories selected</p>
 											{:else}

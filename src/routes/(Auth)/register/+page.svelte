@@ -129,7 +129,7 @@
 			id="name"
 			name="name"
 			class={{
-				'w-full rounded-md border p-2': true,
+				'w-full rounded-md border-2 p-2': true,
 				'border-red-500': !!getFieldError('name')
 			}}
 			bind:value={name}
@@ -156,7 +156,7 @@
 			id="idNumber"
 			name="idNumber"
 			class={{
-				'w-full rounded-md border p-2': true,
+				'w-full rounded-md border-2 p-2': true,
 				'border-red-500': !!getFieldError('idNumber')
 			}}
 			bind:value={idNumber}
@@ -179,7 +179,7 @@
 			type="email"
 			id="email"
 			name="email"
-			class={{ 'w-full rounded-md border p-2': true, 'border-red-500': !!getFieldError('email') }}
+			class={{ 'w-full rounded-md border-2 p-2': true, 'border-red-500': !!getFieldError('email') }}
 			bind:value={email}
 			aria-invalid={!!getFieldError('email')}
 			aria-describedby={getFieldError('email') ? 'email-error' : undefined}
@@ -202,7 +202,7 @@
 			id="phoneNumber"
 			name="phoneNumber"
 			class={{
-				'w-full rounded-md border p-2': true,
+				'w-full rounded-md border-2 p-2': true,
 				'border-red-500': !!getFieldError('phoneNumber')
 			}}
 			bind:value={phoneNumber}
@@ -226,7 +226,7 @@
 			id="password"
 			name="password"
 			class={{
-				'w-full rounded-md border p-2': true,
+				'w-full rounded-md border-2 p-2': true,
 				'border-red-500': !!getFieldError('password')
 			}}
 			bind:value={password}
@@ -263,7 +263,7 @@
 			id="confirmPassword"
 			name="confirmPassword"
 			class={{
-				'w-full rounded-md border p-2': true,
+				'w-full rounded-md border-2 p-2': true,
 				'border-red-500': !!getFieldError('confirmPassword')
 			}}
 			bind:value={confirmPassword}
