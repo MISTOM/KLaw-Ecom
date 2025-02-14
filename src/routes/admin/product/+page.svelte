@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { fade } from 'svelte/transition';
 	import { getToastState } from '$lib/Toast.svelte';
+	import { productSchema, type FormErrors, type ProductData } from '$lib/validations/validationSchemas.js';
 
 	const { data, form } = $props();
 
@@ -22,9 +23,43 @@
 	let publicationDateISO = $state(form?.data?.publicationDate);
 	let searchQuery = $state('');
 	let selectedCategories = $state<{ id: number; name: string }[]>([]);
+	const categoryIds = $derived(selectedCategories.map((c) => c.id));
+	let publicationDate = $state(
+		publicationDateISO ? new Date(publicationDateISO.toString()).toISOString().split('T')[0] : ''
+	);
 
-	// Format publication date to bind to date input
-	let publicationDate = $state(publicationDateISO ? new Date(publicationDateISO).toISOString().split('T')[0] : '');
+	let formErrors = $state<FormErrors<ProductData>>(form?.errors || {});
+
+	const getFieldError = (field: keyof FormErrors<ProductData>) => formErrors[field]?.[0] || '';
+
+	// Validate a single field
+	const validateField = <K extends keyof ProductData>(field: K, value: ProductData[K]) => {
+		// pick the field from the schema
+		const fieldSchema = productSchema.shape[field];
+		const result = fieldSchema.safeParse(value);
+		formErrors[field] = result.success ? [] : result.error?.flatten().formErrors || [];
+	};
+
+	// Validate entire form on submit
+	const validateAll = (formData: FormData) => {
+		const data = Object.fromEntries(formData.entries());
+		// Convert string values to numbers for numeric fields
+		const parsedData = {
+			...data,
+			price: data.price ? parseFloat(data.price as string) : undefined,
+			quantity: data.quantity ? parseInt(data.quantity as string) : undefined,
+			pageCount: data.pageCount ? parseInt(data.pageCount as string) : undefined,
+			categoryIds: selectedCategories.map((c) => c.id)
+		};
+		console.log(parsedData);
+		const result = productSchema.safeParse(parsedData);
+		if (!result.success) {
+			const errors = result.error.flatten().fieldErrors;
+			formErrors = errors;
+			return false;
+		}
+		return true;
+	};
 
 	// When the user selects a category from the dropdown
 	function addCategory(event: Event) {
@@ -35,16 +70,19 @@
 		// Prevent duplicate selections
 		if (selectedCategories.find((c) => c.id === selectedId)) return;
 		const cat = categories.find((c) => c.id === selectedId);
-		if (cat) {
-			selectedCategories = [...selectedCategories, cat];
-		}
+		if (cat) selectedCategories = [...selectedCategories, cat];
+
 		// Reset select to default prompt
 		select.value = '';
+
+		validateField('categoryIds', categoryIds);
 	}
 
 	// When user clicks remove button
 	function removeCategory(categoryId: number) {
 		selectedCategories = selectedCategories.filter((c) => c.id !== categoryId);
+
+		validateField('categoryIds', categoryIds);
 	}
 
 	const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
@@ -244,25 +282,31 @@
 				method="POST"
 				enctype="multipart/form-data"
 				class="space-y-4"
-				use:enhance={({ formData }) => {
+				use:enhance={({ formData, cancel }) => {
+					formErrors = {};
 					formData.delete('categoryIds');
 					selectedCategories.forEach((c) => {
 						formData.append('categoryIds', c.id.toString());
 					});
+
+					if (!validateAll(formData)) cancel();
 
 					return async ({ update, result }) => {
 						if (result.type === 'success') {
 							toast.add('Success', 'Book added successfully', 'success', 2000);
 							await update({ reset: true });
 							selectedCategories = [];
+						} else if (result.type === 'failure') {
+							console.log('form result ->  ', result);
+							formErrors = result.data?.errors || { _errors: ['Error adding book'] };
 						}
 						await update({ reset: false });
 					};
 				}}
 			>
-				{#if form?.errors}
+				{#if formErrors._errors}
 					<div class="rounded-md bg-red-50 p-3 text-sm text-red-500">
-						{form.errors}
+						{formErrors._errors[0]}
 					</div>
 				{/if}
 
@@ -272,38 +316,71 @@
 						type="text"
 						id="name"
 						name="name"
+						class={{
+							'w-full rounded-sm border-2 p-2': true,
+							'border-red-500': !!getFieldError('name'),
+							'focus:border-primary focus:ring-primary focus:ring-1 focus:outline-hidden': true
+						}}
 						bind:value={name}
-						required
-						class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
+						aria-invalid={!!getFieldError('name')}
+						aria-describedby={getFieldError('name') ? 'name-error' : undefined}
+						onkeyup={(e) => validateField('name', e.currentTarget.value)}
 					/>
+					{#if getFieldError('name')}
+						<p id="name-error" class="mt-1 text-xs text-red-600" transition:fade>
+							{getFieldError('name')}
+						</p>
+					{/if}
 				</div>
 
-				<div class="grid gap-4 sm:grid-cols-2">
-					<div class="space-y-2">
-						<label for="price" class="text-sm font-medium text-gray-700">Price (KES)</label>
-						<input
-							type="number"
-							id="price"
-							name="price"
-							bind:value={price}
-							required
-							min="0"
-							class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
-						/>
-					</div>
+				<div class="space-y-2">
+					<label for="price" class="text-sm font-medium text-gray-700">Price (KES)</label>
+					<input
+						type="number"
+						id="price"
+						name="price"
+						class={{
+							'w-full rounded-sm border-2 p-2': true,
+							'border-red-500': !!getFieldError('price'),
+							'focus:border-primary focus:ring-primary focus:ring-1 focus:outline-hidden': true
+						}}
+						bind:value={price}
+						aria-invalid={!!getFieldError('price')}
+						aria-describedby={getFieldError('price') ? 'price-error' : undefined}
+						onkeyup={(e) => validateField('price', parseFloat(e.currentTarget.value))}
+						min="0"
+						required
+					/>
+					{#if getFieldError('price')}
+						<p id="price-error" class="mt-1 text-xs text-red-600" transition:fade>
+							{getFieldError('price')}
+						</p>
+					{/if}
+				</div>
 
-					<div class="space-y-2">
-						<label for="quantity" class="text-sm font-medium text-gray-700">Quantity</label>
-						<input
-							type="number"
-							id="quantity"
-							name="quantity"
-							bind:value={quantity}
-							required
-							min="0"
-							class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
-						/>
-					</div>
+				<div class="space-y-2">
+					<label for="quantity" class="text-sm font-medium text-gray-700">Quantity</label>
+					<input
+						type="number"
+						id="quantity"
+						name="quantity"
+						class={{
+							'w-full rounded-sm border-2 p-2': true,
+							'border-red-500': !!getFieldError('quantity'),
+							'focus:border-primary focus:ring-primary focus:ring-1 focus:outline-hidden': true
+						}}
+						bind:value={quantity}
+						aria-invalid={!!getFieldError('quantity')}
+						aria-describedby={getFieldError('quantity') ? 'quantity-error' : undefined}
+						onkeyup={(e) => validateField('quantity', parseInt(e.currentTarget.value))}
+						min="0"
+						required
+					/>
+					{#if getFieldError('quantity')}
+						<p id="quantity-error" class="mt-1 text-xs text-red-600" transition:fade>
+							{getFieldError('quantity')}
+						</p>
+					{/if}
 				</div>
 
 				<div class="space-y-2">
@@ -311,46 +388,72 @@
 					<textarea
 						id="description"
 						name="description"
+						class={{
+							'w-full rounded-sm border-2 p-2': true,
+							'border-red-500': !!getFieldError('description'),
+							'focus:border-primary focus:ring-primary focus:ring-1 focus:outline-hidden': true
+						}}
 						bind:value={description}
+						aria-invalid={!!getFieldError('description')}
+						aria-describedby={getFieldError('description') ? 'description-error' : undefined}
+						onkeyup={(e) => validateField('description', e.currentTarget.value)}
 						required
 						rows="3"
-						class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
-					>
-					</textarea>
+					></textarea>
+					{#if getFieldError('description')}
+						<p id="description-error" class="mt-1 text-xs text-red-600" transition:fade>
+							{getFieldError('description')}
+						</p>
+					{/if}
 				</div>
-				<!-- <div class="space-y-2">
-					<label for="serviceCode" class="text-sm font-medium text-gray-700">Service Code</label>
-					<input
-						type="text"
-						id="serviceCode"
-						name="serviceCode"
-						bind:value={serviceCode}
-						required
-						class="w-full rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary"
-					/>
-				</div> -->
+
 				<div class="space-y-2">
 					<label for="author" class="text-sm font-medium text-gray-700">Author</label>
 					<input
 						type="text"
 						id="author"
 						name="author"
+						class={{
+							'w-full rounded-sm border-2 p-2': true,
+							'border-red-500': !!getFieldError('author'),
+							'focus:border-primary focus:ring-primary focus:ring-1 focus:outline-hidden': true
+						}}
 						bind:value={author}
+						aria-invalid={!!getFieldError('author')}
+						aria-describedby={getFieldError('author') ? 'author-error' : undefined}
+						onkeyup={(e) => validateField('author', e.currentTarget.value)}
 						required
-						class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 					/>
+					{#if getFieldError('author')}
+						<p id="author-error" class="mt-1 text-xs text-red-600" transition:fade>
+							{getFieldError('author')}
+						</p>
+					{/if}
 				</div>
+
 				<div class="space-y-2">
 					<label for="pageCount" class="text-sm font-medium text-gray-700">Page Count</label>
 					<input
 						type="number"
 						id="pageCount"
 						name="pageCount"
+						class={{
+							'w-full rounded-sm border-2 p-2': true,
+							'border-red-500': !!getFieldError('pageCount'),
+							'focus:border-primary focus:ring-primary focus:ring-1 focus:outline-hidden': true
+						}}
 						bind:value={pageCount}
+						aria-invalid={!!getFieldError('pageCount')}
+						aria-describedby={getFieldError('pageCount') ? 'pageCount-error' : undefined}
+						onkeyup={(e) => validateField('pageCount', parseInt(e.currentTarget.value))}
 						min="0"
 						required
-						class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 					/>
+					{#if getFieldError('pageCount')}
+						<p id="pageCount-error" class="mt-1 text-xs text-red-600" transition:fade>
+							{getFieldError('pageCount')}
+						</p>
+					{/if}
 				</div>
 
 				<div class="space-y-2">
@@ -359,20 +462,37 @@
 						type="date"
 						id="publicationDate"
 						name="publicationDate"
+						class={{
+							'w-full rounded-sm border-2 p-2': true,
+							'border-red-500': !!getFieldError('publicationDate'),
+							'focus:border-primary focus:ring-primary focus:ring-1 focus:outline-hidden': true
+						}}
 						bind:value={publicationDate}
+						aria-invalid={!!getFieldError('publicationDate')}
+						aria-describedby={getFieldError('publicationDate') ? 'publicationDate-error' : undefined}
+						onchange={(e) => validateField('publicationDate', e.currentTarget.value)}
 						required
-						class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 					/>
+					{#if getFieldError('publicationDate')}
+						<p id="publicationDate-error" class="mt-1 text-xs text-red-600" transition:fade>
+							{getFieldError('publicationDate')}
+						</p>
+					{/if}
 				</div>
-
-				<div class="mb-4 space-y-2">
+				<div class="space-y-2">
 					<label for="categories" class="text-sm font-medium text-gray-700">Select Categories</label>
 
 					<!-- Dropdown: Only show categories that are not already selected -->
 					<select
 						name="categoryIds"
-						class="focus:border-primary focus:ring-primary w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-none"
+						class={{
+							'w-full rounded-sm border-2 p-2': true,
+							'border-red-500': !!getFieldError('categoryIds'),
+							'focus:border-primary focus:ring-primary focus:ring-1 focus:outline-hidden': true
+						}}
 						onchange={addCategory}
+						aria-invalid={!!getFieldError('categoryIds')}
+						aria-describedby={getFieldError('categoryIds') ? 'categories-error' : undefined}
 					>
 						<option value="">--</option>
 						{#each categories as category (category.id)}
@@ -381,6 +501,12 @@
 							{/if}
 						{/each}
 					</select>
+
+					{#if getFieldError('categoryIds')}
+						<p id="categories-error" class="mt-1 text-xs text-red-600" transition:fade>
+							{getFieldError('categoryIds')}
+						</p>
+					{/if}
 
 					<!-- Display selected categories -->
 					<div class="flex flex-wrap gap-2">

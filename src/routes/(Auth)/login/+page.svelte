@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import Spinner from '$lib/components/Spinner.svelte';
 	import { eye, eyeSlash } from '$lib/components/icons.js';
+	import type { FormErrors, LoginCredentials } from '$lib/validations/validationSchemas.js';
 
 	const { form } = $props();
 
@@ -12,15 +13,10 @@
 	let passwordVisible = $state(false);
 	let loading = $state(false);
 
-	let formErrors = $state<FormErrors>(form?.errors || {});
+	let formErrors = $state<FormErrors<LoginCredentials>>(form?.errors || {});
 	// Typed interface for form errors
-	interface FormErrors {
-		email?: string[];
-		password?: string[];
-		_errors?: string[];
-	}
 
-	const getFieldError = (field: keyof FormErrors) => {
+	const getFieldError = (field: keyof FormErrors<LoginCredentials>) => {
 		return formErrors[field]?.[0] || '';
 	};
 </script>

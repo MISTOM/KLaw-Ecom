@@ -1,6 +1,8 @@
 import prisma from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { validateProduct } from '$lib/validations';
+import { writeFile, mkdir, unlink } from 'node:fs/promises';
 
 export const load = (async ({ params, depends }) => {
 	depends('update:product');
@@ -34,72 +36,82 @@ export const load = (async ({ params, depends }) => {
 export const actions = {
 	default: async ({ request, params }) => {
 		const id = Number(params.id);
-
 		const formData = await request.formData();
-		const name = formData.get('name')?.toString();
-		const description = formData.get('description')?.toString();
-		const priceData = formData.get('price')?.toString();
-		const quantityData = formData.get('quantity')?.toString();
-		const serviceCode = Math.floor(Math.random() * 8765430).toString(); //auto generate service code  /* formData.get('serviceCode')?.toString();*/
-		const author = formData.get('author')?.toString();
-		const publicationDateData = formData.get('publicationDate')?.toString();
-		const pageCountData = formData.get('pageCount')?.toString();
-		const categoryIds = formData.getAll('categoryIds').map((id) => parseInt(id.toString()));
+		const formObj = Object.fromEntries(formData);
+		const parsedData = {
+			...formObj,
+			price: formObj.price ? parseFloat(formObj.price as string) : undefined,
+			quantity: formObj.quantity ? parseInt(formObj.quantity as string) : undefined,
+			pageCount: formObj.pageCount ? parseInt(formObj.pageCount as string) : undefined,
+			categoryIds: formData.getAll('categoryIds').map((id) => parseInt(id as string))
+		};
 
-		// console.log('update product data fromEntries: ', Object.fromEntries(formData.entries())); : use Object.fromEntries to get all form data
-
-		const price = priceData ? parseFloat(priceData) : 0;
-		const quantity = quantityData ? parseInt(quantityData) : 0;
-		const publicationDate = publicationDateData ? new Date(publicationDateData) : undefined;
-		const pageCount = pageCountData ? parseInt(pageCountData) : 0;
-		if (!name || !description || !serviceCode || !author || !publicationDate || !categoryIds.length) {
+		const validation = validateProduct(parsedData);
+		if (!validation.success) {
 			return fail(400, {
-				data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount, categoryIds },
-				errors: 'All fields and atleast one category are required'
+				data: formObj,
+				errors: validation.errors
 			});
 		}
+		const {
+			name,
+			description,
+			price,
+			quantity,
+			author,
+			publicationDate: publicationDateData,
+			pageCount,
+			categoryIds
+		} = validation.data!;
+		const publicationDate = publicationDateData ? new Date(publicationDateData) : undefined;
+		const serviceCode = Math.floor(Math.random() * 87654321).toString(); //auto generate service code  /* formData.get('serviceCode')?.toString();*/
 
-		try {
-			// Check if product with this service code already exists
-			const isProductExist = await prisma.product.findUnique({
-				where: { serviceCode }
+		// Process new image upload if provided
+		const newImage = formData.get('newImage') as File | null;
+		let imageUrl: string | undefined;
+		if (newImage && newImage.name) {
+			const existingImages = await prisma.image.findMany({
+				where: { productId: id }
 			});
-			if (isProductExist && isProductExist.id !== id)
-				return fail(400, {
-					data: {
-						name,
-						description,
-						price,
-						quantity,
-						serviceCode,
-						author,
-						publicationDate,
-						pageCount,
-						categoryIds
-					},
-					errors: 'Product with this service code already exists'
-				});
 
-			// Validate category ids
-			const categories = await prisma.category.findMany({ where: { id: { in: categoryIds } } });
-			if (categories.length !== categoryIds.length) {
-				return fail(400, {
-					data: {
-						name,
-						description,
-						price,
-						quantity,
-						serviceCode,
-						author,
-						publicationDate,
-						pageCount,
-						categoryIds
-					},
-					errors: 'Invalid category ids'
+			//For each, delete file from disk if it exists, then remove the DB record
+			for (const img of existingImages) {
+				const oldFilePath = `static${img.url}`; // e.g. static/images/filename.png
+				await unlink(oldFilePath).catch(() => console.log(`Old image not found or not removed: ${oldFilePath}`));
+				// Remove the image record
+				await prisma.image.delete({
+					where: { id: img.id }
 				});
 			}
 
-			// Update product
+			const fileName = `${Date.now()}-${newImage.name}`;
+			const imagePath = `static/images/${fileName}`;
+			// Ensure images directory exists
+			await mkdir('static/images', { recursive: true });
+			await writeFile(imagePath, new Uint8Array(await newImage.arrayBuffer()));
+			imageUrl = `/images/${fileName}`;
+		}
+
+		try {
+			// Ensure the serviceCode is unique except for the current product
+			const existing = await prisma.product.findUnique({ where: { serviceCode } });
+			if (existing && existing.id !== id) {
+				return fail(400, {
+					data: formObj,
+					errors: { _errors: ['Product with this service code already exists'] }
+				});
+			}
+
+			// Validate category IDs
+			const cats = await prisma.category.findMany({ where: { id: { in: categoryIds } } });
+			if (cats.length !== categoryIds.length) {
+				return fail(400, {
+					data: formObj,
+					errors: { categoryIds: ['Invalid category IDs'] }
+				});
+			}
+
+			// Update product with validated data; update image if a new one is provided
 			const product = await prisma.product.update({
 				where: { id },
 				data: {
@@ -111,16 +123,21 @@ export const actions = {
 					author,
 					publicationDate,
 					pageCount,
-					categories: { set: categoryIds.map((id) => ({ id })) }
+					categories: { set: categoryIds.map((id) => ({ id })) },
+					...(imageUrl
+						? {
+								Image: {
+									create: { url: imageUrl }
+								}
+							}
+						: {})
 				}
 			});
 
 			return { success: true, product };
 		} catch (e) {
-			console.log('editProd: ', e);
-
-			//@ts-ignore
-			return fail(500, { errors: 'Internal server error adding product' });
+			console.log('editProd error: ', e);
+			return fail(500, { errors: { _errors: ['Internal server error updating product'] } });
 		}
 	}
 };

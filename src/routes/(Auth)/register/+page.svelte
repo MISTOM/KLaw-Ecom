@@ -1,16 +1,15 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import { fade } from 'svelte/transition';
 	import { eye, eyeSlash } from '$lib/components/icons.js';
 	import Spinner from '$lib/components/Spinner.svelte';
 	import { getToastState } from '$lib/Toast.svelte.js';
 	import { validateRegistration } from '$lib/validations/index.js';
-	import { userSchema, type UserRegistration } from '$lib/validations/validationSchemas.js';
-	import { fade } from 'svelte/transition';
+	import { userSchema, type UserRegistration, type FormErrors } from '$lib/validations/validationSchemas.js';
+	const SITE_KEY = '6LfCSboqAAAAAONEp8MMiyAHZycy2b99b2VhHPHD';
 
 	const { form } = $props();
-
-	const SITE_KEY = '6LfCSboqAAAAAONEp8MMiyAHZycy2b99b2VhHPHD';
 
 	let name = $state(form?.data?.name);
 	let email = $state(form?.data?.email);
@@ -22,24 +21,25 @@
 	let loading = $state(false);
 	let passwordVisible = $state(false);
 
-	let formErrors = $state<FormErrors>(form?.errors || {});
 	let recaptchaToken = '';
+	let formErrors = $state<FormErrors<UserRegistration>>(form?.errors || {});
 
 	const toast = getToastState();
 
-	// Typed interface for form errors
-	interface FormErrors {
-		name?: string[];
-		email?: string[];
-		phoneNumber?: string[];
-		idNumber?: string[];
-		password?: string[];
-		confirmPassword?: string[];
-		'g-recaptcha-response'?: string[];
-		_errors?: string[];
-	}
+	// let { formErrors, getFieldError, validateField, validateAll } = useFormValidation<UserRegistration>(userSchema);
 
-	const getFieldError = (field: keyof FormErrors) => {
+	// interface FormErrors {
+	// 	name?: string[];
+	// 	email?: string[];
+	// 	phoneNumber?: string[];
+	// 	idNumber?: string[];
+	// 	password?: string[];
+	// 	confirmPassword?: string[];
+	// 	'g-recaptcha-response'?: string[];
+	// 	_errors?: string[];
+	// }
+
+	const getFieldError = (field: keyof FormErrors<UserRegistration>) => {
 		return formErrors[field]?.[0] || '';
 	};
 
@@ -54,10 +54,9 @@
 	// Validate entire form on submit
 	const validateAll = (formData: FormData) => {
 		const result = userSchema.safeParse(Object.fromEntries(formData.entries()));
-		console.log('Validate all', result);
 		if (!result.success) {
-			const fieldErrors = result.error.flatten().fieldErrors;
-			formErrors = fieldErrors;
+			const errors = result.error.flatten().fieldErrors;
+			formErrors = errors;
 			return false;
 		}
 		return true;
@@ -96,10 +95,14 @@
 	use:enhance={async ({ formData, cancel }) => {
 		loading = true;
 		formErrors = {};
-		if (!passwordMatch || !validateAll(formData)) {
+		if (!passwordMatch) {
 			loading = false;
 			formErrors.confirmPassword = ['Passwords do not match'];
 			toast.add('Error', 'Passwords do not match', 'error');
+			cancel();
+		}
+		if (!validateAll(formData)) {
+			loading = false;
 			cancel();
 		}
 
@@ -143,9 +146,6 @@
 				{getFieldError('name')}
 			</p>
 		{/if}
-		<!-- {#if formErrors.name}
-			<p class="text-sm text-red-600">{formErrors.name}</p>
-		{/if} -->
 	</div>
 
 	<!-- id number -->
@@ -297,7 +297,7 @@
 	<div class="g-recaptcha" data-sitekey={SITE_KEY}></div>
 	<button
 		type="submit"
-		class="group bg-primary flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:bg-primary/90 text-white"
+		class="group bg-primary hover:bg-primary/90 flex w-full items-center justify-center rounded-md border p-2 text-white transition-colors"
 	>
 		{#if loading}
 			<Spinner />

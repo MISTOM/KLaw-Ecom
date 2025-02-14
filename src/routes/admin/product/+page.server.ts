@@ -4,6 +4,7 @@ import prisma from '$lib/server/prisma';
 import { writeFile } from 'node:fs/promises';
 import { mkdir, unlink } from 'node:fs';
 import { dirname } from 'node:path';
+import { validateProduct } from '$lib/validations';
 
 export const load = (async ({ locals }) => {
 	try {
@@ -25,35 +26,40 @@ export const actions: Actions = {
 	default: async ({ request }) => {
 		const formData = await request.formData();
 
-		const name = formData.get('name')?.toString();
-		const description = formData.get('description')?.toString();
-		const price = formData.get('price')?.toString();
-		const quantity = formData.get('quantity')?.toString();
+		// Convert formData to an object for validation
+		const formObj = Object.fromEntries(formData);
+		const parsedData = {
+			...formObj,
+			price: formObj.price ? parseFloat(formObj.price as string) : undefined,
+			quantity: formObj.quantity ? parseInt(formObj.quantity as string) : undefined,
+			pageCount: formObj.pageCount ? parseInt(formObj.pageCount as string) : undefined,
+			categoryIds: formData.getAll('categoryIds').map((id) => parseInt(id as string))
+		};
+		const validation = validateProduct(parsedData);
+
 		const serviceCode = Math.floor(Math.random() * 87654321).toString(); //auto generate service code  /* formData.get('serviceCode')?.toString();*/
-		const author = formData.get('author')?.toString();
-		const publicationDateData = formData.get('publicationDate')?.toString();
-		const pageCount = formData.get('pageCount')?.toString();
-		const categoryIds = formData.getAll('categoryIds').map((id) => parseInt(id.toString()));
-		const publicationDate = publicationDateData ? new Date(publicationDateData) : undefined;
+		const image = (formObj.image || null) as File | null;
 
-		const image = formData.get('image') as File;
-		console.log('productImage: ', image, serviceCode);
-
-		if (
-			!name ||
-			!description ||
-			!price ||
-			!quantity ||
-			!serviceCode ||
-			!author ||
-			!publicationDate ||
-			!pageCount
-		) {
+		// If product data is invalid, return errors
+		if (!validation.success) {
+			const { image: _, ...formData } = formObj;
 			return fail(400, {
-				data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
-				errors: 'All fields and atleast one category are required'
+				data: formData,
+				errors: validation.errors
 			});
 		}
+
+		const {
+			name,
+			description,
+			price,
+			quantity,
+			author,
+			publicationDate: publicationDateData,
+			pageCount,
+			categoryIds
+		} = validation.data!;
+		const publicationDate = publicationDateData ? new Date(publicationDateData) : '';
 
 		let imagePath = null;
 		try {
@@ -64,7 +70,7 @@ export const actions: Actions = {
 			if (isProductExist)
 				return fail(400, {
 					data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
-					errors: 'Product with this service code already exists'
+					errors: { _errors: ['Product with this service code already exists'] }
 				});
 
 			// Validate category ids
@@ -72,7 +78,7 @@ export const actions: Actions = {
 			if (categories.length !== categoryIds.length) {
 				return fail(400, {
 					data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
-					errors: 'Invalid category ids'
+					errors: { categoryIds: ['Invalid category ID'] }
 				});
 			}
 
@@ -88,7 +94,7 @@ export const actions: Actions = {
 				mkdir(directory, { recursive: true }, (err) =>
 					fail(500, {
 						data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
-						errors: 'Failed to create directory'
+						errors: { _errors: ['Internal server err: create dir'] }
 					})
 				);
 
@@ -100,12 +106,12 @@ export const actions: Actions = {
 				data: {
 					name,
 					description,
-					price: parseFloat(price),
-					quantity: parseInt(quantity),
+					price,
+					quantity,
 					serviceCode,
 					author,
 					publicationDate,
-					pageCount: parseInt(pageCount),
+					pageCount,
 					Image: imageUrl ? { create: { url: imageUrl } } : undefined,
 					categories: { connect: categoryIds.map((id) => ({ id })) }
 				},
@@ -127,17 +133,18 @@ export const actions: Actions = {
 			// Delete the image if it was saved
 			imagePath
 				? unlink(imagePath, (err) => {
-					if (err) console.error('Failed to delete image', err);
-				})
+						if (err) console.error('Failed to delete image', err);
+					})
 				: null;
 
 			return fail(500, {
 				data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
-				errors: 'Internal server error'
+				errors: { _errors: ['An unexpected error occurred'] }
 			});
 		}
 	}
 };
+
 // let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 // let generatedCodes = new Set<string>();
 

@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+export type FormErrors<T> = {
+	[K in keyof T]?: string[];
+} & {
+	_errors?: string[];
+};
+
 export const phoneRegex = /^(?:\+254|254|0|01)?[17][0-9]{8,9}$/;
 
 export const userSchema = z.object({
@@ -84,5 +90,75 @@ export const loginSchema = z.object({
 		.min(1, 'Password is required')
 });
 
+export const productSchema = z.object({
+	name: z
+		.string({
+			required_error: 'Product name is required'
+		})
+		.min(2, 'Product name must be at least 2 characters')
+		.max(100, 'Product name is too long'),
+
+	description: z
+		.string({
+			required_error: 'Description is required'
+		})
+		.min(10, 'Description must be at least 10 characters'),
+
+	price: z
+		.number({
+			required_error: 'Price is required',
+			invalid_type_error: 'Price must be a number'
+		})
+		.positive('Price must be positive'),
+
+	quantity: z
+		.number({
+			required_error: 'Quantity is required',
+			invalid_type_error: 'Quantity must be a number'
+		})
+		.int('Quantity must be an integer')
+		.nonnegative('Quantity cannot be negative'),
+
+	author: z
+		.string({
+			required_error: 'Author name is required'
+		})
+		.min(2, 'Author name must be at least 2 characters'),
+
+	pageCount: z
+		.number({
+			required_error: 'Page count is required',
+			invalid_type_error: 'Page count must be a number'
+		})
+		.int('Page count must be an integer')
+		.positive('Page count must be positive'),
+
+	publicationDate: z
+		.string({
+			required_error: 'Publication date is required'
+		})
+		.regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
+
+	categoryIds: z
+		.array(
+			z.number({
+				required_error: 'Category ID is required',
+				invalid_type_error: 'Category ID must be a number'
+			})
+		)
+		.min(1, 'At least one category is required')
+
+	// serviceCode: z
+	// 	.string({
+	// 		required_error: 'Service code is required'
+	// 	})
+	// 	.min(1, 'Service code is required'),
+
+	// isPublished: z
+	// 	.boolean()
+	// 	.default(false)
+});
+
 export type LoginCredentials = z.infer<typeof loginSchema>;
 export type UserRegistration = z.infer<typeof userSchema>;
+export type ProductData = z.infer<typeof productSchema>;

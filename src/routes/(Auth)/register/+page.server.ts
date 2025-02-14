@@ -5,7 +5,7 @@ import auth from '$lib/server/auth';
 import prisma from '$lib/server/prisma';
 import { sendEmail } from '$lib/server/mailService';
 import { RECAPTCHA_SECRET_KEY } from '$env/static/private';
-import { validateRegistration } from '$lib/validations/index';
+import { validateRegistration } from '$lib/validations';
 
 export const load = (async ({ locals }) => {
 	// if (locals.user) { throw redirect(303, '/') }

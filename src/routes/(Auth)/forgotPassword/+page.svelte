@@ -18,7 +18,7 @@
 <!-- Forgot Password page -->
 
 <h2 class="text-center text-2xl font-bold">Forgot Password</h2>
-<span class="hover:underline text-xs text-primary mt-4"><a href="/login">Back to login</a></span>
+<span class="text-primary mt-4 text-xs hover:underline"><a href="/login">Back to login</a></span>
 <form
 	method="POST"
 	class="mt-4"
@@ -52,7 +52,7 @@
 	</div>
 	<button
 		type="submit"
-		class="group bg-primary flex w-full items-center justify-center rounded-md border p-2 transition-colors hover:cursor-pointer hover:bg-primary/90 text-white"
+		class="group bg-primary hover:bg-primary/90 flex w-full items-center justify-center rounded-md border p-2 text-white transition-colors hover:cursor-pointer"
 		disabled={loading}
 	>
 		{#if loading}

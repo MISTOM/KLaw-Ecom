@@ -3,10 +3,13 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { getToastState } from '$lib/Toast.svelte';
 	import { fade } from 'svelte/transition';
+	import { productSchema, type FormErrors, type ProductData } from '$lib/validations/validationSchemas.js';
+	import Spinner from '$lib/components/Spinner.svelte';
 
 	const { data, form } = $props();
 	const toast = getToastState();
 
+	let loading = $state(false);
 	let product = $derived(data.product || null);
 	let categories = $state(data?.categories || []);
 
@@ -24,6 +27,7 @@
 	let showPublishModal = $state(false);
 
 	let selectedCategories = $state(data.product?.categories || []);
+	let categoryIds = $derived(selectedCategories.map((c) => c.id));
 
 	// Format publication date to bind to date input
 	let publicationDate = $state(publicationDateISO ? new Date(publicationDateISO).toISOString().split('T')[0] : '');
@@ -104,12 +108,42 @@
 		}
 		// Reset select to default prompt
 		select.value = '';
+		validateField('categoryIds', categoryIds);
 	}
 
 	// When user clicks remove button
 	function removeCategory(categoryId: number) {
 		selectedCategories = selectedCategories.filter((c) => c.id !== categoryId);
+		validateField('categoryIds', categoryIds);
 	}
+
+	// Client-side validation state and helpers
+	let formErrors = $state<FormErrors<ProductData>>({});
+	const getFieldError = (field: keyof FormErrors<ProductData>) => formErrors[field]?.[0] || '';
+	const validateField = <K extends keyof ProductData>(field: K, value: ProductData[K]) => {
+		const fieldSchema = productSchema.shape[field];
+		const result = fieldSchema.safeParse(value);
+		formErrors[field] = result.success ? [] : result.error?.flatten().formErrors || [];
+	};
+	const validateAll = (formData: FormData) => {
+		const data = Object.fromEntries(formData.entries());
+		const parsedData = {
+			...data,
+			price: data.price ? parseFloat(data.price as string) : undefined,
+			quantity: data.quantity ? parseInt(data.quantity as string) : undefined,
+			pageCount: data.pageCount ? parseInt(data.pageCount as string) : undefined,
+			categoryIds: selectedCategories.map((c) => c.id)
+		};
+		const result = productSchema.safeParse(parsedData);
+		if (!result.success) {
+			formErrors = result.error.flatten().fieldErrors;
+			return false;
+		}
+		return true;
+	};
+
+	// Allowed file extensions
+	const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
 </script>
 
 <svelte:head>
@@ -347,25 +381,34 @@
 					<div class="p-6">
 						<form
 							method="POST"
-							use:enhance={({ formData }) => {
+							enctype="multipart/form-data"
+							use:enhance={({ formData, cancel }) => {
+								loading = true;
+								formErrors = {};
 								formData.delete('categoryIds');
-								selectedCategories.forEach((c) => {
-									formData.append('categoryIds', c.id.toString());
-								});
-								return async ({ update, result }) => {
-									console.log('form result ->  ', result);
-									if (result.status === 200) {
-										isEditMode = false;
-										goto('/admin/product');
-										toast.add('Success', 'Product updated', 'success');
-									} else await update();
+								selectedCategories.forEach((c) => formData.append('categoryIds', c.id.toString()));
+
+								if (!validateAll(formData)) {
+									loading = false;
+									cancel();
+								}
+								return async ({ result, update }) => {
+									if (result.type === 'success') {
+										toast.add('Success', 'Product updated successfully', 'success', 2000);
+										// Optionally leave edit mode or refresh fields
+										await goto('/admin/product');
+									} else if (result.type === 'failure') {
+										formErrors = result.data?.errors || { _errors: ['Error updating product'] };
+										await update({ reset: false });
+									}
+									loading = false;
 								};
 							}}
 							class="space-y-6"
 						>
-							{#if form?.errors}
+							{#if formErrors._errors}
 								<div class="rounded-md bg-red-50 p-3 text-sm text-red-500">
-									{form.errors}
+									{formErrors._errors[0]}
 								</div>
 							{/if}
 
@@ -377,8 +420,13 @@
 										type="text"
 										name="name"
 										bind:value={name}
+										onkeyup={(e) => validateField('name', e.currentTarget.value)}
+										aria-invalid={!!getFieldError('name')}
 										class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 									/>
+									{#if getFieldError('name')}
+										<p class="mt-1 text-xs text-red-600">{getFieldError('name')}</p>
+									{/if}
 								</div>
 								<!-- <div>
 										<label for="servicecode" class="text-sm font-medium text-gray-700">Service Code</label>
@@ -400,8 +448,13 @@
 											name="price"
 											bind:value={price}
 											min="0"
+											onkeyup={(e) => validateField('price', parseFloat(e.currentTarget.value))}
+											aria-invalid={!!getFieldError('price')}
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 										/>
+										{#if getFieldError('price')}
+											<p class="mt-1 text-xs text-red-600">{getFieldError('price')}</p>
+										{/if}
 									</div>
 									<div>
 										<label for="quantity" class="text-sm font-medium text-gray-700">Quantity in Stock</label>
@@ -411,8 +464,13 @@
 											name="quantity"
 											bind:value={quantity}
 											min="0"
+											onkeyup={(e) => validateField('quantity', parseInt(e.currentTarget.value))}
+											aria-invalid={!!getFieldError('quantity')}
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 										/>
+										{#if getFieldError('quantity')}
+											<p class="mt-1 text-xs text-red-600">{getFieldError('quantity')}</p>
+										{/if}
 									</div>
 									<div>
 										<label for="author" class="text-sm font-medium text-gray-700">Author</label>
@@ -421,8 +479,13 @@
 											type="text"
 											name="author"
 											bind:value={author}
+											onkeyup={(e) => validateField('author', e.currentTarget.value)}
+											aria-invalid={!!getFieldError('author')}
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 										/>
+										{#if getFieldError('author')}
+											<p class="mt-1 text-xs text-red-600">{getFieldError('author')}</p>
+										{/if}
 									</div>
 
 									<div>
@@ -432,8 +495,13 @@
 											type="date"
 											name="publicationDate"
 											bind:value={publicationDate}
+											onchange={(e) => validateField('publicationDate', e.currentTarget.value)}
+											aria-invalid={!!getFieldError('publicationDate')}
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 										/>
+										{#if getFieldError('publicationDate')}
+											<p class="mt-1 text-xs text-red-600">{getFieldError('publicationDate')}</p>
+										{/if}
 									</div>
 
 									<!-- Select categories section -->
@@ -474,6 +542,9 @@
 												{/if}
 											{/each}
 										</select>
+										{#if getFieldError('categoryIds')}
+											<p class="mt-1 text-xs text-red-600">{getFieldError('categoryIds')}</p>
+										{/if}
 
 										<!-- Display selected categories -->
 										<div class="flex flex-wrap gap-2">
@@ -507,8 +578,13 @@
 											type="number"
 											name="pageCount"
 											bind:value={pageCount}
+											onkeyup={(e) => validateField('pageCount', parseInt(e.currentTarget.value))}
+											aria-invalid={!!getFieldError('pageCount')}
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 										/>
+										{#if getFieldError('pageCount')}
+											<p class="mt-1 text-xs text-red-600">{getFieldError('pageCount')}</p>
+										{/if}
 									</div>
 
 									<div>
@@ -518,8 +594,25 @@
 											name="description"
 											rows="3"
 											bind:value={description}
+											onkeyup={(e) => validateField('description', e.currentTarget.value)}
+											aria-invalid={!!getFieldError('description')}
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 										></textarea>
+										{#if getFieldError('description')}
+											<p class="mt-1 text-xs text-red-600">{getFieldError('description')}</p>
+										{/if}
+									</div>
+
+									<!-- New image upload field -->
+									<div class="mb-4">
+										<label for="newImage" class="text-sm font-medium text-gray-700">Upload New Image</label>
+										<input
+											id="newImage"
+											type="file"
+											name="newImage"
+											accept={allowedExtensions.join(',')}
+											class="mt-1 w-full rounded-md border p-2"
+										/>
 									</div>
 								</div>
 								<div class="flex justify-end gap-4">
@@ -527,7 +620,7 @@
 										<button
 											type="button"
 											onclick={() => (showPublishModal = true)}
-											class="border-primary text-primary hover:bg-primary/10 rounded-sm border-2 px-4 py-2 transition-colors"
+											class="border-primary text-primary hover:bg-primary/10 w-36 rounded-sm border-2 px-4 py-2 transition-colors"
 										>
 											{data.product?.isPublished ? 'Unpublish' : 'Publish'}
 										</button>
@@ -535,13 +628,16 @@
 
 									<button
 										type="submit"
-										class="bg-primary hover:bg-primary/90 cursor-pointer rounded-md px-4 py-2 text-white transition-colors"
+										class="bg-primary hover:bg-primary/90 flex w-36 cursor-pointer justify-center rounded-sm px-4 py-2 align-middle text-white transition-colors"
 									>
+										{#if loading}
+											<Spinner />
+										{/if}
 										Save
 									</button>
 									<button
 										type="button"
-										class="rounded-md bg-red-100 p-2 text-red-600 transition-colors hover:bg-red-200"
+										class="w-36 rounded-sm bg-red-100 p-2 text-red-600 transition-colors hover:bg-red-200"
 										onclick={() => (showDeleteModal = true)}
 									>
 										<!-- <Trash2 size={16} /> -->
