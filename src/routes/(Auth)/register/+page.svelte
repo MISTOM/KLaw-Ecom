@@ -62,6 +62,24 @@
 		return true;
 	};
 
+	async function saveCredentials(email: any, password: any) {
+		if ('credentials' in navigator) {
+			const credential = new PasswordCredential({
+				id: email,
+				password: password
+			});
+
+			try {
+				await navigator.credentials.store(credential);
+				console.log('Credentials saved successfully!');
+			} catch (error) {
+				console.error('Error saving credentials:', error);
+			}
+		} else {
+			console.warn('Credential Management API not supported in this browser.');
+		}
+	}
+
 	// function getReCaptchaToken(action: string): Promise<string> {
 	// 	return new Promise((resolve) => {
 	// 		if (typeof grecaptcha !== 'undefined') {
@@ -92,6 +110,8 @@
 <form
 	class="mt-4 space-y-3"
 	method="POST"
+	action=""
+	autocomplete="on"
 	use:enhance={async ({ formData, cancel }) => {
 		loading = true;
 		formErrors = {};
@@ -106,11 +126,13 @@
 			cancel();
 		}
 
-		return async ({ result }) => {
+		return async ({ result, formData }) => {
 			console.log('form result ->  ', result);
 			if (result.type === 'success') {
 				toast.add('Success', 'Please check your email to verify your account', 'success', 7000);
-				goto('/login');
+				await saveCredentials(formData.get('email'), formData.get('password'));
+
+				await goto('/login');
 			} else if (result.type === 'failure') {
 				formErrors = result.data?.errors || { _errors: ['Error registering user'] };
 			}
@@ -149,7 +171,7 @@
 	</div>
 
 	<!-- id number -->
-	<div class="">
+	<!-- <div class="">
 		<label for="idNumber" class="block text-sm font-semibold">ID Number <span class="text-red-500">*</span></label>
 		<input
 			type="number"
@@ -171,27 +193,8 @@
 				{getFieldError('idNumber')}
 			</p>
 		{/if}
-	</div>
+	</div> -->
 
-	<div class="">
-		<label for="email" class="block text-sm font-semibold">Email <span class="text-red-500">*</span> </label>
-		<input
-			type="email"
-			id="email"
-			name="email"
-			class={{ 'w-full rounded-md border-2 p-2': true, 'border-red-500': !!getFieldError('email') }}
-			bind:value={email}
-			aria-invalid={!!getFieldError('email')}
-			aria-describedby={getFieldError('email') ? 'email-error' : undefined}
-			onkeyup={(e) => validateField('email', e.currentTarget.value)}
-			required
-		/>
-		{#if getFieldError('email')}
-			<p id="email-error" class="mt-1 text-xs text-red-600" transition:fade>
-				{getFieldError('email')}
-			</p>
-		{/if}
-	</div>
 	<!-- phonenumber -->
 	<div class="">
 		<label for="phoneNumber" class="block text-sm font-semibold"
@@ -215,6 +218,26 @@
 		{#if getFieldError('phoneNumber')}
 			<p id="phoneNumber-error" class="mt-1 text-xs text-red-600" transition:fade>
 				{getFieldError('phoneNumber')}
+			</p>
+		{/if}
+	</div>
+
+	<div class="">
+		<label for="email" class="block text-sm font-semibold">Email <span class="text-red-500">*</span> </label>
+		<input
+			type="email"
+			id="email"
+			name="email"
+			class={{ 'w-full rounded-md border-2 p-2': true, 'border-red-500': !!getFieldError('email') }}
+			bind:value={email}
+			aria-invalid={!!getFieldError('email')}
+			aria-describedby={getFieldError('email') ? 'email-error' : undefined}
+			onkeyup={(e) => validateField('email', e.currentTarget.value)}
+			required
+		/>
+		{#if getFieldError('email')}
+			<p id="email-error" class="mt-1 text-xs text-red-600" transition:fade>
+				{getFieldError('email')}
 			</p>
 		{/if}
 	</div>
