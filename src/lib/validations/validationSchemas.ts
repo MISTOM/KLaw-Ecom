@@ -25,13 +25,13 @@ export const userSchema = z.object({
 		.min(1, 'Email is Required')
 		.email('Please enter a valid email address'),
 
-	// idNumber: z
-	// 	.string({
-	// 		required_error: 'ID number is required'
-	// 	})
-	// 	.min(6, 'ID number must be at least 6 digits')
-	// 	.max(10, 'ID number cannot exceed 10 digits')
-	// 	.regex(/^\d+$/, 'ID number must contain only digits'),
+	idNumber: z
+		.string({
+			required_error: 'ID number is required'
+		})
+		.min(6, 'ID number must be at least 6 digits')
+		.max(10, 'ID number cannot exceed 10 digits')
+		.regex(/^\d+$/, 'ID number must contain only digits'),
 
 	phoneNumber: z
 		.string({

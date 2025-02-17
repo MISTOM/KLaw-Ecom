@@ -15,7 +15,7 @@ export const actions: Actions = {
 	default: async ({ request, url, fetch }) => {
 		const formData = Object.fromEntries(await request.formData());
 		const validation = validateRegistration(formData);
-		const idNumber = 555000
+		// const idNumber = 555000
 
 		if (!validation.success) {
 			return fail(400, {
@@ -27,7 +27,7 @@ export const actions: Actions = {
 			name,
 			email,
 			phoneNumber,
-			// idNumber,
+			idNumber,
 			password,
 			'g-recaptcha-response': recaptchaToken
 		} = validation.data!; // or = validation.data ?? {}
@@ -42,7 +42,17 @@ export const actions: Actions = {
 				});
 			}
 
-			// Verify token with Google
+			const user = await prisma.user.findUnique({
+				where: { email: email.toString() }
+			});
+			if (user) {
+				return fail(400, {
+					data: { name, email, phoneNumber, idNumber },
+					errors: { email: ['Email is already in use. Please log in.'] }
+				});
+			}
+
+			// Verify token with Google TODO: validate last
 			const verificationURL = 'https://www.google.com/recaptcha/api/siteverify';
 			const response = await fetch(verificationURL, {
 				method: 'POST',
@@ -61,21 +71,12 @@ export const actions: Actions = {
 				});
 			}
 
-			const user = await prisma.user.findUnique({
-				where: { email: email.toString() }
-			});
-			if (user) {
-				return fail(400, {
-					data: { name, email, phoneNumber, idNumber },
-					errors: { email: ['Email is already in use. Please log in.'] }
-				});
-			}
 			const hashedPassword = await auth.hash(password.toString());
 			const newUser = await prisma.user.create({
 				data: {
 					name: name.toString(),
 					email: email.toString(),
-					idNumber: 40003553,
+					idNumber: parseInt(idNumber),
 					phoneNumber: phoneNumber.toString(),
 					password: hashedPassword,
 					role: { connect: { name: 'USER' } }

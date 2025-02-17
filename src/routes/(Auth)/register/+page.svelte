@@ -1,4 +1,5 @@
 <script lang="ts">
+
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { fade } from 'svelte/transition';
@@ -7,6 +8,7 @@
 	import { getToastState } from '$lib/Toast.svelte.js';
 	import { validateRegistration } from '$lib/validations/index.js';
 	import { userSchema, type UserRegistration, type FormErrors } from '$lib/validations/validationSchemas.js';
+
 	const SITE_KEY = '6LfCSboqAAAAAONEp8MMiyAHZycy2b99b2VhHPHD';
 
 	const { form } = $props();
@@ -132,7 +134,11 @@
 				toast.add('Success', 'Please check your email to verify your account', 'success', 7000);
 				await saveCredentials(formData.get('email'), formData.get('password'));
 
-				await goto('/login');
+				setTimeout(() => {
+					window.location.href = '/login';
+				}, 4000);
+
+				// await goto('/login');
 			} else if (result.type === 'failure') {
 				formErrors = result.data?.errors || { _errors: ['Error registering user'] };
 			}
@@ -171,7 +177,7 @@
 	</div>
 
 	<!-- id number -->
-	<!-- <div class="">
+	<div class="">
 		<label for="idNumber" class="block text-sm font-semibold">ID Number <span class="text-red-500">*</span></label>
 		<input
 			type="number"
@@ -193,7 +199,7 @@
 				{getFieldError('idNumber')}
 			</p>
 		{/if}
-	</div> -->
+	</div>
 
 	<!-- phonenumber -->
 	<div class="">
