@@ -1,5 +1,4 @@
 <script lang="ts">
-
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { fade } from 'svelte/transition';
@@ -22,6 +21,7 @@
 	let passwordMatch = $derived(password === confirmPassword ? true : false);
 	let loading = $state(false);
 	let passwordVisible = $state(false);
+	let passwordVisible2 = $state(false);
 
 	let recaptchaToken = '';
 	let formErrors = $state<FormErrors<UserRegistration>>(form?.errors || {});
@@ -66,6 +66,7 @@
 
 	async function saveCredentials(email: any, password: any) {
 		if ('credentials' in navigator) {
+			// @ts-ignore
 			const credential = new PasswordCredential({
 				id: email,
 				password: password
@@ -136,7 +137,7 @@
 
 				setTimeout(() => {
 					window.location.href = '/login';
-				}, 4000);
+				}, 3000);
 
 				// await goto('/login');
 			} else if (result.type === 'failure') {
@@ -160,7 +161,7 @@
 			id="name"
 			name="name"
 			class={{
-				'w-full rounded-md border-2 p-2': true,
+				'focus:border-primary w-full rounded-md border-2 border-black p-2 focus:outline-none': true,
 				'border-red-500': !!getFieldError('name')
 			}}
 			bind:value={name}
@@ -184,7 +185,7 @@
 			id="idNumber"
 			name="idNumber"
 			class={{
-				'w-full rounded-md border-2 p-2': true,
+				'focus:border-primary w-full rounded-md border-2 border-black p-2 focus:outline-none': true,
 				'border-red-500': !!getFieldError('idNumber')
 			}}
 			bind:value={idNumber}
@@ -211,7 +212,7 @@
 			id="phoneNumber"
 			name="phoneNumber"
 			class={{
-				'w-full rounded-md border-2 p-2': true,
+				'focus:border-primary w-full rounded-md border-2 border-black p-2 focus:outline-none': true,
 				'border-red-500': !!getFieldError('phoneNumber')
 			}}
 			bind:value={phoneNumber}
@@ -234,7 +235,10 @@
 			type="email"
 			id="email"
 			name="email"
-			class={{ 'w-full rounded-md border-2 p-2': true, 'border-red-500': !!getFieldError('email') }}
+			class={{
+				'focus:border-primary w-full rounded-md border-2 border-black p-2 focus:outline-none': true,
+				'border-red-500': !!getFieldError('email')
+			}}
 			bind:value={email}
 			aria-invalid={!!getFieldError('email')}
 			aria-describedby={getFieldError('email') ? 'email-error' : undefined}
@@ -255,7 +259,7 @@
 			id="password"
 			name="password"
 			class={{
-				'w-full rounded-md border-2 p-2': true,
+				'focus:border-primary w-full rounded-md border-2 border-black p-2 focus:outline-none': true,
 				'border-red-500': !!getFieldError('password')
 			}}
 			bind:value={password}
@@ -272,7 +276,7 @@
 
 		<button
 			type="button"
-			class="absolute top-7 right-3 text-xs text-gray-400"
+			class="text-gray-7 00 absolute top-7 right-3 text-xs"
 			tabindex="-1"
 			onclick={() => (passwordVisible = !passwordVisible)}
 		>
@@ -288,11 +292,11 @@
 			>Confirm Password <span class="text-red-500">*</span></label
 		>
 		<input
-			type={passwordVisible ? 'text' : 'password'}
+			type={passwordVisible2 ? 'text' : 'password'}
 			id="confirmPassword"
 			name="confirmPassword"
 			class={{
-				'w-full rounded-md border-2 p-2': true,
+				'focus:border-primary focus:outline-nonex w-full rounded-md border-2 border-black p-2	': true,
 				'border-red-500': !!getFieldError('confirmPassword')
 			}}
 			bind:value={confirmPassword}
@@ -308,11 +312,11 @@
 
 		<button
 			type="button"
-			class="absolute top-7 right-3 text-xs text-gray-400"
+			class="absolute top-7 right-3 text-xs text-gray-700"
 			tabindex="-1"
-			onclick={() => (passwordVisible = !passwordVisible)}
+			onclick={() => (passwordVisible2 = !passwordVisible2)}
 		>
-			{#if passwordVisible}
+			{#if passwordVisible2}
 				{@html eye}
 			{:else}
 				{@html eyeSlash}

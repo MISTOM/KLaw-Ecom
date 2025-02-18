@@ -47,6 +47,11 @@ export const actions: Actions = {
 				}
 			});
 
+			//if password was updated, send an email
+			if (newPassword) {
+				//send email
+			}
+
 			return { success: true };
 		} catch (e) {
 			console.error('updateProfile:', e);

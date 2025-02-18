@@ -4,12 +4,11 @@
 	import { getToastState } from '$lib/Toast.svelte';
 	import { fade } from 'svelte/transition';
 	import { productSchema, type FormErrors, type ProductData } from '$lib/validations/validationSchemas.js';
-	import Spinner from '$lib/components/Spinner.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 
 	const { data, form } = $props();
 	const toast = getToastState();
 
-	let loading = $state(false);
 	let product = $derived(data.product || null);
 	let categories = $state(data?.categories || []);
 
@@ -27,7 +26,6 @@
 	let showPublishModal = $state(false);
 
 	let selectedCategories = $state(data.product?.categories || []);
-	let categoryIds = $derived(selectedCategories.map((c) => c.id));
 
 	// Format publication date to bind to date input
 	let publicationDate = $state(publicationDateISO ? new Date(publicationDateISO).toISOString().split('T')[0] : '');
@@ -108,13 +106,11 @@
 		}
 		// Reset select to default prompt
 		select.value = '';
-		validateField('categoryIds', categoryIds);
 	}
 
 	// When user clicks remove button
 	function removeCategory(categoryId: number) {
 		selectedCategories = selectedCategories.filter((c) => c.id !== categoryId);
-		validateField('categoryIds', categoryIds);
 	}
 
 	// Client-side validation state and helpers
@@ -141,9 +137,6 @@
 		}
 		return true;
 	};
-
-	// Allowed file extensions
-	const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
 </script>
 
 <svelte:head>
@@ -298,66 +291,52 @@
 			</div>
 		</div>
 		<!-- Delete Confirmation Modal -->
-		{#if showDeleteModal}
-			<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-				<div class="w-full max-w-md rounded-lg bg-white p-6">
-					<h3 class="mb-4 text-xl font-bold">Delete Book</h3>
-					<p class="mb-6 text-gray-600">
-						Are you sure you want to delete "{name}"? This action cannot be undone.
-					</p>
-					<div class="flex justify-end gap-4">
-						<button
-							class="rounded-md px-4 py-2 text-gray-600 hover:bg-gray-100"
-							onclick={() => (showDeleteModal = false)}
-						>
-							Cancel
-						</button>
-						<button
-							type="submit"
-							class="rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-							onclick={async () => {
-								showDeleteModal = false;
-								await deleteProduct();
-							}}
-						>
-							Delete
-						</button>
-					</div>
-				</div>
+		<Modal bind:show={showDeleteModal} title="Delete Book">
+			<p class="mb-6 text-gray-600">
+				Are you sure you want to delete "{name}"? This action cannot be undone.
+			</p>
+			<div class="flex justify-end gap-4">
+				<button
+					class="rounded-md bg-gray-100 px-4 py-2 text-gray-600 hover:bg-gray-200"
+					onclick={() => (showDeleteModal = false)}
+				>
+					Cancel
+				</button>
+				<button
+					class="rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+					onclick={async () => {
+						showDeleteModal = false;
+						await deleteProduct();
+					}}
+				>
+					Delete
+				</button>
 			</div>
-		{/if}
+		</Modal>
 
 		<!-- Publish confirmation Modal -->
-		{#if showPublishModal}
-			<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-				<div class="w-full max-w-md rounded-lg bg-white p-6">
-					<h3 class="mb-4 text-xl font-bold">
-						{data.product?.isPublished ? 'Unpublish' : 'Publish'} Book
-					</h3>
-					<p class="mb-6 text-gray-600">
-						Are you sure you want to {data.product?.isPublished ? 'unpublish' : 'publish'} "{name}"?
-					</p>
-					<div class="flex justify-end gap-4">
-						<button
-							class="rounded-md px-4 py-2 text-gray-600 hover:bg-gray-100"
-							onclick={() => (showPublishModal = false)}
-						>
-							Cancel
-						</button>
-						<button
-							type="button"
-							class="border-primary text-primary hover:bg-primary/10 rounded-sm border-2 px-4 py-2 transition-colors"
-							onclick={async () => {
-								showPublishModal = false;
-								await togglePublish();
-							}}
-						>
-							{data.product?.isPublished ? 'Unpublish' : 'Publish'}
-						</button>
-					</div>
-				</div>
+		<Modal bind:show={showPublishModal} title={`${data.product?.isPublished ? 'Unpublish' : 'Publish'} Book`}>
+			<p class="mb-6 text-gray-600">
+				Are you sure you want to {data.product?.isPublished ? 'unpublish' : 'publish'} "{name}"?
+			</p>
+			<div class="flex justify-end gap-4">
+				<button
+					class="rounded-md bg-gray-100 px-4 py-2 text-gray-600 hover:bg-gray-200"
+					onclick={() => (showPublishModal = false)}
+				>
+					Cancel
+				</button>
+				<button
+					class="bg-primary hover:bg-primary/90 flex w-36 cursor-pointer justify-center rounded-sm px-4 py-2 align-middle text-white transition-colors"
+					onclick={async () => {
+						showPublishModal = false;
+						await togglePublish();
+					}}
+				>
+					{data.product?.isPublished ? 'Unpublish' : 'Publish'}
+				</button>
 			</div>
-		{/if}
+		</Modal>
 
 		<div class="mb-6 flex items-center gap-4">
 			<a
@@ -381,27 +360,23 @@
 					<div class="p-6">
 						<form
 							method="POST"
-							enctype="multipart/form-data"
 							use:enhance={({ formData, cancel }) => {
-								loading = true;
 								formErrors = {};
 								formData.delete('categoryIds');
 								selectedCategories.forEach((c) => formData.append('categoryIds', c.id.toString()));
 
 								if (!validateAll(formData)) {
-									loading = false;
 									cancel();
 								}
 								return async ({ result, update }) => {
 									if (result.type === 'success') {
 										toast.add('Success', 'Product updated successfully', 'success', 2000);
 										// Optionally leave edit mode or refresh fields
-										await goto('/admin/product');
+										await update({ reset: false });
 									} else if (result.type === 'failure') {
 										formErrors = result.data?.errors || { _errors: ['Error updating product'] };
 										await update({ reset: false });
 									}
-									loading = false;
 								};
 							}}
 							class="space-y-6"
@@ -602,25 +577,13 @@
 											<p class="mt-1 text-xs text-red-600">{getFieldError('description')}</p>
 										{/if}
 									</div>
-
-									<!-- New image upload field -->
-									<div class="mb-4">
-										<label for="newImage" class="text-sm font-medium text-gray-700">Upload New Image</label>
-										<input
-											id="newImage"
-											type="file"
-											name="newImage"
-											accept={allowedExtensions.join(',')}
-											class="mt-1 w-full rounded-md border p-2"
-										/>
-									</div>
 								</div>
 								<div class="flex justify-end gap-4">
 									<div>
 										<button
 											type="button"
 											onclick={() => (showPublishModal = true)}
-											class="border-primary text-primary hover:bg-primary/10 w-36 rounded-sm border-2 px-4 py-2 transition-colors"
+											class="bg-primary hover:bg-primary/90 flex w-36 cursor-pointer justify-center rounded-sm px-4 py-2 align-middle text-white transition-colors"
 										>
 											{data.product?.isPublished ? 'Unpublish' : 'Publish'}
 										</button>
@@ -630,14 +593,11 @@
 										type="submit"
 										class="bg-primary hover:bg-primary/90 flex w-36 cursor-pointer justify-center rounded-sm px-4 py-2 align-middle text-white transition-colors"
 									>
-										{#if loading}
-											<Spinner />
-										{/if}
 										Save
 									</button>
 									<button
 										type="button"
-										class="w-36 rounded-sm bg-red-100 p-2 text-red-600 transition-colors hover:bg-red-200"
+										class="flex w-36 cursor-pointer justify-center rounded-sm bg-red-600 px-4 py-2 align-middle text-white transition-colors hover:bg-red-600/90"
 										onclick={() => (showDeleteModal = true)}
 									>
 										<!-- <Trash2 size={16} /> -->

@@ -22,24 +22,27 @@
 					<h1 style="font-size: 24px; color: #8f2a2b; text-align: center; margin-bottom: 20px;">
 						Verify Your Email
 					</h1>
-					<p style="font-size: 16px; line-height: 1.5; margin-bottom: 5px;">Hello {username},</p>
 					<p style="font-size: 16px; line-height: 1.5; margin-bottom: 30px;">
-						Thank you for registering with Kenya Law. Please confirm your email address by clicking the button
-						below. The link will expire in 1 hr.
+						Hello {username},<br />
+						Thank you for registering with Kenya Law. Please confirm your email address by clicking the button below.
+						The link will expire in 1 hr.
 					</p>
-
 					<p style="text-align: center; margin-bottom: 30px;">
 						<a
 							href={link}
 							target="_blank"
 							style="
-                                background-color: #faa21b;
-                                color: #ffffff;
-                                padding: 12px 24px;
-                                text-decoration: none;
-                                border-radius: 4px;
-                                font-weight: bold;
-                            "
+								display: inline-flex;
+								align-items: center;
+								justify-content: center;
+								background-color: #8f2a2b;
+								color: #ffffff;
+								padding: 8px 16px;
+								text-decoration: none;
+								border-radius: 5px;
+								border: 1px solid #8f2a2b;
+								font-weight: 500;
+							"
 						>
 							Verify Email
 						</a>
@@ -59,7 +62,7 @@
 			<tr>
 				<td style="padding: 20px; text-align: center; background-color: #f0f0f0;">
 					<p style="font-size: 12px; color: #999999; margin-bottom: 5px;">
-						© 2024 National Council for Law Reporting (Kenya Law)
+						© 2025 National Council for Law Reporting (Kenya Law)
 					</p>
 					<p style="font-size: 12px; color: #999999;">
 						<a

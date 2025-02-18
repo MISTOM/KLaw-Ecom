@@ -101,7 +101,7 @@
 				/>
 			</div>
 			{#if isEditMode}
-				<div class="mb-4" in:fade={{ duration: 150 }}>
+				<div class="mb-4" in:fade={{ duration: 100 }}>
 					<label for="oldPassword" class="block text-sm font-semibold">Old Password</label>
 					<input
 						type="password"
@@ -111,7 +111,7 @@
 						bind:value={oldPassword}
 					/>
 				</div>
-				<div class="mb-4" in:fade={{ duration: 150 }}>
+				<div class="mb-4" in:fade={{ duration: 100 }}>
 					<label for="password" class="block text-sm font-semibold">New Password</label>
 					<input
 						type="password"
@@ -121,7 +121,7 @@
 						bind:value={password}
 					/>
 				</div>
-				<div class="mb-4" in:fade={{ duration: 150 }}>
+				<div class="mb-4" in:fade={{ duration: 100 }}>
 					<label for="confirmPassword" class="block text-sm font-semibold">Confirm New Password</label>
 					<input
 						type="password"

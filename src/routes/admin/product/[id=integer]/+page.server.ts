@@ -2,7 +2,6 @@ import prisma from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { validateProduct } from '$lib/validations';
-import { writeFile, mkdir, unlink } from 'node:fs/promises';
 
 export const load = (async ({ params, depends }) => {
 	depends('update:product');
@@ -66,32 +65,6 @@ export const actions = {
 		const publicationDate = publicationDateData ? new Date(publicationDateData) : undefined;
 		const serviceCode = Math.floor(Math.random() * 87654321).toString(); //auto generate service code  /* formData.get('serviceCode')?.toString();*/
 
-		// Process new image upload if provided
-		const newImage = formData.get('newImage') as File | null;
-		let imageUrl: string | undefined;
-		if (newImage && newImage.name) {
-			const existingImages = await prisma.image.findMany({
-				where: { productId: id }
-			});
-
-			//For each, delete file from disk if it exists, then remove the DB record
-			for (const img of existingImages) {
-				const oldFilePath = `static${img.url}`; // e.g. static/images/filename.png
-				await unlink(oldFilePath).catch(() => console.log(`Old image not found or not removed: ${oldFilePath}`));
-				// Remove the image record
-				await prisma.image.delete({
-					where: { id: img.id }
-				});
-			}
-
-			const fileName = `${Date.now()}-${newImage.name}`;
-			const imagePath = `static/images/${fileName}`;
-			// Ensure images directory exists
-			await mkdir('static/images', { recursive: true });
-			await writeFile(imagePath, new Uint8Array(await newImage.arrayBuffer()));
-			imageUrl = `/images/${fileName}`;
-		}
-
 		try {
 			// Ensure the serviceCode is unique except for the current product
 			const existing = await prisma.product.findUnique({ where: { serviceCode } });
@@ -111,7 +84,7 @@ export const actions = {
 				});
 			}
 
-			// Update product with validated data; update image if a new one is provided
+			// Update product with validated data
 			const product = await prisma.product.update({
 				where: { id },
 				data: {
@@ -123,14 +96,7 @@ export const actions = {
 					author,
 					publicationDate,
 					pageCount,
-					categories: { set: categoryIds.map((id) => ({ id })) },
-					...(imageUrl
-						? {
-								Image: {
-									create: { url: imageUrl }
-								}
-							}
-						: {})
+					categories: { set: categoryIds.map((id) => ({ id })) }
 				}
 			});
 

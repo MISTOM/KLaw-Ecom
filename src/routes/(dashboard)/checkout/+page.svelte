@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { getCartState } from '$lib/Cart.svelte.js';
 	import Spinner from '$lib/components/Spinner.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 
 	const { data } = $props();
 
@@ -13,14 +14,14 @@
 	const cart = getCartState();
 
 	let errors = $state('');
+	let showConfirmModal = $state(false);
 	let showPaymentModal = $state(false);
 	let loading = $state(false);
 
 	let totalPrice = $derived(cart.cartStats.total + (convenienceFee?.amount || 0));
 
-	const createOrder = async () => {
-		if (!confirm('Are you sure you want to purchase these items?')) return;
-
+	const handleCreateOrder = async () => {
+		showConfirmModal = false;
 		const data = JSON.stringify({
 			cartItems: cart.cartItems.map((item) => ({
 				quantity: item.quantity,
@@ -40,10 +41,9 @@
 			console.log(resData.message);
 			cart.cartItems = [];
 			await cart.saveCart();
-			// submit payment
 			const form = document.getElementById('payment-form') as HTMLFormElement;
 			if (form) {
-				showPaymentModal = true; // Display the modal
+				showPaymentModal = true;
 				loading = true;
 				await tick();
 				form.submit();
@@ -70,7 +70,7 @@
 	<section class="col-span-2">
 		<a
 			href="/"
-			class="mb-2 flex w-28 items-center rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-200"
+			class="mb-2 flex w-28 items-center rounded-sm bg-gray-100 px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-200"
 		>
 			← Back
 		</a>
@@ -78,7 +78,7 @@
 		<hr />
 		<ul>
 			{#each cart.cartItems as item, i}
-				<li class="my-3 flex items-center rounded-md border p-1 hover:shadow-xs">
+				<li class="my-3 flex items-center rounded-sm border p-1 hover:shadow-xs">
 					<span class="m-5">{i + 1}</span>
 					<img
 						src={item.product.Image[0]?.url || '/kLawPillers.png'}
@@ -93,7 +93,7 @@
 
 					<div class="flex space-x-2">
 						<button
-							class="rounded-md bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+							class="rounded-sm bg-red-500 px-3 py-1 text-white hover:bg-red-600"
 							onclick={() => cart.removeItem(item.id)}
 						>
 							Remove
@@ -103,7 +103,7 @@
 			{/each}
 		</ul>
 	</section>
-	<section class="h-fit rounded-md border p-6">
+	<section class="h-fit rounded-sm border p-6">
 		<h2 class="mb-4 text-xl font-semibold">Order Summary</h2>
 
 		{#if errors}
@@ -157,7 +157,7 @@
 		{#if paymentDetails}
 			<button
 				class="transition-color m-1 w-full rounded-sm bg-green-600 p-1 text-white hover:opacity-90"
-				onclick={createOrder}
+				onclick={() => (showConfirmModal = true)}
 				>Pay
 			</button>
 		{:else}
@@ -165,47 +165,41 @@
 		{/if}
 	</section>
 </main>
-{#if showPaymentModal}
-	<div
-		class="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black backdrop-blur-xs"
-		role="button"
-		tabindex="-1"
-		onclick={() => (showPaymentModal = false)}
-		onkeydown={(e) => {
-			e.key === 'Escape' && (showPaymentModal = false);
-		}}
-		in:fade={{ duration: 100 }}
-		out:fade={{ duration: 50 }}
-	>
-		<div
-			class="relative max-h-[90vh] w-4/5 max-w-[800px] overflow-hidden rounded-lg bg-white p-5"
-			role="button"
-			onkeydown={() => {}}
-			tabindex="0"
-			onclick={(e) => e.stopPropagation()}
+
+<!-- Confirmation Modal -->
+<Modal bind:show={showConfirmModal} title="Confirm Purchase">
+	<p class="mb-6 text-gray-700">
+		Are you sure you want to proceed with the purchase of {cart.cartItems.length} item{cart.cartItems.length !== 1
+			? 's'
+			: ''}? Total amount: <strong>KES {totalPrice.toLocaleString()}</strong>
+	</p>
+	<div class="flex justify-end gap-4">
+		<button
+			class="rounded-sm bg-gray-100 px-4 py-2 text-gray-600 hover:bg-gray-200"
+			onclick={() => (showConfirmModal = false)}
 		>
-			<!-- Close Button -->
-			<button
-				class="absolute top-2 right-6 text-2xl text-gray-500 hover:text-gray-700"
-				aria-label="Close"
-				onclick={() => (showPaymentModal = false)}
-			>
-				&times;
-			</button>
-
-			<!-- Loading Overlay -->
-			{#if loading}
-				<div class="bg-opacity-75 absolute inset-0 z-10 flex items-center justify-center bg-white">
-					<Spinner />
-				</div>
-			{/if}
-
-			<iframe
-				class="h-[500px] w-full border-0"
-				name="my_frame"
-				title="PesaFlow Payment Form"
-				onload={() => (loading = false)}
-			></iframe>
-		</div>
+			Cancel
+		</button>
+		<button class="rounded-sm bg-green-600 px-4 py-2 text-white hover:bg-green-700" onclick={handleCreateOrder}>
+			Confirm Purchase
+		</button>
 	</div>
-{/if}
+</Modal>
+
+<!-- Payment Modal -->
+<Modal bind:show={showPaymentModal} title="Payment" modalClass="max-w-[800px]">
+	<div class="relative h-full w-full">
+		{#if loading}
+			<div class="absolute inset-0 z-10 flex items-center justify-center bg-gray-400">
+				<Spinner />
+			</div>
+		{/if}
+
+		<iframe
+			class="h-[600px] w-full border-0"
+			name="my_frame"
+			title="PesaFlow Payment Form"
+			onload={() => (loading = false)}
+		></iframe>
+	</div>
+</Modal>
