@@ -95,44 +95,49 @@
 			<div class="col-span-full text-center text-gray-600">No products found</div>
 		{:else}
 			{#each filteredProducts as product (product.id)}
-				<div class="group overflow-hidden rounded-md border transition-all hover:shadow-lg">
-					<a href="/product/{product.id}?category={selectedCategoryId}">
-						<div class="mx-auto aspect-square overflow-hidden">
-							<img
-								src={product.Image[0]?.url || '/kLawPillers.png'}
-								alt={product.name}
-								class="bg-primary h-full object-cover transition-transform group-hover:scale-105"
-							/>
-						</div>
-					</a>
-					<div class="p-4">
-						<h3 class="text-lg font-semibold">{product.name}</h3>
-						<p class="mt-2 line-clamp-1 text-sm text-gray-600">{product.description}</p>
+				<div
+					class="group flex flex-col justify-between overflow-hidden rounded-sm border transition-all hover:shadow-lg"
+				>
+					<div>
+						<a href="/product/{product.id}?category={selectedCategoryId}">
+							<div class="flex aspect-square items-center justify-center overflow-hidden">
+								<img
+									src={product.Image[0]?.url || '/noImage.jpg'}
+									alt={product.name}
+									class="h-full bg-gray-100 object-cover transition-transform group-hover:scale-105"
+								/>
+							</div>
+						</a>
 
-						<div class="mt-auto flex items-center justify-between pt-4">
-							<span class="text-lg font-bold">
-								KES {product.price.toLocaleString()}
-							</span>
-							<button
-								class="rounded-md px-3 py-2 text-sm text-white transition-colors {product.quantity > 0
-									? 'bg-primary hover:bg-primary/90'
-									: 'cursor-not-allowed bg-gray-400'}"
-								onclick={async () => {
-									if (product.quantity <= 0) {
-										toast.add('Error', 'Product is out of stock', 'warning', 2000);
-										return;
-									}
-									if (await cart.addItem(product)) {
-										toast.add('Success', 'Product added to cart', 'success', 2000);
-									} else {
-										console.log('product not added to cart');
-										if (data.user) toast.add('Error', 'Failed to Save Cart', 'error', 2000);
-									}
-								}}
-							>
-								{product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
-							</button>
+						<div class="p-4">
+							<h3 class="line-clamp-2 text-lg font-semibold">{product.name}</h3>
+							<p class="mt-2 line-clamp-1 text-sm text-gray-600">{product.description}</p>
 						</div>
+					</div>
+
+					<div class="flex items-center justify-between p-4">
+						<span class="text-lg font-bold">
+							KES {product.price.toLocaleString()}
+						</span>
+						<button
+							class="rounded-md px-3 py-2 text-sm text-white transition-colors {product.quantity > 0
+								? 'bg-primary hover:bg-primary/90'
+								: 'cursor-not-allowed bg-gray-400'}"
+							onclick={async () => {
+								if (product.quantity <= 0) {
+									toast.add('Error', 'Product is out of stock', 'warning', 2000);
+									return;
+								}
+								if (await cart.addItem(product)) {
+									toast.add('Success', 'Product added to cart', 'success', 2000);
+								} else {
+									console.log('product not added to cart');
+									if (data.user) toast.add('Error', 'Failed to Save Cart', 'error', 2000);
+								}
+							}}
+						>
+							{product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+						</button>
 					</div>
 				</div>
 			{/each}

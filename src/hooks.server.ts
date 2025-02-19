@@ -55,7 +55,7 @@ async function authenticateWithAccessToken(event: any, token: string, refreshTok
 		const decodedToken = jwt.verify(token, SECRET_KEY) as JwtPayload;
 		event.locals.user = decodedToken;
 	} catch (err: any) {
-		if (err?.name === 'TokenExpiredError' && refreshToken) {
+		if (err instanceof jwt.TokenExpiredError && refreshToken) {
 			await refreshAccessToken(event, refreshToken);
 		} else {
 			throw err;

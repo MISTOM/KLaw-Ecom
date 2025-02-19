@@ -219,7 +219,7 @@
 									<img
 										src={book.Image[0]?.url || '/kLawPillers.png'}
 										alt={book.name}
-										class="bg-primary h-full w-full object-cover"
+										class="h-full w-full bg-gray-600 object-cover"
 									/>
 								</div>
 

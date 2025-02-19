@@ -330,7 +330,7 @@
 	<div class="g-recaptcha" data-sitekey={SITE_KEY}></div>
 	<button
 		type="submit"
-		class="group bg-primary hover:bg-primary/90 flex w-full items-center justify-center rounded-md border p-2 text-white transition-colors"
+		class="group bg-primary hover:bg-primary/90 flex w-full cursor-pointer items-center justify-center rounded-md border p-2 text-white transition-colors"
 	>
 		{#if loading}
 			<Spinner />

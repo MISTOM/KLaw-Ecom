@@ -2,13 +2,14 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import prisma from '$lib/server/prisma';
 import auth from '$lib/server/auth';
+import { sendEmail } from '$lib/server/mailService';
 
 export const load = (async () => {
 	return {};
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-	default: async ({ request, locals: { user } }) => {
+	default: async ({ request, locals: { user }, url }) => {
 		// if (!user) redirect(303, '/login');
 
 		const id = Number(user?.id);
@@ -37,7 +38,7 @@ export const actions: Actions = {
 				newPassword = await auth.hash(password.toString());
 			}
 
-			await prisma.user.update({
+			const { id: userId } = await prisma.user.update({
 				where: { id },
 				data: {
 					name: name.toString(),
@@ -49,7 +50,15 @@ export const actions: Actions = {
 
 			//if password was updated, send an email
 			if (newPassword) {
-				//send email
+				const resetToken = auth.generateResetToken(userId);
+				const link = url.origin + `/reset-password?token=${resetToken}`;
+				const origin = url.origin;
+
+				const emailSent = await sendEmail(email, 'Password Change Notification', 'notify-password-change', {
+					link,
+					origin
+				});
+				console.log(emailSent);
 			}
 
 			return { success: true };
