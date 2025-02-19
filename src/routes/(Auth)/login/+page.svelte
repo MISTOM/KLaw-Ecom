@@ -11,10 +11,10 @@
 	let email = $state(form?.data?.email);
 	let password = $state('');
 	let passwordVisible = $state(false);
+	let rememberMe = $state(false);
 	let loading = $state(false);
 
 	let formErrors = $state<FormErrors<LoginCredentials>>(form?.errors || {});
-	// Typed interface for form errors
 
 	const getFieldError = (field: keyof FormErrors<LoginCredentials>) => {
 		return formErrors[field]?.[0] || '';
@@ -100,6 +100,16 @@
 				{@html eyeSlash}
 			{/if}
 		</button>
+	</div>
+	<div class="flex items-center">
+		<input
+			type="checkbox"
+			id="rememberMe"
+			name="rememberMe"
+			class="h-4 w-4 rounded border-gray-400"
+			bind:checked={rememberMe}
+		/>
+		<label for="rememberMe" class="ml-2 block text-sm text-gray-900">Remember me</label>
 	</div>
 	<button
 		type="submit"

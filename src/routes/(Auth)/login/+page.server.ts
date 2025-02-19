@@ -9,7 +9,7 @@ import { validateLogin } from '$lib/validations';
 
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {
-		const formData = Object.fromEntries(await request.formData());
+		const formData = Object.fromEntries((await request.formData()).entries());
 		const validation = validateLogin(formData);
 
 		if (!validation.success) {
@@ -57,7 +57,7 @@ export const actions: Actions = {
 			httpOnly: true,
 			secure: secure,
 			path: '/',
-			maxAge: refreshTokenMaxAge
+			maxAge: formData?.rememberMe ? refreshTokenMaxAge : undefined
 		});
 
 		isAdmin ? redirect(303, '/admin/product') : redirect(303, '/product');

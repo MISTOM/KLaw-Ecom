@@ -26,9 +26,9 @@
 		<div class="grid gap-8 md:grid-cols-2">
 			<div class="group aspect-square overflow-hidden rounded-md">
 				<img
-					src={product.Image[0]?.url || '/kLawPillers.png'}
+					src={product.Image[0]?.url || '/noImage.jpg'}
 					alt={product.name}
-					class="bg-primary h-full w-full object-contain transition-transform group-hover:scale-105"
+					class="h-full w-full bg-gray-100 object-contain transition-transform group-hover:scale-105"
 				/>
 			</div>
 

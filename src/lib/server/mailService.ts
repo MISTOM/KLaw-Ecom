@@ -102,7 +102,7 @@ async function renderEmail(templateName: string, props: any): Promise<string> {
 
 		case 'verify-email':
 			return render(VerifyEmail, { props }).body;
-		
+
 		case 'notify-password-change':
 			return render(PasswordChangeNotification, { props }).body;
 
