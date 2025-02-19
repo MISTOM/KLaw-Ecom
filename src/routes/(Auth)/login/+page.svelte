@@ -54,6 +54,7 @@
 			type="email"
 			id="email"
 			name="email"
+			autocomplete="username"
 			class={{
 				'focus:border-primary w-full rounded-md border-2 border-black p-2 focus:outline-none': true,
 				'border-red-500': !!getFieldError('email')
@@ -74,6 +75,7 @@
 			type={passwordVisible ? 'text' : 'password'}
 			id="password"
 			name="password"
+			autocomplete="current-password"
 			class={{
 				'focus:border-primary w-full rounded-md border-2 border-black p-2 focus:outline-none': true,
 				'border-red-500': !!getFieldError('password')

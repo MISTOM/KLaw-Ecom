@@ -52,7 +52,6 @@ export const actions: Actions = {
 				});
 			}
 
-			// Verify token with Google TODO: validate last
 			const verificationURL = 'https://www.google.com/recaptcha/api/siteverify';
 			const response = await fetch(verificationURL, {
 				method: 'POST',

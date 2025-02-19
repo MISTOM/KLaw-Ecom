@@ -160,6 +160,7 @@
 			type="text"
 			id="name"
 			name="name"
+			autocomplete="name"
 			class={{
 				'focus:border-primary w-full rounded-md border-2 border-black p-2 focus:outline-none': true,
 				'border-red-500': !!getFieldError('name')
@@ -184,6 +185,7 @@
 			type="number"
 			id="idNumber"
 			name="idNumber"
+			autocomplete="off"
 			class={{
 				'focus:border-primary w-full rounded-md border-2 border-black p-2 focus:outline-none': true,
 				'border-red-500': !!getFieldError('idNumber')
@@ -211,6 +213,7 @@
 			type="tel"
 			id="phoneNumber"
 			name="phoneNumber"
+			autocomplete="tel"
 			class={{
 				'focus:border-primary w-full rounded-md border-2 border-black p-2 focus:outline-none': true,
 				'border-red-500': !!getFieldError('phoneNumber')
@@ -235,6 +238,7 @@
 			type="email"
 			id="email"
 			name="email"
+			autocomplete="username"
 			class={{
 				'focus:border-primary w-full rounded-md border-2 border-black p-2 focus:outline-none': true,
 				'border-red-500': !!getFieldError('email')
@@ -258,6 +262,7 @@
 			type={passwordVisible ? 'text' : 'password'}
 			id="password"
 			name="password"
+			autocomplete="new-password"
 			class={{
 				'focus:border-primary w-full rounded-md border-2 border-black p-2 focus:outline-none': true,
 				'border-red-500': !!getFieldError('password')
