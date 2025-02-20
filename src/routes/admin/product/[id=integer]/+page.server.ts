@@ -2,6 +2,8 @@ import prisma from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { validateProduct } from '$lib/validations';
+import { writeFile, mkdir, unlink } from 'node:fs/promises';
+import { dirname } from 'node:path';
 
 export const load = (async ({ params, depends }) => {
 	depends('update:product');
@@ -65,6 +67,45 @@ export const actions = {
 		const publicationDate = publicationDateData ? new Date(publicationDateData) : undefined;
 		const serviceCode = Math.floor(Math.random() * 87654321).toString(); //auto generate service code  /* formData.get('serviceCode')?.toString();*/
 
+
+		// Process new image upload if provided
+		const newImage = formData.get('newImage') as File | null;
+		let imageUrl: string | undefined;
+
+		if (newImage && newImage.name) {
+
+			const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+				if (!allowedTypes.includes(newImage.type)) {
+					return fail(400, {
+						data: formObj,
+						errors: { _errors: ['Invalid image type'] }
+					});
+				}
+
+			const existingImages = await prisma.image.findMany({
+				where: { productId: id }
+			});
+
+			// For each, delete file from disk if it exists, then remove the DB record
+			for (const img of existingImages) {
+				const oldFilePath = `uploads/images/${img.url.split('/').pop()}`; 
+				unlink(oldFilePath).catch((e) => console.log(`Old image not found or not removed: ${oldFilePath}\n ${e}`));
+				// Remove the image record
+				await prisma.image.delete({
+					where: { id: img.id }
+				});
+			}
+
+			const fileName = `${Date.now()}-${newImage.name}`;
+			const imagePath = `uploads/images/${fileName}`;
+			const directory = dirname(imagePath);
+			// Ensure images directory exists
+			await mkdir(directory, { recursive: true });
+			await writeFile(imagePath, new Uint8Array(await newImage.arrayBuffer()));
+			imageUrl = `/api/image/${fileName}`;
+		}
+
+
 		try {
 			// Ensure the serviceCode is unique except for the current product
 			const existing = await prisma.product.findUnique({ where: { serviceCode } });
@@ -96,7 +137,14 @@ export const actions = {
 					author,
 					publicationDate,
 					pageCount,
-					categories: { set: categoryIds.map((id) => ({ id })) }
+					categories: { set: categoryIds.map((id) => ({ id })) },
+					...(imageUrl
+						? {
+							Image: {
+								create: { url: imageUrl }
+							}
+						}
+						: {})
 				}
 			});
 

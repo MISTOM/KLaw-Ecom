@@ -2,7 +2,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
 import { writeFile } from 'node:fs/promises';
-import { mkdir, unlink } from 'node:fs';
+import { mkdir, unlink } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { validateProduct } from '$lib/validations';
 
@@ -85,21 +85,31 @@ export const actions: Actions = {
 			let imageUrl = null;
 			let writeFilePromise;
 			if (image && image.name) {
+
+				const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+				if (!allowedTypes.includes(image.type)) {
+					return fail(400, {
+						data: formObj,
+						errors: { _errors: ['Invalid image type'] }
+					});
+				}
+
 				console.log('Saving image');
 				const fileName = `${Date.now()}-${image.name}`;
-				imagePath = `static/images/${fileName}`;
+				imagePath = `uploads/images/${fileName}`; // Changed to public directory
 				const directory = dirname(imagePath);
 
-				// Ensure the directory exists
-				mkdir(directory, { recursive: true }, (err) =>
-					fail(500, {
-						data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
-						errors: { _errors: ['Internal server err: create dir'] }
-					})
-				);
+				try {
+					await mkdir(directory, { recursive: true });
+				} catch (err) {
+					return fail(500, {
+						data: { name, description, price, quantity, serviceCode },
+						errors: { _errors: ['Failed to create upload directory'] }
+					});
+				}
 
 				writeFilePromise = writeFile(imagePath, new Uint8Array(await image.arrayBuffer()));
-				imageUrl = `/images/${fileName}`;
+				imageUrl = `/api/image/${fileName}`;
 			}
 
 			const newProductPromise = prisma.product.create({
@@ -128,15 +138,12 @@ export const actions: Actions = {
 				}
 			};
 		} catch (e) {
+
 			console.log('addProduct error: ', e);
 
-			// Delete the image if it was saved
-			imagePath
-				? unlink(imagePath, (err) => {
-						if (err) console.error('Failed to delete image', err);
-					})
-				: null;
-
+			if (imagePath) {
+				await safeDeleteFile(imagePath);
+			}
 			return fail(500, {
 				data: { name, description, price, quantity, serviceCode, author, publicationDate, pageCount },
 				errors: { _errors: ['An unexpected error occurred'] }
@@ -144,6 +151,14 @@ export const actions: Actions = {
 		}
 	}
 };
+
+async function safeDeleteFile(path: string) {
+	try {
+		await unlink(path);
+	} catch (err) {
+		console.error(`Failed to delete file ${path}:`, err);
+	}
+}
 
 // let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 // let generatedCodes = new Set<string>();

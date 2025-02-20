@@ -5,6 +5,7 @@
 	import { fade } from 'svelte/transition';
 	import { productSchema, type FormErrors, type ProductData } from '$lib/validations/validationSchemas.js';
 	import Modal from '$lib/components/Modal.svelte';
+	import Spinner from '$lib/components/Spinner.svelte';
 
 	const { data, form } = $props();
 	const toast = getToastState();
@@ -31,10 +32,13 @@
 	let publicationDate = $state(publicationDateISO ? new Date(publicationDateISO).toISOString().split('T')[0] : '');
 
 	let isEditMode = $state(false);
+	let loading = $state(false);
 
 	const toggleEditMode = () => {
 		isEditMode = !isEditMode;
 	};
+
+	const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
 
 	const togglePublish = async () => {
 		console.log('Publishing product');
@@ -360,23 +364,27 @@
 					<div class="p-6">
 						<form
 							method="POST"
+							enctype="multipart/form-data"
 							use:enhance={({ formData, cancel }) => {
+								loading = true
 								formErrors = {};
 								formData.delete('categoryIds');
 								selectedCategories.forEach((c) => formData.append('categoryIds', c.id.toString()));
 
 								if (!validateAll(formData)) {
+									loading = false
 									cancel();
 								}
 								return async ({ result, update }) => {
 									if (result.type === 'success') {
 										toast.add('Success', 'Product updated successfully', 'success', 2000);
 										// Optionally leave edit mode or refresh fields
-										await update({ reset: false });
+										await goto('/admin/product')
 									} else if (result.type === 'failure') {
 										formErrors = result.data?.errors || { _errors: ['Error updating product'] };
 										await update({ reset: false });
 									}
+									loading = false
 								};
 							}}
 							class="space-y-6"
@@ -577,6 +585,18 @@
 											<p class="mt-1 text-xs text-red-600">{getFieldError('description')}</p>
 										{/if}
 									</div>
+
+									<!-- New image upload field -->
+									<div class="mb-4">
+										<label for="newImage" class="text-sm font-medium text-gray-700">Upload New Image</label>
+										<input
+											id="newImage"
+											type="file"
+											name="newImage"
+											accept={allowedExtensions.join(',')}
+											class="mt-1 w-full rounded-md border p-2"
+										/>
+									</div>
 								</div>
 								<div class="flex justify-end gap-4">
 									<div>
@@ -593,6 +613,9 @@
 										type="submit"
 										class="bg-primary hover:bg-primary/90 flex w-36 cursor-pointer justify-center rounded-sm px-4 py-2 align-middle text-white transition-colors"
 									>
+									{#if loading}
+											<Spinner />
+										{/if}
 										Save
 									</button>
 									<button

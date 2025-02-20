@@ -549,7 +549,7 @@
 
 				<button
 					type="submit"
-					class="bg-primary hover:bg-primary/90 mt-4 w-full rounded-md px-4 py-2 text-white transition-colors"
+					class="bg-primary hover:bg-primary/90 mt-4 w-full cursor-pointer rounded-md px-4 py-2 text-white transition-colors"
 				>
 					Add Book
 				</button>
