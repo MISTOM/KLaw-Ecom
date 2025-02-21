@@ -3,23 +3,91 @@ import type { RequestHandler } from './$types';
 import prisma from '$lib/server/prisma';
 
 export const POST: RequestHandler = async ({ request }) => {
-	// Update the order status if the payment is successful
-	// TODO: verify the secure hash
+	const payload = await request.json();
+	console.log('Notification payload:', payload);
 
-	const data = await request.json();
-	console.log('Notification data', data);
+	try {
+		// Handle payment success
+		if (payload.status === 'settled' && payload.client_invoice_ref) {
+			// Start transaction
+			const result = await prisma.$transaction(async (tx) => {
+				// Find cart using billRefNumber from payment payload
+				const cart = await tx.cart.findFirst({
+					where: {
+						user: {
+							Order: {
+								none: { billRefNumber: payload.client_invoice_ref }
+							}
+						}
+					},
+					include: {
+						CartItem: {
+							include: { product: true }
+						},
+						user: true
+					}
+				});
 
-	// Update the order status
-	if (data.status === 'settled' && data.client_invoice_ref) {
-		const order = await prisma.order.update({
-			where: { billRefNumber: data.client_invoice_ref },
-			data: { status: 'COMPLETED', invoiceNumber: data.invoice_number }
-		});
+				if (!cart) {
+					throw new Error('Cart not found or order already exists');
+				}
 
-		return json({ message: 'Order status updated', order });
-	} else {
-		console.error(`Order status not updated:: billRefNumber: ${data.client_invoice_ref}`);
-		return json({ message: 'Order status not updated' });
+				// Calculate total price
+				const totalPrice = cart.CartItem.reduce(
+					(sum, item) => sum + item.product.price * item.quantity,
+					0
+				);
+
+				// Create order
+				const order = await tx.order.create({
+					data: {
+						userId: cart.userId,
+						totalPrice,
+						status: 'COMPLETED',
+						billRefNumber: payload.client_invoice_ref,
+						invoiceNumber: payload.invoice_number,
+						ProductOnOrder: {
+							createMany: {
+								data: cart.CartItem.map(item => ({
+									productId: item.productId,
+									quantity: item.quantity
+								}))
+							}
+						}
+					},
+					include: {
+						ProductOnOrder: true
+					}
+				});
+
+				// Update product quantities
+				for (const item of cart.CartItem) {
+					await tx.product.update({
+						where: { id: item.productId },
+						data: { quantity: { decrement: item.quantity } }
+					});
+				}
+
+				// Clear user's cart
+				await tx.cart.delete({
+					where: { id: cart.id }
+				});
+
+				return order;
+			});
+
+			return json({
+				message: 'Order created successfully',
+				order: result
+			});
+		} else{
+			console.log('Payment not settled...', payload);
+		}
+
+		return json({ message: 'Notification received' });
+	} catch (error) {
+		console.error('Webhook error:', error);
+		return json({ error: 'Internal server error' }, { status: 500 });
 	}
 };
 

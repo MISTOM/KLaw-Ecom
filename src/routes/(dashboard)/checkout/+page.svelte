@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { tick } from 'svelte';
+	import { tick, onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { getCartState } from '$lib/Cart.svelte.js';
@@ -17,49 +17,70 @@
 	let showConfirmModal = $state(false);
 	let showPaymentModal = $state(false);
 	let loading = $state(false);
+	let paymentStatus = $state('initial'); // 'initial' | 'processing' | 'failed'
+	let paymentError = $state('');
 
 	let totalPrice = $derived(cart.cartStats.total + (convenienceFee?.amount || 0));
 
-	const handleCreateOrder = async () => {
+	const initiatePayment = async () => {
 		showConfirmModal = false;
-		const data = JSON.stringify({
-			cartItems: cart.cartItems.map((item) => ({
-				quantity: item.quantity,
-				product: item.product
-			})),
-			billRefNumber: paymentDetails?.billRefNumber
-		});
+		paymentStatus = 'processing';
 
-		const res = await fetch('/api/order', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: data
-		});
+		try {
+			// Validate cart items stock before proceeding
+			const validateRes = await fetch('/api/order/validate', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					cartItems: cart.cartItems.map((item) => ({
+						quantity: item.quantity,
+						product: item.product
+					}))
+				})
+			});
 
-		const resData = await res.json();
-		if (res.ok) {
-			console.log(resData.message);
-			cart.cartItems = [];
-			await cart.saveCart();
+			if (!validateRes.ok) {
+				const error = await validateRes.json();
+				throw new Error(error.message);
+			}
+
+			showPaymentModal = true;
 			const form = document.getElementById('payment-form') as HTMLFormElement;
 			if (form) {
-				showPaymentModal = true;
 				loading = true;
 				await tick();
 				form.submit();
 			} else {
-				console.error('Payment Form not found');
+				throw new Error('Payment form not found');
 			}
-		} else if (res.status === 401) {
-			console.error('Unauthorized');
-			await goto(`/login?redirect=${window.location.pathname}`);
-		} else if (res.status === 400) {
-			errors = resData.message;
-			console.log(resData.message);
-		} else {
-			console.error('Failed to create order');
+		} catch (err) {
+			paymentStatus = 'failed';
+			//@ts-ignore
+			paymentError = err?.message || 'Failed to initiate payment';
+			showPaymentModal = false;
+		} finally {
+			loading = false;
 		}
 	};
+
+	// Handle payment iframe messages
+	const handlePaymentMessage = (event: MessageEvent) => {
+		if (event.origin === 'https://test.pesaflow.com') {
+			const { status, message } = event.data;
+			if (status === 'success') {
+				window.location.href = '/purchases?payment=success';
+			} else if (status === 'failed') {
+				paymentStatus = 'failed';
+				paymentError = message || 'Payment failed';
+				showPaymentModal = false;
+			}
+		}
+	};
+
+	onMount(() => {
+		window.addEventListener('message', handlePaymentMessage);
+		return () => window.removeEventListener('message', handlePaymentMessage);
+	});
 </script>
 
 <svelte:head>
@@ -180,21 +201,31 @@
 		>
 			Cancel
 		</button>
-		<button class="rounded-sm bg-green-600 px-4 py-2 text-white hover:bg-green-700" onclick={handleCreateOrder}>
+		<button class="rounded-sm bg-green-600 px-4 py-2 text-white hover:bg-green-700" onclick={initiatePayment}>
 			Confirm Purchase
 		</button>
 	</div>
 </Modal>
 
+<!-- Payment Status Feedback -->
+{#if paymentStatus === 'failed'}
+	<div class="fixed right-4 bottom-4 z-50" transition:fade>
+		<div class="rounded-lg bg-red-100 p-4 text-red-700 shadow-lg">
+			<h4 class="font-bold">Payment Failed</h4>
+			<p>{paymentError}</p>
+			<button class="mt-2 text-sm underline" onclick={() => (paymentStatus = 'initial')}> Try Again </button>
+		</div>
+	</div>
+{/if}
+
 <!-- Payment Modal -->
 <Modal bind:show={showPaymentModal} title="Payment" modalClass="max-w-[800px]">
 	<div class="relative h-full w-full">
 		{#if loading}
-			<div class="absolute inset-0 z-10 flex items-center justify-center bg-gray-400">
+			<div class="absolute inset-0 z-10 flex items-center justify-center bg-gray-400/50">
 				<Spinner />
 			</div>
 		{/if}
-
 		<iframe
 			class="h-[600px] w-full border-0"
 			name="my_frame"
@@ -202,4 +233,15 @@
 			onload={() => (loading = false)}
 		></iframe>
 	</div>
+	<button
+		class="absolute top-2 right-2 rounded-full bg-gray-200 p-2 hover:bg-gray-300"
+		onclick={() => {
+			if (confirm('Are you sure you want to cancel the payment?')) {
+				showPaymentModal = false;
+				paymentStatus = 'initial';
+			}
+		}}
+	>
+		✕
+	</button>
 </Modal>

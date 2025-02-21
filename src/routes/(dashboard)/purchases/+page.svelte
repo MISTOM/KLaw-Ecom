@@ -1,90 +1,73 @@
 <script lang="ts">
+	import OrderCard from '$lib/components/OrderCard.svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+
 	const { data } = $props();
-	const orders = $derived(data?.orders || []);
-	// $inspect(orders);
+	const orders = $derived(data.orders || []);
+	const currentPage = $derived(data.page || 1);
+	const totalPages = $derived(data.totalPages || 1);
 
-	function getIssuedProducts(order: any): any[] {
-		if (order) return order.ProductOnOrder.filter((product: any) => product.isIssued);
-		return [];
-	}
-
-	function formatDate(date: Date) {
-		return new Date(date).toLocaleDateString('en-KE', {
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric'
-		});
+	function handlePageChange(page: number) {
+		goto(`?page=${page}`, { keepFocus: true });
 	}
 </script>
 
 <svelte:head>
-	<title>Purchases</title>
+	<title>My Purchases | Kenya Law</title>
 </svelte:head>
 
 <div class="container mx-auto px-4 py-8">
-	<h1 class="mb-8 text-3xl font-bold">My Purchases</h1>
+	<div class="mb-8 space-y-2">
+		<h1 class="text-3xl font-bold">My Purchases</h1>
+		<p class="text-gray-600">Track and manage your orders</p>
+	</div>
 
-	<div class="grid gap-6">
+	<div class="space-y-4">
 		{#if orders.length === 0}
-			<p class="text-lg text-gray-600">You have no purchases yet.</p>
-		{/if}
-		{#each orders as order (order.id)}
-			<div class="rounded-md border p-6 transition-all hover:shadow-lg">
-				<div class="flex flex-wrap items-center justify-between gap-4">
-					<div class="text-sm text-gray-600">
-						<span class="text-gray-500">Order #{order.id} </span>
-						<p>{formatDate(order.createdAt)}</p>
-						<!-- Payment status -->
-						<p>
-							Payment:
-							{#if order.status === 'COMPLETED'}
-								<span class="text-green-600">Paid</span>
-							{:else if order.status === 'PENDING'}
-								<span class="text-yellow-600">Pending</span>
-							{:else if order.status === 'CANCELLED'}
-								<span class="text-red-600">Cancelled</span>
-							{/if}
-							<!-- {:else if order.status === 'FAILED'}
-								<span class="text-red-600">Failed</span> -->
-						</p>
-					</div>
-
-					<div class="text-right">
-						<p class="text-lg font-bold">KES {order.totalPrice.toLocaleString()}</p>
-						<p class="text-sm text-gray-600">
-							{order.ProductOnOrder.filter((product) => !product.isIssued).length} item(s) not issued
-						</p>
-					</div>
-				</div>
-
-				<div class="mt-4">
-					<h4 class="mb-2 font-semibold">Issued Products</h4>
-					<div class="space-y-2">
-						{#each getIssuedProducts(order) as product}
-							<div class="rounded-md bg-gray-50 p-3">
-								<div class="flex items-center justify-between">
-									<div>
-										<p class="font-medium">{product.product.name}</p>
-										<p class="text-sm text-gray-600">Quantity: {product.quantity}</p>
-									</div>
-									<p class="font-semibold">
-										KES {(product.product.price * product.quantity).toLocaleString()}
-									</p>
-								</div>
-							</div>
-						{/each}
-					</div>
-				</div>
-
-				<div class="mt-4 flex justify-end">
-					<a
-						href="/purchases/{order.id}"
-						class="bg-primary hover:bg-primary/90 rounded-md px-4 py-2 text-sm text-white transition-colors"
-					>
-						View Order
-					</a>
-				</div>
+			<div class="rounded-lg border border-gray-200 bg-white p-8 text-center">
+				<h3 class="text-lg font-medium">No purchases yet</h3>
+				<p class="mt-2 text-gray-600">When you make a purchase, it will appear here.</p>
+				<a
+					href="/products"
+					class="bg-primary hover:bg-primary/90 mt-4 inline-block rounded-md px-4 py-2 text-sm text-white"
+				>
+					Browse Products
+				</a>
 			</div>
+		{/if}
+
+		{#each orders as order (order.id)}
+			<OrderCard {order} />
 		{/each}
+
+		{#if totalPages > 1}
+			<div class="mt-8 flex justify-center gap-2">
+				<button
+					class="rounded-md bg-gray-100 px-4 py-2 text-sm disabled:opacity-50"
+					disabled={currentPage === 1}
+					onclick={() => handlePageChange(currentPage - 1)}
+				>
+					Previous
+				</button>
+
+				{#each Array(totalPages) as _, i}
+					<button
+						class="rounded-md px-4 py-2 text-sm {currentPage === i + 1 ? 'bg-primary text-white' : 'bg-gray-100'}"
+						onclick={() => handlePageChange(i + 1)}
+					>
+						{i + 1}
+					</button>
+				{/each}
+
+				<button
+					class="rounded-md bg-gray-100 px-4 py-2 text-sm disabled:opacity-50"
+					disabled={currentPage === totalPages}
+					onclick={() => handlePageChange(currentPage + 1)}
+				>
+					Next
+				</button>
+			</div>
+		{/if}
 	</div>
 </div>

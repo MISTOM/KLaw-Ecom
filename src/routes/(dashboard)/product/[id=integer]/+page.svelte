@@ -26,7 +26,7 @@
 		<div class="grid gap-8 md:grid-cols-2">
 			<div class="aspect-square overflow-hidden rounded-md">
 				<img
-					src={product.Image[0]?.url || '/noImage.jpg'}
+					src={product.Image[0]?.url || '/coat-of-arms.jpg'}
 					alt={product.name}
 					class="h-full w-full object-contain transition-transform"
 				/>
