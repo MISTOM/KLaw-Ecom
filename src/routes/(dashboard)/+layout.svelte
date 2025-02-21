@@ -103,7 +103,7 @@
 				<button
 					class="hover:bg-primary rounded-md border border-gray-300 px-2 py-1 transition-colors hover:text-white"
 				>
-					<a href={user ? '/checkout' : '/login'}>Proceed to checkout</a>
+					<a href={user ? '/checkout' : '/login'} onclick={() => (cart.cartopen = false)}>Proceed to checkout</a>
 				</button>
 			{:else}
 				<div>

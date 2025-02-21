@@ -7,7 +7,7 @@
 	<link rel="preload" href="/kenyaLawLogo.png" as="image" />
 </svelte:head>
 <div class="loginbg fixed inset-0 -z-10">
-	<div class="overlay absolute inset-0 backdrop-blur-xs"></div>
+	<div class="overlay absolute inset-0 backdrop-blur-[2px]"></div>
 </div>
 <div class="flex min-h-screen items-center justify-center">
 	<main class="w-1/3 min-w-72 overflow-y-auto rounded-sm bg-white p-6 shadow-lg">

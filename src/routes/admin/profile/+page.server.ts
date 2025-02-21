@@ -9,62 +9,77 @@ export const load = (async () => {
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-	default: async ({ request, locals: { user }, url }) => {
+	editProfile: async ({ request, locals: { user } }) => {
 		if (!(await auth.isAdmin(user))) return fail(401, { errors: 'Unauthorized' });
 
 		const id = Number(user?.id);
 		const formData = Object.fromEntries(await request.formData());
-		const { name, email, oldPassword, password, confirmPassword } = formData;
+		const { name, email, idNumber, phoneNumber } = formData;
 
 		if (!name || !email) {
-			return fail(400, { data: formData, errors: 'All fields are required' });
+			return fail(400, { errors: 'All fields are required' });
 		}
 
 		try {
-			let newPassword;
-
-			if (oldPassword) {
-				if (!password || !confirmPassword)
-					return fail(400, { data: formData, errors: 'All password fields are required' });
-
-				if (password !== confirmPassword) return fail(400, { data: formData, errors: 'Passwords do not match' });
-
-				const existingUser = await prisma.user.findUnique({
-					where: { id }
-				});
-				if (!existingUser) return fail(400, { errors: 'User not found' });
-
-				const match = await auth.compare(oldPassword.toString(), existingUser.password);
-				if (!match) return fail(400, { data: formData, errors: 'Old password is incorrect' });
-
-				newPassword = await auth.hash(password.toString());
-			}
-
-			const { id: userId } = await prisma.user.update({
+			await prisma.user.update({
 				where: { id },
 				data: {
 					name: name.toString(),
 					email: email.toString(),
-					...(newPassword && { password: newPassword })
+					idNumber: idNumber ? parseInt(idNumber) : undefined,
+					phoneNumber: phoneNumber ? phoneNumber : undefined
 				}
 			});
 
-			if (newPassword) {
-				const resetToken = auth.generateResetToken(userId);
-				const link = url.origin + `/reset-password?token=${resetToken}`;
-				const origin = url.origin;
+			return { success: true };
+		} catch (e) {
+			console.error('updateAdminProfile:', e);
+			return fail(500, { errors: 'Internal server error updating profile' });
+		}
+	},
 
-				const emailSent = await sendEmail(email, 'Password Change Notification', 'notify-password-change', {
-					link,
-					origin
-				});
-				console.log(emailSent);
-			}
+	changePassword: async ({ request, locals: { user }, url }) => {
+		if (!(await auth.isAdmin(user))) return fail(401, { errors: 'Unauthorized' });
+
+		const id = Number(user?.id);
+		const formData = Object.fromEntries(await request.formData());
+		const { oldPassword, password, confirmPassword } = formData;
+
+		if (!oldPassword || !password || !confirmPassword) {
+			return fail(400, { errors: 'All password fields are required' });
+		}
+
+		if (password !== confirmPassword) {
+			return fail(400, { errors: 'Passwords do not match' });
+		}
+
+		try {
+			const existingUser = await prisma.user.findUnique({ where: { id } });
+			if (!existingUser) return fail(400, { errors: 'User not found' });
+
+			const match = await auth.compare(oldPassword.toString(), existingUser.password);
+			if (!match) return fail(400, { errors: 'Old password is incorrect' });
+
+			const newPassword = await auth.hash(password.toString());
+
+			const { id: userId } = await prisma.user.update({
+				where: { id },
+				data: { password: newPassword }
+			});
+
+			const resetToken = auth.generateResetToken(userId);
+			const link = url.origin + `/reset-password?token=${resetToken}`;
+			const origin = url.origin;
+
+			await sendEmail(existingUser.email, 'Password Change Notification', 'notify-password-change', {
+				link,
+				origin
+			});
 
 			return { success: true };
 		} catch (e) {
-			console.error('updateProfile:', e);
-			return fail(500, { errors: 'Internal server error updating profile' });
+			console.error('changeAdminPassword:', e);
+			return fail(500, { errors: 'Internal server error changing password' });
 		}
 	}
 };

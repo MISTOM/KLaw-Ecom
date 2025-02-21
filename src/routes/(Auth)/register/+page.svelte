@@ -105,9 +105,8 @@
 
 <h2 class="text-center text-2xl font-bold">Welcome, Please Register</h2>
 
-<div class="text-primary mt-3 flex flex-col text-xs">
+<div class="text-primary mt-3 text-xs">
 	<span class="hover:underline"><a href="/login">Back to login</a></span>
-	<span><a href="/verify" class="transition-colors hover:underline">Resend Verification Email</a></span>
 </div>
 
 <form
@@ -343,6 +342,12 @@
 		Register</button
 	>
 </form>
+
+<div class="mt-2">
+	<a href="/verify" class=" text-primary text-xs transition-colors hover:underline"
+		>Resend Verification Email</a
+	>
+</div>
 
 <style>
 	input[type='number'] {

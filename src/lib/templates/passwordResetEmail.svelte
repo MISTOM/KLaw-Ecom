@@ -21,7 +21,7 @@
 					<h1 style="font-size: 24px; color: #8f2a2b; text-align: center; margin-bottom: 20px;">
 						Reset Your Password
 					</h1>
-					<p style="font-size: 16px; line-height: 1.5; margin-bottom: 30px;">
+					<p style="font-size: 16px; line-height: 1.5; margin-bottom: 5px;">
 						Hello,<br />
 						We received a request to reset your password. Click the button below to proceed.
 					</p>
@@ -36,17 +36,17 @@
 								color: #ffffff;
 								padding: 8px 16px;
 								text-decoration: none;
-								border-radius: 5px;
+								border-radius: 3px;
 								border: 1px solid #8f2a2b;
 								font-weight: 500;"
 						>
 							Reset Password
 						</a>
 					</p>
-					<p style="font-size: 14px; line-height: 1.5; margin-top: 30px; color: #666666;">
+					<p style="font-size: 14px; line-height: 1.5; margin-top: 8px;">
 						If you did not request a password reset, please ignore this email or contact us immediately.
 					</p>
-					<p style="font-size: 14px; line-height: 1.5; color: #666666;">
+					<p style="font-size: 14px; line-height: 1.5;">
 						Best regards,<br />
 						Kenya Law Team
 					</p>

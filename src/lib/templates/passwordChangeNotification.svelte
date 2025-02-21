@@ -19,8 +19,8 @@
 					<h1 style="font-size: 24px; color: #8f2a2b; text-align: center; margin-bottom: 20px;">
 						Your Password Has Been Changed
 					</h1>
-					<p style="font-size: 16px; line-height: 1.5; margin-bottom: 30px;">
-						Hello,<br /><br />
+					<p style="font-size: 16px; line-height: 1.5; margin-bottom: 8px;">
+						Hello,<br />
 						This is a notification that the password for your account was recently changed. If you made this change,
 						no further action is required.<br /><br />
 						If you did not authorize this change, please secure your account immediately.
@@ -34,19 +34,19 @@
                                 justify-content: center;
                                 background-color: #8f2a2b;
                                 color: #ffffff;
-                                padding: 8px 16px;
+                                padding: 8px 15px;
                                 text-decoration: none;
-                                border-radius: 5px;
+                                border-radius: 3px;
                                 border: 1px solid #8f2a2b;
                                 font-weight: 500;"
 						>
 							Reset Your Password
 						</a>
 					</p>
-					<p style="font-size: 14px; line-height: 1.5; margin-top: 30px; color: #666666;">
-						If you did not request this change, please click the button above to reset your password immediately.
+					<p style="font-size: 14px; line-height: 1.5; margin-top: 8px;">
+						If you did not request this change, please click the button above to reset your password or contact us immediately.
 					</p>
-					<p style="font-size: 14px; line-height: 1.5; color: #666666;">
+					<p style="font-size: 14px; line-height: 1.5;">
 						Best regards,<br />
 						Kenya Law Team
 					</p>

@@ -22,12 +22,12 @@
 					<h1 style="font-size: 24px; color: #8f2a2b; text-align: center; margin-bottom: 20px;">
 						Verify Your Email
 					</h1>
-					<p style="font-size: 16px; line-height: 1.5; margin-bottom: 30px;">
+					<p style="font-size: 16px; line-height: 1.5; margin-bottom: 8px;">
 						Hello {username},<br />
 						Thank you for registering with Kenya Law. Please confirm your email address by clicking the button below.
 						The link will expire in 1 hr.
 					</p>
-					<p style="text-align: center; margin-bottom: 30px;">
+					<p style="text-align: center;">
 						<a
 							href={link}
 							target="_blank"
@@ -37,9 +37,9 @@
 								justify-content: center;
 								background-color: #8f2a2b;
 								color: #ffffff;
-								padding: 8px 16px;
+								padding: 8px 26px;
 								text-decoration: none;
-								border-radius: 5px;
+								border-radius: 3px;
 								border: 1px solid #8f2a2b;
 								font-weight: 500;
 							"
@@ -48,10 +48,10 @@
 						</a>
 					</p>
 
-					<p style="font-size: 14px; line-height: 1.5; margin-top: 30px; color: #666666;">
+					<p style="font-size: 14px; line-height: 1.5; margin-top: 8px">
 						If you did not sign up for an account or believe this is an error, kindly ignore this email.
 					</p>
-					<p style="font-size: 14px; line-height: 1.5; color: #666666;">
+					<p style="font-size: 14px; line-height: 1.5;">
 						Regards,<br />
 						Kenya Law Team
 					</p>
