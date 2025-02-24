@@ -67,7 +67,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 				}
 
 				// Send order confirmation email
-				await sendEmail(cart.user.email, 'Order Confirmation - Kenya Law', 'order-confirmation', {
+				sendEmail(cart.user.email, 'Order Confirmation - Kenya Law', 'order-confirmation', {
 					username: cart.user.name || cart.user.email,
 					order: {
 						...order,
