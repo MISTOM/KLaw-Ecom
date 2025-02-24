@@ -22,6 +22,9 @@
 	let password = $state('');
 	let oldPassword = $state('');
 	let confirmPassword = $state('');
+	let address = $state(data.user?.address || '');
+	let postalCode = $state(data.user?.postalCode || '');
+	console.log(data.user);
 
 	let passwordMatch = $derived(password === confirmPassword ? true : false);
 
@@ -47,6 +50,8 @@
 		<p class="mb-2 text-lg text-gray-900">Email: {email}</p>
 		<p class="mb-2 text-lg text-gray-900">Phone: {phoneNumber}</p>
 		<p class="mb-2 text-lg text-gray-900">ID Number: {idNumber}</p>
+		<p class="mb-2 text-lg text-gray-900">Address: {address}</p>
+		<p class="mb-2 text-lg text-gray-900">Postal Code: {postalCode}</p>
 
 		<!-- Action buttons open modals -->
 		<div class="mt-4 space-x-2">
@@ -113,6 +118,20 @@
 					name="idNumber"
 					class="w-full rounded-md border p-2"
 					bind:value={idNumber}
+				/>
+			</div>
+			<div>
+				<label for="address" class="block text-sm font-semibold">Address</label>
+				<input type="text" id="address" name="address" class="w-full rounded-md border p-2" bind:value={address} />
+			</div>
+			<div>
+				<label for="postalCode" class="block text-sm font-semibold">Postal Code</label>
+				<input
+					type="text"
+					id="postalCode"
+					name="postalCode"
+					class="w-full rounded-md border p-2"
+					bind:value={postalCode}
 				/>
 			</div>
 			{#if form?.errors}

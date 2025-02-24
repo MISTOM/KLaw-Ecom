@@ -15,6 +15,7 @@ model User {
   idNumber     Int?
   phoneNumber  String?
   address      String?
+  postalCode   String?  // Added field
   refreshToken String?
   isVerified   Boolean  @default(false)
   imageId      Int?

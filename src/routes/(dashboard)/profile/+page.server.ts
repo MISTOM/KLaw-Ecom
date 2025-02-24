@@ -12,7 +12,7 @@ export const actions: Actions = {
 	editProfile: async ({ request, locals: { user } }) => {
 		const id = Number(user?.id);
 		const formData = Object.fromEntries(await request.formData());
-		const { name, email, phoneNumber, idNumber } = formData;
+		const { name, email, phoneNumber, idNumber, address, postalCode } = formData;
 
 		if (!name || !email || !phoneNumber || !idNumber) {
 			return fail(400, { errors: 'All fields are required' });
@@ -25,7 +25,9 @@ export const actions: Actions = {
 					name: name.toString(),
 					email: email.toString(),
 					phoneNumber: phoneNumber?.toString(),
-					idNumber: parseInt(idNumber.toString()) || 0
+					idNumber: parseInt(idNumber.toString()) || 0,
+					address: address?.toString(),
+					postalCode: postalCode?.toString()
 				}
 			});
 

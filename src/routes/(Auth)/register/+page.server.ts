@@ -15,7 +15,6 @@ export const actions: Actions = {
 	default: async ({ request, url, fetch }) => {
 		const formData = Object.fromEntries(await request.formData());
 		const validation = validateRegistration(formData);
-		// const idNumber = 555000
 
 		if (!validation.success) {
 			return fail(400, {
@@ -23,12 +22,15 @@ export const actions: Actions = {
 				errors: validation.errors
 			});
 		}
+
 		const {
 			name,
 			email,
 			phoneNumber,
 			idNumber,
 			password,
+			postalCode,
+			address,
 			'g-recaptcha-response': recaptchaToken
 		} = validation.data!; // or = validation.data ?? {}
 
@@ -78,6 +80,8 @@ export const actions: Actions = {
 					idNumber: parseInt(idNumber),
 					phoneNumber: phoneNumber.toString(),
 					password: hashedPassword,
+					postalCode: postalCode.toString(),
+					address: address.toString(),
 					role: { connect: { name: 'USER' } }
 				}
 			});
@@ -113,7 +117,7 @@ export const actions: Actions = {
 		} catch (e) {
 			console.log(e);
 			return fail(500, {
-				data: { name, email, password, phoneNumber, idNumber },
+				data: { name, email, phoneNumber, idNumber, address, postalCode },
 				errors: { _errors: ['An unexpected error occurred'] }
 			});
 		}

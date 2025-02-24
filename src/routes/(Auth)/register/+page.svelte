@@ -22,6 +22,8 @@
 	let loading = $state(false);
 	let passwordVisible = $state(false);
 	let passwordVisible2 = $state(false);
+	let address = $state(form?.data?.address);
+	let postalCode = $state(form?.data?.postalCode);
 
 	let recaptchaToken = '';
 	let formErrors = $state<FormErrors<UserRegistration>>(form?.errors || {});
@@ -251,6 +253,54 @@
 		{#if getFieldError('email')}
 			<p id="email-error" class="mt-1 text-xs text-red-600" transition:fade>
 				{getFieldError('email')}
+			</p>
+		{/if}
+	</div>
+
+	<div class="">
+		<label for="address" class="block text-sm font-semibold">Address <span class="text-red-500">*</span></label>
+		<input
+			type="text"
+			id="address"
+			name="address"
+			class={{
+				'focus:border-primary w-full rounded-md border-2 border-black p-2 focus:outline-none': true,
+				'border-red-500': !!getFieldError('address')
+			}}
+			bind:value={address}
+			aria-invalid={!!getFieldError('address')}
+			aria-describedby={getFieldError('address') ? 'address-error' : undefined}
+			onkeyup={(e) => validateField('address', e.currentTarget.value)}
+			required
+		/>
+		{#if getFieldError('address')}
+			<p id="address-error" class="mt-1 text-xs text-red-600" transition:fade>
+				{getFieldError('address')}
+			</p>
+		{/if}
+	</div>
+
+	<div class="">
+		<label for="postalCode" class="block text-sm font-semibold"
+			>Postal Code <span class="text-red-500">*</span></label
+		>
+		<input
+			type="text"
+			id="postalCode"
+			name="postalCode"
+			class={{
+				'focus:border-primary w-full rounded-md border-2 border-black p-2 focus:outline-none': true,
+				'border-red-500': !!getFieldError('postalCode')
+			}}
+			bind:value={postalCode}
+			aria-invalid={!!getFieldError('postalCode')}
+			aria-describedby={getFieldError('postalCode') ? 'postalCode-error' : undefined}
+			onkeyup={(e) => validateField('postalCode', e.currentTarget.value)}
+			required
+		/>
+		{#if getFieldError('postalCode')}
+			<p id="postalCode-error" class="mt-1 text-xs text-red-600" transition:fade>
+				{getFieldError('postalCode')}
 			</p>
 		{/if}
 	</div>

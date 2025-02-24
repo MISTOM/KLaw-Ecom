@@ -14,10 +14,10 @@ export const actions: Actions = {
 
 		const id = Number(user?.id);
 		const formData = Object.fromEntries(await request.formData());
-		const { name, email, idNumber, phoneNumber } = formData;
+		const { name, email, phoneNumber, idNumber, address, postalCode } = formData;
 
 		if (!name || !email) {
-			return fail(400, { errors: 'All fields are required' });
+			return fail(400, { errors: 'Required fields are missing' });
 		}
 
 		try {
@@ -26,8 +26,10 @@ export const actions: Actions = {
 				data: {
 					name: name.toString(),
 					email: email.toString(),
-					idNumber: idNumber ? parseInt(idNumber) : undefined,
-					phoneNumber: phoneNumber ? phoneNumber : undefined
+					phoneNumber: phoneNumber?.toString(),
+					idNumber: idNumber ? parseInt(idNumber.toString()) : undefined,
+					address: address?.toString(),
+					postalCode: postalCode?.toString()
 				}
 			});
 

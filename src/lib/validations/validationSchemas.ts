@@ -62,6 +62,20 @@ export const userSchema = z.object({
 		required_error: 'Please confirm your password'
 	}),
 
+	address: z
+		.string({
+			required_error: 'Address is required'
+		})
+		.min(5, 'Address must be at least 5 characters')
+		.max(200, 'Address is too long'),
+
+	postalCode: z
+		.string({
+			required_error: 'Postal code is required'
+		})
+		.min(5, 'Postal code must be at least 5 characters')
+		.max(10, 'Postal code is too long'),
+
 	'g-recaptcha-response': z
 		.string({
 			required_error: 'reCAPTCHA is required'
