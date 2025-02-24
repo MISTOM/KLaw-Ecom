@@ -25,7 +25,7 @@ export const actions: Actions = {
 					name: name.toString(),
 					email: email.toString(),
 					phoneNumber: phoneNumber?.toString(),
-					idNumber: parseInt(idNumber.toString()) || 0,
+					idNumber: parseInt(idNumber.toString()) || 0
 				}
 			});
 

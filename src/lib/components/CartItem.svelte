@@ -14,7 +14,7 @@
 >
 	<div class="flex items-center">
 		<img
-			src={item.product.Image[0]?.url || '/kLawPillers.png'}
+			src={item.product.Image[0]?.url || '/coat-of-arms.jpg'}
 			alt="Product"
 			class="mr-4 size-12 rounded-sm object-cover"
 		/>

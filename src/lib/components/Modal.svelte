@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 
-	let { show = $bindable(), title, children, modalClass = '' } = $props();
+	let { show = $bindable(), title, children, modalClass = 'max-w-lg' } = $props();
 
 	const close = () => (show = false);
 	// const overflow = $derived((show: boolean) =>
@@ -15,17 +15,17 @@
 	<div
 		class="fixed inset-0 z-50 flex items-center justify-center"
 		aria-modal="true"
-		in:fade={{ duration: 100 }}
-		out:fade={{ duration: 100 }}
+		in:fade={{ duration: 70 }}
+		out:fade={{ duration: 70 }}
 	>
 		<div
-			class="fixed inset-0 bg-black opacity-30 backdrop-blur-xs transition-all"
+			class="fixed inset-0 bg-black/50 backdrop-blur-[2px] transition-all"
 			aria-hidden="true"
 			onclick={close}
 		></div>
 
 		<div
-			class="relative z-50 w-full max-w-lg transform overflow-y-auto rounded-sm bg-white p-6 shadow-xl transition-all {modalClass}"
+			class="relative z-50 w-full transform overflow-y-auto rounded-sm bg-white p-6 shadow-xl transition-all {modalClass}"
 		>
 			<div class="mb-4 flex items-center justify-between">
 				<h2 class="text-xl font-semibold">{title}</h2>

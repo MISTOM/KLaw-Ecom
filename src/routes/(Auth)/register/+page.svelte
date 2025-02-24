@@ -344,9 +344,7 @@
 </form>
 
 <div class="mt-2">
-	<a href="/verify" class=" text-primary text-xs transition-colors hover:underline"
-		>Resend Verification Email</a
-	>
+	<a href="/verify" class=" text-primary text-xs transition-colors hover:underline">Resend Verification Email</a>
 </div>
 
 <style>

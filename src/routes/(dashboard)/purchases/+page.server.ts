@@ -20,7 +20,7 @@ export const load = (async ({ locals: { user }, url }) => {
 				},
 				orderBy: { createdAt: 'desc' },
 				skip,
-				take: ITEMS_PER_PAGE,
+				take: ITEMS_PER_PAGE
 			}),
 			prisma.order.count({
 				where: { userId: user.id }

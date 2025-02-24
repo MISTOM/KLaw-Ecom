@@ -102,7 +102,7 @@
 				<li class="my-3 flex items-center rounded-sm border p-1 hover:shadow-xs">
 					<span class="m-5">{i + 1}</span>
 					<img
-						src={item.product.Image[0]?.url || '/kLawPillers.png'}
+						src={item.product.Image[0]?.url || '/coat-of-arms.jpg'}
 						alt={item.product.name}
 						class="mr-4 size-14"
 					/>
@@ -233,7 +233,7 @@
 			onload={() => (loading = false)}
 		></iframe>
 	</div>
-	<button
+	<!-- <button
 		class="absolute top-2 right-2 rounded-full bg-gray-200 p-2 hover:bg-gray-300"
 		onclick={() => {
 			if (confirm('Are you sure you want to cancel the payment?')) {
@@ -243,5 +243,5 @@
 		}}
 	>
 		✕
-	</button>
+	</button> -->
 </Modal>

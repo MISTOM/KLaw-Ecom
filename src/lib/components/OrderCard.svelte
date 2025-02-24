@@ -38,6 +38,9 @@
 					</span>
 				</div>
 				<p class="text-sm text-gray-600">{formatDate(order.createdAt)}</p>
+				{#if order.ProductOnOrder.some((item: any) => !item.isIssued)}
+					<p class="text-xs text-gray-600">Order is being consolidated for dispatch</p>
+				{/if}
 			</div>
 			<div class="text-right">
 				<p class="text-primary text-xl font-bold">KES {order.totalPrice.toLocaleString()}</p>
@@ -49,7 +52,7 @@
 
 		<div class="mt-4 flex items-center justify-between">
 			<button
-				class="hover:text-primary flex items-center gap-2 text-sm bg-gray-200 p-2 rounded-sm  cursor-pointer"
+				class="hover:text-primary flex cursor-pointer items-center gap-2 rounded-sm bg-gray-200 p-2 text-sm"
 				onclick={() => (isExpanded = !isExpanded)}
 			>
 				<!-- <Icon name={isExpanded ? 'chevron-up' : 'chevron-down'} size="18" /> -->
@@ -76,7 +79,7 @@
 								class={`inline-flex rounded-full px-2 py-1 text-xs
                                 ${item.isIssued ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'}`}
 							>
-								{item.isIssued ? 'Issued' : 'Pending'}
+								{item.isIssued ? 'Issued' : 'Not issued'}
 							</span>
 						</div>
 						<p class="font-semibold">

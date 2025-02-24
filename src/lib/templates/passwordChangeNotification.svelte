@@ -23,7 +23,8 @@
 						Hello,<br />
 						This is a notification that the password for your account was recently changed. If you made this change,
 						no further action is required.<br /><br />
-						If you did not authorize this change, please secure your account immediately.
+						If you did not authorize this change, please secure your account immediately. The link below will expire
+						in 1 hour.
 					</p>
 					<p style="text-align: center;">
 						<a
@@ -44,7 +45,8 @@
 						</a>
 					</p>
 					<p style="font-size: 14px; line-height: 1.5; margin-top: 8px;">
-						If you did not request this change, please click the button above to reset your password or contact us immediately.
+						If you did not request this change, please click the button above to reset your password or contact us
+						immediately.
 					</p>
 					<p style="font-size: 14px; line-height: 1.5;">
 						Best regards,<br />
