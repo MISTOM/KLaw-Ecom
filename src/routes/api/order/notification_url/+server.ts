@@ -66,18 +66,18 @@ export const POST: RequestHandler = async ({ request, url }) => {
 					});
 				}
 
-				// Send order confirmation email
-				sendEmail(cart.user.email, 'Order Confirmation - Kenya Law', 'order-confirmation', {
-					username: cart.user.name || cart.user.email,
-					order: {
-						...order,
-						ProductOnOrder: order.ProductOnOrder.map((item) => ({
-							...item,
-							product: cart.CartItem.find((cartItem) => cartItem.productId === item.productId)?.product
-						}))
-					},
-					origin: url.origin
-				});
+				// // Send order confirmation email
+				// sendEmail(cart.user.email, 'Order Confirmation - Kenya Law', 'order-confirmation', {
+				// 	username: cart.user.name || cart.user.email,
+				// 	order: {
+				// 		...order,
+				// 		ProductOnOrder: order.ProductOnOrder.map((item) => ({
+				// 			...item,
+				// 			product: cart.CartItem.find((cartItem) => cartItem.productId === item.productId)?.product
+				// 		}))
+				// 	},
+				// 	origin: url.origin
+				// });
 
 				// Clear user's cart
 				await tx.cart.delete({
