@@ -5,6 +5,7 @@ import WelcomeEmail from '$lib/templates/welcomeEmail.svelte';
 import PasswordResetEmail from '$lib/templates/passwordResetEmail.svelte';
 import VerifyEmail from '$lib/templates/verifyEmail.svelte';
 import PasswordChangeNotification from '$lib/templates/passwordChangeNotification.svelte';
+import OrderConfirmation from '$lib/templates/orderConfirmation.svelte';
 
 interface MailConfig {
 	host: string;
@@ -105,6 +106,9 @@ async function renderEmail(templateName: string, props: any): Promise<string> {
 
 		case 'notify-password-change':
 			return render(PasswordChangeNotification, { props }).body;
+
+		case 'order-confirmation':
+			return render(OrderConfirmation, { props }).body;
 
 		// Add more template types as needed
 		default:

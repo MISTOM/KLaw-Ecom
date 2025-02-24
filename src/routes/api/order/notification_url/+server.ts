@@ -1,8 +1,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import prisma from '$lib/server/prisma';
+import { sendEmail } from '$lib/server/mailService';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, url }) => {
 	const payload = await request.json();
 	console.log('Notification payload:', payload);
 
@@ -33,10 +34,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				}
 
 				// Calculate total price
-				const totalPrice = cart.CartItem.reduce(
-					(sum, item) => sum + item.product.price * item.quantity,
-					0
-				);
+				const totalPrice = cart.CartItem.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
 				// Create order
 				const order = await tx.order.create({
@@ -48,7 +46,7 @@ export const POST: RequestHandler = async ({ request }) => {
 						invoiceNumber: payload.invoice_number,
 						ProductOnOrder: {
 							createMany: {
-								data: cart.CartItem.map(item => ({
+								data: cart.CartItem.map((item) => ({
 									productId: item.productId,
 									quantity: item.quantity
 								}))
@@ -68,6 +66,19 @@ export const POST: RequestHandler = async ({ request }) => {
 					});
 				}
 
+				// Send order confirmation email
+				await sendEmail(cart.user.email, 'Order Confirmation - Kenya Law', 'order-confirmation', {
+					username: cart.user.name || cart.user.email,
+					order: {
+						...order,
+						ProductOnOrder: order.ProductOnOrder.map((item) => ({
+							...item,
+							product: cart.CartItem.find((cartItem) => cartItem.productId === item.productId)?.product
+						}))
+					},
+					origin: url.origin
+				});
+
 				// Clear user's cart
 				await tx.cart.delete({
 					where: { id: cart.id }
@@ -80,7 +91,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				message: 'Order created successfully',
 				order: result
 			});
-		} else{
+		} else {
 			console.log('Payment not settled...', payload);
 		}
 

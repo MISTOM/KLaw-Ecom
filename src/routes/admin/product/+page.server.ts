@@ -6,19 +6,33 @@ import { mkdir, unlink } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { validateProduct } from '$lib/validations';
 
-export const load = (async ({ locals }) => {
+const ITEMS_PER_PAGE = 12; // 3x4 grid layout
+
+export const load = (async ({ locals, url }) => {
 	try {
-		const productsPromise = prisma.product.findMany({
-			include: { Image: true, categories: true },
-			orderBy: { createdAt: 'desc' }
-		});
-		const categoriesPromise = prisma.category.findMany();
+		const page = Math.max(1, parseInt(url.searchParams.get('page') || '1'));
+		const skip = (page - 1) * ITEMS_PER_PAGE;
 
-		const [products, categories] = await Promise.all([productsPromise, categoriesPromise]);
+		const [products, total, categories] = await Promise.all([
+			prisma.product.findMany({
+				include: { Image: true, categories: true },
+				orderBy: { createdAt: 'desc' },
+				skip,
+				take: ITEMS_PER_PAGE
+			}),
+			prisma.product.count(),
+			prisma.category.findMany()
+		]);
 
-		return { products, categories };
+		return {
+			products,
+			categories,
+			page,
+			totalPages: Math.ceil(total / ITEMS_PER_PAGE)
+		};
 	} catch (e) {
-		console.log('Error getting products: ', e);
+		console.error('Error getting products: ', e);
+		return { status: 500, error: 'Internal server error' };
 	}
 }) satisfies PageServerLoad;
 
@@ -85,7 +99,6 @@ export const actions: Actions = {
 			let imageUrl = null;
 			let writeFilePromise;
 			if (image && image.name) {
-
 				const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
 				if (!allowedTypes.includes(image.type)) {
 					return fail(400, {
@@ -138,7 +151,6 @@ export const actions: Actions = {
 				}
 			};
 		} catch (e) {
-
 			console.log('addProduct error: ', e);
 
 			if (imagePath) {

@@ -285,7 +285,7 @@
 	{:else}
 		<div class="mb-6 flex items-center gap-4">
 			<img
-				src={imageUrl || '/kLawPillers.png'}
+				src={imageUrl || '/coat-of-arms.jpg'}
 				alt="product"
 				class="bg-primary h-32 w-32 rounded-sm object-cover shadow-xs"
 			/>
@@ -325,13 +325,13 @@
 			</p>
 			<div class="flex justify-end gap-4">
 				<button
-					class="rounded-md bg-gray-100 px-4 py-2 text-gray-600 hover:bg-gray-200"
+					class="cursor-pointer rounded-md bg-gray-200 px-4 py-2 text-gray-600 hover:bg-gray-200"
 					onclick={() => (showPublishModal = false)}
 				>
 					Cancel
 				</button>
 				<button
-					class="bg-primary hover:bg-primary/90 flex w-36 cursor-pointer justify-center rounded-sm px-4 py-2 align-middle text-white transition-colors"
+					class="bg-secondary hover:bg-secondary/90 flex w-36 cursor-pointer justify-center rounded-sm px-4 py-2 align-middle text-white transition-colors"
 					onclick={async () => {
 						showPublishModal = false;
 						await togglePublish();
@@ -366,25 +366,25 @@
 							method="POST"
 							enctype="multipart/form-data"
 							use:enhance={({ formData, cancel }) => {
-								loading = true
+								loading = true;
 								formErrors = {};
 								formData.delete('categoryIds');
 								selectedCategories.forEach((c) => formData.append('categoryIds', c.id.toString()));
 
 								if (!validateAll(formData)) {
-									loading = false
+									loading = false;
 									cancel();
 								}
 								return async ({ result, update }) => {
 									if (result.type === 'success') {
 										toast.add('Success', 'Product updated successfully', 'success', 2000);
 										// Optionally leave edit mode or refresh fields
-										await goto('/admin/product')
+										await goto('/admin/product');
 									} else if (result.type === 'failure') {
 										formErrors = result.data?.errors || { _errors: ['Error updating product'] };
 										await update({ reset: false });
 									}
-									loading = false
+									loading = false;
 								};
 							}}
 							class="space-y-6"
@@ -603,7 +603,7 @@
 										<button
 											type="button"
 											onclick={() => (showPublishModal = true)}
-											class="bg-primary hover:bg-primary/90 flex w-36 cursor-pointer justify-center rounded-sm px-4 py-2 align-middle text-white transition-colors"
+											class="bg-secondary hover:bg-secondary/90 flex w-36 cursor-pointer justify-center rounded-sm px-4 py-2 align-middle text-white transition-colors"
 										>
 											{data.product?.isPublished ? 'Unpublish' : 'Publish'}
 										</button>
@@ -613,7 +613,7 @@
 										type="submit"
 										class="bg-primary hover:bg-primary/90 flex w-36 cursor-pointer justify-center rounded-sm px-4 py-2 align-middle text-white transition-colors"
 									>
-									{#if loading}
+										{#if loading}
 											<Spinner />
 										{/if}
 										Save

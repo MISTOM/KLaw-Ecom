@@ -67,20 +67,18 @@ export const actions = {
 		const publicationDate = publicationDateData ? new Date(publicationDateData) : undefined;
 		const serviceCode = Math.floor(Math.random() * 87654321).toString(); //auto generate service code  /* formData.get('serviceCode')?.toString();*/
 
-
 		// Process new image upload if provided
 		const newImage = formData.get('newImage') as File | null;
 		let imageUrl: string | undefined;
 
 		if (newImage && newImage.name) {
-
 			const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-				if (!allowedTypes.includes(newImage.type)) {
-					return fail(400, {
-						data: formObj,
-						errors: { _errors: ['Invalid image type'] }
-					});
-				}
+			if (!allowedTypes.includes(newImage.type)) {
+				return fail(400, {
+					data: formObj,
+					errors: { _errors: ['Invalid image type'] }
+				});
+			}
 
 			const existingImages = await prisma.image.findMany({
 				where: { productId: id }
@@ -88,7 +86,7 @@ export const actions = {
 
 			// For each, delete file from disk if it exists, then remove the DB record
 			for (const img of existingImages) {
-				const oldFilePath = `uploads/images/${img.url.split('/').pop()}`; 
+				const oldFilePath = `uploads/images/${img.url.split('/').pop()}`;
 				unlink(oldFilePath).catch((e) => console.log(`Old image not found or not removed: ${oldFilePath}\n ${e}`));
 				// Remove the image record
 				await prisma.image.delete({
@@ -104,7 +102,6 @@ export const actions = {
 			await writeFile(imagePath, new Uint8Array(await newImage.arrayBuffer()));
 			imageUrl = `/api/image/${fileName}`;
 		}
-
 
 		try {
 			// Ensure the serviceCode is unique except for the current product
@@ -140,10 +137,10 @@ export const actions = {
 					categories: { set: categoryIds.map((id) => ({ id })) },
 					...(imageUrl
 						? {
-							Image: {
-								create: { url: imageUrl }
+								Image: {
+									create: { url: imageUrl }
+								}
 							}
-						}
 						: {})
 				}
 			});
