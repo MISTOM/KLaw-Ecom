@@ -37,6 +37,12 @@ export const POST: RequestHandler = async ({ request }) => {
 
 				const totalPrice = cart.CartItem.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
+				// Update cart status before creating order
+				await tx.cart.update({
+					where: { id: cart.id },
+					data: { status: 'COMPLETED' }
+				});
+
 				const order = await tx.order.create({
 					data: {
 						userId: cart.userId,
@@ -72,12 +78,6 @@ export const POST: RequestHandler = async ({ request }) => {
 				// Clear user's cart
 				await tx.cart.delete({
 					where: { id: cart.id }
-				});
-
-				// After successful order creation, update cart status
-				await tx.cart.update({
-					where: { id: cart.id },
-					data: { status: 'COMPLETED' }
 				});
 
 				return order;
