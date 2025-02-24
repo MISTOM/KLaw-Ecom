@@ -7,18 +7,14 @@ export const POST: RequestHandler = async ({ request }) => {
 	console.log('Notification payload:', payload);
 
 	try {
-		// Handle payment success
 		if (payload.status === 'settled' && payload.client_invoice_ref) {
-			// Start transaction
+			console.log('Processing payment for:', payload.client_invoice_ref);
+
 			const result = await prisma.$transaction(async (tx) => {
-				// Find cart using billRefNumber from payment payload
 				const cart = await tx.cart.findFirst({
 					where: {
-						user: {
-							Order: {
-								none: { billRefNumber: payload.client_invoice_ref }
-							}
-						}
+						paymentReference: payload.client_invoice_ref,
+						status: 'PENDING_PAYMENT'
 					},
 					include: {
 						CartItem: {
@@ -28,17 +24,19 @@ export const POST: RequestHandler = async ({ request }) => {
 					}
 				});
 
-				if (!cart) {
-					throw new Error('Cart not found or order already exists');
+				if (!cart?.CartItem?.length) {
+					throw new Error('Cart is empty or invalid');
 				}
 
-				// Calculate total price
-				const totalPrice = cart.CartItem.reduce(
-					(sum, item) => sum + item.product.price * item.quantity,
-					0
-				);
+				// Validate stock availability
+				for (const item of cart.CartItem) {
+					if (item.quantity > item.product.quantity) {
+						throw new Error(`Insufficient stock for product: ${item.product.name}`);
+					}
+				}
 
-				// Create order
+				const totalPrice = cart.CartItem.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+
 				const order = await tx.order.create({
 					data: {
 						userId: cart.userId,
@@ -46,9 +44,10 @@ export const POST: RequestHandler = async ({ request }) => {
 						status: 'COMPLETED',
 						billRefNumber: payload.client_invoice_ref,
 						invoiceNumber: payload.invoice_number,
+						description: `Payment via ${payload.payment_channel}`,
 						ProductOnOrder: {
 							createMany: {
-								data: cart.CartItem.map(item => ({
+								data: cart.CartItem.map((item) => ({
 									productId: item.productId,
 									quantity: item.quantity
 								}))
@@ -61,51 +60,64 @@ export const POST: RequestHandler = async ({ request }) => {
 				});
 
 				// Update product quantities
-				for (const item of cart.CartItem) {
-					await tx.product.update({
-						where: { id: item.productId },
-						data: { quantity: { decrement: item.quantity } }
-					});
-				}
+				await Promise.all(
+					cart.CartItem.map((item) =>
+						tx.product.update({
+							where: { id: item.productId },
+							data: { quantity: { decrement: item.quantity } }
+						})
+					)
+				);
 
 				// Clear user's cart
 				await tx.cart.delete({
 					where: { id: cart.id }
 				});
 
+				// After successful order creation, update cart status
+				await tx.cart.update({
+					where: { id: cart.id },
+					data: { status: 'COMPLETED' }
+				});
+
 				return order;
 			});
-			console.log('Order created:', result);
 
 			return json({
 				message: 'Order created successfully',
 				order: result
 			});
-		} else {
-			console.log('Payment not settled...', payload);
 		}
 
 		return json({ message: 'Notification received' });
 	} catch (error) {
 		console.error('Webhook error:', error);
+		if (error instanceof Error) {
+			return json(
+				{ error: error.message },
+				{
+					status: error.message.includes('not found') ? 404 : 500
+				}
+			);
+		}
 		return json({ error: 'Internal server error' }, { status: 500 });
 	}
 };
 
 /**
-	 * Sample data from the notification url
-	 *  {
+     * Sample data from the notification url
+     *  {
   status: 'settled',
   secure_hash: 'Mjc2NzZlMGVmA==',
   phone_number: '0718566741',
   payment_reference: [
-	{
-	  payment_reference: 'TA677AKMYJ',
-	  payment_date: '2025-01-06T13:35:15Z',
-	  inserted_at: '2025-01-06T13:35:15',
-	  currency: 'KES',
-	  amount: '1.00'
-	}
+    {
+      payment_reference: 'TA677AKMYJ',
+      payment_date: '2025-01-06T13:35:15Z',
+      inserted_at: '2025-01-06T13:35:15',
+      currency: 'KES',
+      amount: '1.00'
+    }
   ],
   payment_date: '2025-01-06 16:35:15+03:00 EAT Africa/Nairobi',
   payment_channel: 'MPesa',
@@ -116,7 +128,7 @@ export const POST: RequestHandler = async ({ request }) => {
   client_invoice_ref: 'ORDER-1736170468163',
   amount_paid: '1'
 }
-	 */
+     */
 
 // sendEmail(cart.user.email, 'Order Confirmation - Kenya Law', 'order-confirmation', {
 // 	username: cart.user.name || cart.user.email,

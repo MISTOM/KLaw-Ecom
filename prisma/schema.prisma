@@ -15,7 +15,7 @@ model User {
   idNumber     Int?
   phoneNumber  String?
   address      String?
-  postalCode   String?  // Added field
+  postalCode   String? // Added field
   refreshToken String?
   isVerified   Boolean  @default(false)
   imageId      Int?
@@ -79,12 +79,20 @@ model Category {
 // }
 
 model Cart {
-  id        Int        @id @default(autoincrement())
-  userId    Int        @unique
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  CartItem  CartItem[]
+  id               Int        @id @default(autoincrement())
+  userId           Int        @unique
+  paymentReference String?    @unique
+  status           CartStatus @default(ACTIVE)
+  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  CartItem         CartItem[]
+}
+
+enum CartStatus {
+  ACTIVE
+  PENDING_PAYMENT
+  COMPLETED
 }
 
 model CartItem {

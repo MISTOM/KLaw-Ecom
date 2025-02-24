@@ -5,6 +5,8 @@
 	import { getCartState } from '$lib/Cart.svelte.js';
 	import Spinner from '$lib/components/Spinner.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import { getToastState } from '$lib/Toast.svelte.js';
+	import { json } from '@sveltejs/kit';
 
 	const { data } = $props();
 
@@ -12,6 +14,8 @@
 	const convenienceFee = $derived(data.convenienceFee);
 
 	const cart = getCartState();
+
+	const toast = getToastState();
 
 	let errors = $state('');
 	let showConfirmModal = $state(false);
@@ -41,7 +45,7 @@
 
 			if (!validateRes.ok) {
 				const error = await validateRes.json();
-				throw new Error(error.message);
+				throw error;
 			}
 
 			showPaymentModal = true;
@@ -53,10 +57,11 @@
 			} else {
 				throw new Error('Payment form not found');
 			}
-		} catch (err) {
+		} catch (err: any) {
 			paymentStatus = 'failed';
 			//@ts-ignore
-			paymentError = err?.message || 'Failed to initiate payment';
+			paymentError = err?.body?.message || 'Failed to initiate payment';
+			toast.add('Error', err?.body?.message || 'Something went wrong', 'error');
 			showPaymentModal = false;
 		} finally {
 			loading = false;

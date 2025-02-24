@@ -1,4 +1,4 @@
-import { goto, invalidate } from '$app/navigation';
+import { goto, invalidate, invalidateAll } from '$app/navigation';
 import { getContext, setContext } from 'svelte';
 import type { Product } from '@prisma/client';
 import { getToastState } from './Toast.svelte';
@@ -84,6 +84,7 @@ class Cart {
 
 			return false;
 		} finally {
+			await invalidateAll();
 			this.isLoading = false;
 		}
 	}

@@ -53,6 +53,6 @@ export const POST: RequestHandler = async ({ locals: { user }, request }) => {
 	} catch (e) {
 		console.error('Validation error:', e);
 		//@ts-ignore
-		throw error(e?.status || 500, e?.message || 'Validation failed');
+		throw error(e?.status || 500, e || 'Validation failed');
 	}
 };

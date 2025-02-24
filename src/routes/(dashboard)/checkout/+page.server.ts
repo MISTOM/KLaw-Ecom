@@ -26,6 +26,17 @@ export const load = (async ({ locals: { user }, url: { origin }, depends }) => {
 		// Calculate total price
 		const totalPrice = cart.CartItem.reduce((total, item) => total + item.product.price * item.quantity, 0);
 
+		const billRefNumber = `ORDER-${Date.now()}`;
+
+		// Update cart with payment reference
+		await prisma.cart.update({
+			where: { userId: user.id },
+			data: {
+				paymentReference: billRefNumber,
+				status: 'PENDING_PAYMENT'
+			}
+		});
+
 		// Prepare payment details
 		const paymentDetails = {
 			apiClientID: API_CLIENT_ID, // Your Pesaflow API Client ID
@@ -33,7 +44,7 @@ export const load = (async ({ locals: { user }, url: { origin }, depends }) => {
 			serviceID: SERVICE_ID,
 			clientIDNumber: cart.user.idNumber || '0',
 			currency: 'KES',
-			billRefNumber: `ORDER-${Date.now()}`, // Unique order reference
+			billRefNumber,
 			billDesc: 'Product Purchase',
 			clientName: cart.user.name || cart.user.email,
 			secret: SECRET
