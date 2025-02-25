@@ -15,7 +15,6 @@ export const load = (async ({ depends }) => {
 			},
 			orderBy: { createdAt: 'desc' }
 		});
-		console.log(orders);
 		return { orders };
 	} catch (e) {
 		console.log('Error loading orders', e);

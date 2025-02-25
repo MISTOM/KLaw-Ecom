@@ -38,12 +38,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	// **Admin Route Protection**
 	if (event.url.pathname.startsWith('/admin')) {
-		if (!event.locals.user) {
+		if (!event.locals.user || !(await auth.isAdmin(event.locals.user))) {
 			throw redirect(303, '/login');
-		}
-
-		if (!(await auth.isAdmin(event.locals.user))) {
-			throw redirect(303, '/product');
 		}
 	}
 

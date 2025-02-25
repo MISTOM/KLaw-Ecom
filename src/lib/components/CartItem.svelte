@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import { getCartState, type CartItems } from '$lib/Cart.svelte';
+	import { getToastState } from '$lib/Toast.svelte';
 
 	const { item }: { item: CartItems } = $props();
 
 	const cart = getCartState();
+	const toast = getToastState();
 </script>
 
 <div
@@ -39,8 +41,10 @@
 			class="rounded-sm p-1 hover:bg-gray-200"
 			aria-label="Add 1 to quantity"
 			onclick={async () => {
-				item.quantity++;
-				await cart.saveCart();
+				const result = await cart.addItem(item.product);
+				if (result.error) {
+					toast.add('Stock Limited', result.error, 'warning');
+				}
 			}}>+</button
 		>
 		<button

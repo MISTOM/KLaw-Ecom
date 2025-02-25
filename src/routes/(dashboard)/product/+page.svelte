@@ -94,14 +94,17 @@
 								: 'cursor-not-allowed bg-gray-400'}"
 							onclick={async () => {
 								if (product.quantity <= 0) {
-									toast.add('Error', 'Product is out of stock', 'warning', 2000);
+									toast.add('Error', 'Product is out of stock', 'warning');
 									return;
 								}
-								if (await cart.addItem(product)) {
-									toast.add('Success', 'Product added to cart', 'success', 2000);
+
+								const result = await cart.addItem(product);
+								if (result.success) {
+									toast.add('Success', 'Product added to cart', 'success');
+								} else if (result.error) {
+									toast.add('Stock Limited', result.error, 'warning');
 								} else {
-									console.log('product not added to cart');
-									if (data.user) toast.add('Error', 'Failed to Save Cart', 'error', 2000);
+									if (data.user) toast.add('Error', 'Failed to Save Cart', 'error');
 								}
 							}}
 						>

@@ -39,9 +39,18 @@ class Cart {
 
 	async addItem(product: ProductWithImage) {
 		const existingItem = this.cartItems.find((item) => item.product.id === product.id);
+		const newQuantity = (existingItem?.quantity || 0) + 1;
+
+		// Check stock availability before adding
+		if (newQuantity > product.quantity) {
+			return {
+				success: false,
+				error: `Only ${product.quantity} item${product.quantity !== 1 ? 's' : ''} left in stock`
+			};
+		}
 
 		if (existingItem) {
-			existingItem.quantity++;
+			existingItem.quantity = newQuantity;
 		} else {
 			this.cartItems = [
 				...this.cartItems,
@@ -50,12 +59,12 @@ class Cart {
 			];
 		}
 
-		return await this.saveCart();
+		const saved = await this.saveCart();
+		return { success: saved };
 	}
 
 	async saveCart() {
 		this.isLoading = true;
-		invalidate('update:paymentDetails');
 		const cartItems = this.cartItems.map((item) => {
 			return {
 				productId: item.product.id,
@@ -84,8 +93,8 @@ class Cart {
 
 			return false;
 		} finally {
-			await invalidateAll();
 			this.isLoading = false;
+			invalidate('update:paymentDetails');
 		}
 	}
 
@@ -139,7 +148,7 @@ class Cart {
 		// }
 		this.cartItems = this.cartItems.filter((item) => item.id !== id);
 		if (this.cartStats.quantity === 0) this.cartopen = false;
-		await this.saveCart();
+		return await this.saveCart();
 	}
 
 	// save(){

@@ -61,6 +61,7 @@
 			await goto(`/login?redirect=${window.location.pathname}`);
 		} else {
 			console.error('Failed to issue product');
+			toast.add('Error', 'Failed to issue product', 'error');
 		}
 	};
 

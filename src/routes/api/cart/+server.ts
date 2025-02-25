@@ -31,20 +31,31 @@ export const GET = async ({ locals: { user } }) => {
 export const POST = async ({ request, locals: { user } }) => {
 	if (!user?.id) return error(401, 'Unauthorized');
 
-	const cartItems = await request.json(); // [{ productId: 1, quantity: 2 }, { productId: 2, quantity: 3 }]
-
-	// Validate request data
-	if (
-		!Array.isArray(cartItems) ||
-		!cartItems.every(
-			(item) => typeof item.productId === 'number' && typeof item.quantity === 'number' && item.quantity > 0
-		)
-	) {
-		throw error(400, 'Invalid cart items format');
-	}
+	const cartItems = await request.json(); //
 
 	try {
-		// Upsert cart and cartItems in a transaction
+		// Validate stock levels before saving cart
+		const products = await prisma.product.findMany({
+			where: {
+				id: {
+					in: cartItems.map((item: any) => item.productId)
+				}
+			}
+		});
+
+		const productMap = new Map(products.map((p) => [p.id, p]));
+
+		// Check stock availability
+		for (const item of cartItems) {
+			const product = productMap.get(item.productId);
+			if (!product || product.quantity < item.quantity) {
+				return error(400, {
+					message: `Only ${product?.quantity || 0} items available for ${product?.name || 'product'}`
+				});
+			}
+		}
+
+		// Existing cart update logic
 		await prisma.$transaction(async (tx) => {
 			// Find or create cart
 			const cart = await tx.cart.upsert({
@@ -60,7 +71,7 @@ export const POST = async ({ request, locals: { user } }) => {
 
 			// Create new cart items
 			await tx.cartItem.createMany({
-				data: cartItems.map((item) => ({
+				data: cartItems.map((item: any) => ({
 					cartId: cart.id,
 					productId: item.productId,
 					quantity: item.quantity
@@ -68,7 +79,8 @@ export const POST = async ({ request, locals: { user } }) => {
 			});
 		});
 		return json({ message: 'Cart saved' });
-	} catch (e) {
-		return error(500, 'Error saving cart');
+	} catch (e: any) {
+		console.log(e);
+		return error(e?.status || 500, e?.body?.message || 'Error saving cart');
 	}
 };

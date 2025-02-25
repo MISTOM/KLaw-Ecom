@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { tick, onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { goto } from '$app/navigation';
 	import { getCartState } from '$lib/Cart.svelte.js';
 	import Spinner from '$lib/components/Spinner.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import { getToastState } from '$lib/Toast.svelte.js';
-	import { json } from '@sveltejs/kit';
 
 	const { data } = $props();
 
 	const paymentDetails = $derived(data.paymentDetails);
 	const convenienceFee = $derived(data.convenienceFee);
+
+	// $inspect(paymentDetails, data);
 
 	const cart = getCartState();
 
@@ -31,7 +31,7 @@
 		paymentStatus = 'processing';
 
 		try {
-			// Validate cart items stock before proceeding
+			// Validate current stock levels
 			const validateRes = await fetch('/api/order/validate', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -48,6 +48,7 @@
 				throw error;
 			}
 
+			// If validation passes, show payment modal and submit form
 			showPaymentModal = true;
 			const form = document.getElementById('payment-form') as HTMLFormElement;
 			if (form) {
@@ -180,14 +181,14 @@
 			<input type="hidden" name="amountExpected" value={paymentDetails?.amountExpected} />
 		</form>
 
-		{#if paymentDetails}
+		{#if paymentDetails && totalPrice > 0}
 			<button
 				class="transition-color m-1 w-full rounded-sm bg-green-600 p-1 text-white hover:opacity-90"
 				onclick={() => (showConfirmModal = true)}
 				>Pay
 			</button>
 		{:else}
-			<a href="/product" class="text-secondary hover:underline">Continue shopping...</a>
+			<a href="/product" class="text-secondary p-2 hover:underline">Continue shopping...</a>
 		{/if}
 	</section>
 </main>
@@ -247,6 +248,6 @@
 			}
 		}}
 	>
-		✕
+			✕
 	</button> -->
 </Modal>

@@ -56,7 +56,6 @@
 			pageCount: data.pageCount ? parseInt(data.pageCount as string) : undefined,
 			categoryIds: selectedCategories.map((c) => c.id)
 		};
-		console.log(parsedData);
 		const result = productSchema.safeParse(parsedData);
 		if (!result.success) {
 			const errors = result.error.flatten().fieldErrors;

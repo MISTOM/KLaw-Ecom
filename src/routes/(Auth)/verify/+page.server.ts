@@ -27,7 +27,7 @@ export const load = (async ({ url }) => {
 		return { status: 200, message: 'Email verified' };
 	} catch (e) {
 		//@ts-ignore
-		console.log(e.message);
+		console.log(e?.message);
 		//@ts-ignore
 		if (e.message === 'jwt expired') return { status: 400, error: 'Token expired' };
 		//@ts-ignore
