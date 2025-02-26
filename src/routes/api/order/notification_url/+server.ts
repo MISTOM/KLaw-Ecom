@@ -3,8 +3,9 @@ import { PaymentValidator } from '$lib/server/services/PaymentValidator';
 import { rateLimiter } from '$lib/server/services/RateLimiter';
 import prisma from '$lib/server/prisma';
 import type { Cart, CartItem } from '@prisma/client';
+import { sendEmail } from '$lib/server/mailService';
 
-export const POST = async ({ request }) => {
+export const POST = async ({ request, url }) => {
 	console.log(request.headers); // TODO: Implement rate limiting and validation
 	// const clientIp = request.headers.get('x-forwarded-for') || 'unknown';
 
@@ -29,7 +30,7 @@ export const POST = async ({ request }) => {
 		// }
 
 		if (validatedPayload?.status === 'settled') {
-			return await processPayment(validatedPayload);
+			return await processPayment(validatedPayload, url);
 		}
 
 		return json({ message: 'Notification acknowledged' });
@@ -47,7 +48,7 @@ export const POST = async ({ request }) => {
 	}
 };
 
-async function processPayment(payload: any) {
+async function processPayment(payload: any, url: URL) {
 	return await prisma.$transaction(
 		async (tx) => {
 			// Lock the cart for processing
@@ -75,6 +76,17 @@ async function processPayment(payload: any) {
 			// Update inventory
 			await updateInventory(tx, cart.CartItem);
 
+			sendEmail(cart.user.email, 'Order Confirmation - Kenya Law', 'order-confirmation', {
+				username: cart.user.name || cart.user.email,
+				order: {
+					...order,
+					ProductOnOrder: order.ProductOnOrder.map((item: any) => ({
+						...item,
+						product: cart.CartItem.find((cartItem) => cartItem.productId === item.productId)?.product
+					}))
+				},
+				origin: url.origin
+			});
 			// Clear cart
 			await tx.cart.delete({ where: { id: cart.id } });
 
