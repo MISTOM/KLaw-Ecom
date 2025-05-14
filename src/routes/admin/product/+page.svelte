@@ -141,6 +141,7 @@
 							<img
 								src={product.Image[0]?.url || '/coat-of-arms.jpg'}
 								alt={product.name}
+								loading="lazy"
 								class="h-full w-full object-cover"
 							/>
 						</div>
@@ -187,7 +188,7 @@
 	{#if totalPages > 1}
 		<div class="mt-8 flex justify-center gap-2">
 			<button
-				class="rounded-md bg-gray-100 px-4 py-2 text-sm disabled:opacity-50"
+				class="cursor-pointer rounded-md bg-gray-100 px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
 				disabled={currentPage === 1}
 				onclick={() => handlePageChange(currentPage - 1)}
 			>
@@ -195,16 +196,19 @@
 			</button>
 
 			{#each Array(totalPages) as _, i}
-				<button
-					class="rounded-md px-4 py-2 text-sm {currentPage === i + 1 ? 'bg-primary text-white' : 'bg-gray-100'}"
-					onclick={() => handlePageChange(i + 1)}
-				>
-					{i + 1}
-				</button>
+				<a href="?page={i + 1}">
+					<button
+						class="cursor-pointer rounded-md px-4 py-2 text-sm {currentPage === i + 1
+							? 'bg-primary  text-white'
+							: 'bg-gray-100'}"
+					>
+						{i + 1}
+					</button>
+				</a>
 			{/each}
 
 			<button
-				class="rounded-md bg-gray-100 px-4 py-2 text-sm disabled:opacity-50"
+				class="cursor-pointer rounded-md bg-gray-100 px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
 				disabled={currentPage === totalPages}
 				onclick={() => handlePageChange(currentPage + 1)}
 			>
