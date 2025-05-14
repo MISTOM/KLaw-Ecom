@@ -24,21 +24,22 @@
 			<tr>
 				<td style="padding: 0 20px 20px 20px;">
 					<h1 style="font-size: 24px; color: #8f2a2b; text-align: center; margin-bottom: 20px;">
-						Order Confirmation
+						Order Confirmation – Kenya Law Publications
 					</h1>
 					<p style="font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-						Hello {username},<br />
-						Thank you for your order. We're pleased to confirm that we've received your payment and your order has been
-						processed successfully.
+						Dear {username},<br />
+						Thank you for your order with Kenya Law Online Bookstore.<br />
+						We are pleased to confirm that we have received your order for the following publications:
 					</p>
 
 					<div style="margin: 20px 0; padding: 15px; background-color: #f8f8f8; border-radius: 4px;">
-						<p style="margin: 0; font-weight: bold;">Order Details:</p>
-						<p style="margin: 5px 0;">Order Reference: {order.billRefNumber}</p>
+						<p style="margin: 0; font-weight: bold;">Order Summary:</p>
+						<p style="margin: 5px 0;">Order Number: {order.billRefNumber}</p>
+						<p style="margin: 5px 0;">Order Date: {new Date(order.createdAt).toLocaleDateString()}</p>
 						<p style="margin: 5px 0;">Invoice Number: {order.invoiceNumber}</p>
-						<p style="margin: 5px 0;">Date: {new Date(order.createdAt).toLocaleDateString()}</p>
 					</div>
 
+					<p style="margin: 0; font-weight: bold;">Publications:</p>
 					<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
 						<thead>
 							<tr style="background-color: #f0f0f0;">
@@ -60,7 +61,7 @@
 								</tr>
 							{/each}
 							<tr>
-								<td colspan="3" style="padding: 10px; text-align: right; font-weight: bold;">Total:</td>
+								<td colspan="3" style="padding: 10px; text-align: right; font-weight: bold;">Total Amount:</td>
 								<td style="padding: 10px; text-align: right; font-weight: bold;">
 									KES {order.totalPrice}
 								</td>
@@ -69,16 +70,21 @@
 					</table>
 
 					<p style="font-size: 14px; line-height: 1.5;">
-						The products will be available in your account's purchases section. You can download them at any time.
+						Your order is currently being processed. The products will be available in your account's purchases
+						section.
 					</p>
 
 					<p style="font-size: 14px; line-height: 1.5;">
-						If you have any questions about your order, please contact our support team.
+						If you have any questions or need further assistance, feel free to contact us at
+						<a href="mailto:info@kenyalaw.org">info@kenyalaw.org</a> or call us at +254 20 271 2767, 20 271 9231.
 					</p>
 
+					<p style="font-size: 14px; line-height: 1.5;">Thank you for choosing Kenya Law.</p>
+
 					<p style="font-size: 14px; line-height: 1.5;">
-						Best regards,<br />
-						Kenya Law Team
+						Best Regards,<br />
+						Kenya Law Sales, Marketing & Customer Care Team<br />
+						<a href="https://www.kenyalaw.org">www.kenyalaw.org</a>
 					</p>
 				</td>
 			</tr>

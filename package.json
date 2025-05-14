@@ -28,6 +28,8 @@
 		"@types/eslint": "^9.6.1",
 		"@types/jsonwebtoken": "^9.0.7",
 		"@types/nodemailer": "^6.4.17",
+		"@types/puppeteer": "^5.4.7",
+		"@types/uuid": "^10.0.0",
 		"eslint": "^9.17.0",
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-svelte": "^2.46.0",
@@ -50,6 +52,8 @@
 		"bcrypt": "^5.1.1",
 		"jsonwebtoken": "^9.0.2",
 		"nodemailer": "^6.9.16",
+		"puppeteer": "^24.3.1",
+		"uuid": "^11.1.0",
 		"zod": "^3.24.1"
 	}
 }
