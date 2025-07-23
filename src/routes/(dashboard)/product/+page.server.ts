@@ -34,12 +34,12 @@ export const load = (async ({ locals: { user }, url }) => {
 					Image: { select: { url: true } },
 					categories: true
 				},
-				orderBy: { createdAt: 'desc' },
+				orderBy: { name: 'asc' },
 				skip,
 				take: ITEMS_PER_PAGE
 			}),
 			prisma.product.count({ where }),
-			prisma.category.findMany()
+			prisma.category.findMany({ orderBy: { sortOrder: 'asc' } })
 		]);
 
 		const totalPages = Math.ceil(total / ITEMS_PER_PAGE);

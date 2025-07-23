@@ -21,7 +21,7 @@ export const load = (async ({ params, depends }) => {
 				}
 			}
 		});
-		const categoriesPromise = prisma.category.findMany();
+		const categoriesPromise = prisma.category.findMany({ orderBy: { sortOrder: 'asc' } });
 
 		const [product, categories] = await Promise.all([productPromise, categoriesPromise]);
 

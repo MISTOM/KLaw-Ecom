@@ -96,7 +96,10 @@
 
 			<div class="mt-4">
 				<p class="text-sm font-bold">
-					&copy 2024 National Council for Law Reporting (Kenya Law). |
+					&copy <script>
+						document.write(new Date().getFullYear());
+					</script>
+					Council for Law Reporting (Kenya Law). |
 					<a href="https://kenyalaw.org/kl/index.php?id=2161" class="text-primary hover:underline"
 						>Creative Commons</a
 					>

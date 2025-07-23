@@ -16,12 +16,12 @@ export const load = (async ({ locals, url }) => {
 		const [products, total, categories] = await Promise.all([
 			prisma.product.findMany({
 				include: { Image: true, categories: true },
-				orderBy: { createdAt: 'desc' },
+				orderBy: { name: 'asc' },
 				skip,
 				take: ITEMS_PER_PAGE
 			}),
 			prisma.product.count(),
-			prisma.category.findMany()
+			prisma.category.findMany({ orderBy: { sortOrder: 'asc' } })
 		]);
 
 		return {

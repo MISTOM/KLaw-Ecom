@@ -42,7 +42,7 @@
 </svelte:head>
 
 <div class="container mx-auto px-4 py-8">
-	<h1 class="mb-8 text-3xl font-bold">Our Products</h1>
+	<h1 class="mb-8 text-3xl font-bold">Product Catalogue</h1>
 
 	<!-- Filters Section -->
 	<div class="mb-6 grid gap-4 sm:grid-cols-2 md:grid-cols-4">

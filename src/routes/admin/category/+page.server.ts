@@ -4,7 +4,7 @@ import { fail } from '@sveltejs/kit';
 
 export const load = (async () => {
 	try {
-		const categories = await prisma.category.findMany();
+		const categories = await prisma.category.findMany({ orderBy: { sortOrder: 'asc' } });
 		return { categories };
 	} catch (e) {
 		console.error(e);

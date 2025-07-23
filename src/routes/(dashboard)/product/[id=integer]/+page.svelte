@@ -71,14 +71,16 @@
 					<div>
 						<p class="mb-2 font-medium">Product Details</p>
 						<ul class="space-y-1 text-sm text-gray-600">
-							<li>Author: {product.author}</li>
-							<li>Pages: {product.pageCount}</li>
+							<!-- <li>Author: {product.author}</li> -->
+							<li>Author: National Council for Law Reporting (Kenya Law)</li>
+							<li>Pages: _</li>
 							<li>
-								Publication Date: {product.publicationDate?.toLocaleDateString('en-uk', {
+								<!-- Publication Date: {product.publicationDate?.toLocaleDateString('en-uk', {
 									year: 'numeric',
 									month: 'long',
 									day: 'numeric'
-								})}
+								})} -->
+								Publication Date: _
 							</li>
 							<!-- Categories -->
 							<li>
