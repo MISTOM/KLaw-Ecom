@@ -23,4 +23,5 @@ vite.config.ts.timestamp-*
 static/images/*
 uploads/*
 file.json
-static/reports/
+static/reports/*
+!static/reports/.gitkeep
