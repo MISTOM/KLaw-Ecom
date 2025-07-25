@@ -9,12 +9,14 @@
 	const toast = getToastState();
 
 	let categoryParam = $derived.by(() => page.url.searchParams.get('category') || 'all');
+	let selectedYear = $derived.by(() => page.url.searchParams.get('year') || 'all');
+	let currentPage = $derived.by(() => parseInt(page.url.searchParams.get('page') || '1', 10));
 </script>
 
 <div class="container mx-auto px-4 py-8">
 	<div class="mb-8 flex items-center gap-4">
 		<a
-			href="/product/?category={categoryParam}"
+			href="/product/?category={categoryParam}&year={selectedYear}&page={currentPage}"
 			class="rounded-md bg-gray-100 px-4 py-2 text-sm transition-colors hover:bg-gray-200"
 		>
 			← Back to Products
@@ -71,16 +73,16 @@
 					<div>
 						<p class="mb-2 font-medium">Product Details</p>
 						<ul class="space-y-1 text-sm text-gray-600">
-							<!-- <li>Author: {product.author}</li> -->
-							<li>Author: National Council for Law Reporting (Kenya Law)</li>
-							<li>Pages: _</li>
+							<li>Author: {product.author}</li>
+							<!-- <li>Author: National Council for Law Reporting (Kenya Law)</li> -->
+							<!-- <li>Pages: _</li> -->
 							<li>
 								<!-- Publication Date: {product.publicationDate?.toLocaleDateString('en-uk', {
 									year: 'numeric',
 									month: 'long',
 									day: 'numeric'
 								})} -->
-								Publication Date: _
+								<!-- Publication Date: _ -->
 							</li>
 							<!-- Categories -->
 							<li>

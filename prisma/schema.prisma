@@ -36,6 +36,7 @@ model Product {
   price           Float
   quantity        Int
   author          String
+  citation        String?
   pageCount       Int
   publicationDate DateTime
   serviceCode     String           @unique

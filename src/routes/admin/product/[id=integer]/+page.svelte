@@ -20,6 +20,7 @@
 	let quantity = $state(data.product?.quantity);
 	let serviceCode = $state(data.product?.serviceCode);
 	let author = $state(data.product?.author);
+	let citation = $state(data.product?.citation);
 	let publicationDateISO = $state(data.product?.publicationDate);
 	let pageCount = $state(data.product?.pageCount);
 	let imageUrl = $state(data.product?.Image[0]?.url);
@@ -132,7 +133,8 @@
 			price: data.price ? parseFloat(data.price as string) : undefined,
 			quantity: data.quantity ? parseInt(data.quantity as string) : undefined,
 			pageCount: data.pageCount ? parseInt(data.pageCount as string) : undefined,
-			categoryIds: selectedCategories.map((c) => c.id)
+			categoryIds: selectedCategories.map((c) => c.id),
+			citation: data.citation || undefined
 		};
 		const result = productSchema.safeParse(parsedData);
 		if (!result.success) {
@@ -468,6 +470,23 @@
 										/>
 										{#if getFieldError('author')}
 											<p class="mt-1 text-xs text-red-600">{getFieldError('author')}</p>
+										{/if}
+									</div>
+
+									<div>
+										<label for="citation" class="text-sm font-medium text-gray-700">Citation (Optional)</label>
+										<input
+											id="citation"
+											type="text"
+											name="citation"
+											bind:value={citation}
+											onkeyup={(e) => validateField('citation', e.currentTarget.value)}
+											aria-invalid={!!getFieldError('citation')}
+											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
+											placeholder="Enter citation..."
+										/>
+										{#if getFieldError('citation')}
+											<p class="mt-1 text-xs text-red-600">{getFieldError('citation')}</p>
 										{/if}
 									</div>
 

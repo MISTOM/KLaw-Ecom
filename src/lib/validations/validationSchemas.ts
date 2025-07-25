@@ -139,6 +139,11 @@ export const productSchema = z.object({
 		})
 		.min(2, 'Author name must be at least 2 characters'),
 
+	citation: z
+		.string()
+		.optional()
+		.or(z.literal('').transform(() => undefined)),
+
 	pageCount: z
 		.number({
 			required_error: 'Page count is required',

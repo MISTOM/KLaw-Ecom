@@ -94,8 +94,8 @@
 	let filteredProducts = $derived(
 		products.filter(
 			(product) =>
-				product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				product.serviceCode.toLowerCase().includes(searchQuery.toLowerCase())
+				product.name.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+				product.serviceCode.toLowerCase().includes(searchQuery.toLowerCase().trim())
 		)
 	);
 
