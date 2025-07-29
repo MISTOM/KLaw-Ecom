@@ -44,84 +44,104 @@ export const load = (async ({ locals: { user }, url }) => {
 		let products, total;
 
 		if (categoryId === '16') {
-			// Get all products for category 16
-			const allCategoryProducts = await prisma.product.findMany({
-				where,
-				include: {
-					Image: { select: { url: true } },
-					categories: true
-				},
-				orderBy: [
-					{ publicationDate: 'desc' }, // First sort by publicationDate
-					{ name: 'asc' } // Then by name
-				]
-			});
+			// Sort using sortOrder and publicationDate
+			[products, total] = await Promise.all([
+				prisma.product.findMany({
+					where,
+					include: {
+						Image: { select: { url: true } },
+						categories: true,
+					},
+					orderBy: [
+						{ sortOrder: 'asc' }, // First sort by sortOrder
+						{ publicationDate: 'desc' }, // Then by publicationDate	
+					],
+					skip,
+					take: ITEMS_PER_PAGE
+				}),
+				prisma.product.count({ where })
+			]);
 
-			// Custom sorting for category 16
-			const sortedProducts = allCategoryProducts.sort((a, b) => {
-				const aName = a.name.toLowerCase();
-				const bName = b.name.toLowerCase();
+			
 
-				// Check if products start with "kenya law"
-				const aStartsWithKenyaLaw = aName.startsWith('kenya law');
-				const bStartsWithKenyaLaw = bName.startsWith('kenya law');
+			// // Get all products for category 16
+			// const allCategoryProducts = await prisma.product.findMany({
+			// 	where,
+			// 	include: {
+			// 		Image: { select: { url: true } },
+			// 		categories: true
+			// 	},
+			// 	orderBy: [
+			// 		{ publicationDate: 'desc' }, // First sort by publicationDate
+			// 		{ name: 'asc' } // Then by name
+			// 	]
+			// });
 
-				// Priority products to come after first two
-				const priorityProducts = [
-					'kenya law reports (environment and land vol. 2)',
-					'kenya law reports (employment & labour vol. 1)',
-					'kenya law reports (family)',
-					'kenya law reports (gender based violence)'
-				];
-				const aIsPriority = priorityProducts.includes(aName);
-				const bIsPriority = priorityProducts.includes(bName);
+			// // Custom sorting for category 16
+			// const sortedProducts = allCategoryProducts.sort((a, b) => {
+			// 	const aName = a.name.toLowerCase();
+			// 	const bName = b.name.toLowerCase();
 
-				// First: "Kenya Law" products come before non-"Kenya Law" products
-				if (aStartsWithKenyaLaw && !bStartsWithKenyaLaw) return -1;
-				if (!aStartsWithKenyaLaw && bStartsWithKenyaLaw) return 1;
+			// 	// Check if products start with "kenya law"
+			// 	const aStartsWithKenyaLaw = aName.startsWith('kenya law');
+			// 	const bStartsWithKenyaLaw = bName.startsWith('kenya law');
 
-				// If both are "Kenya Law" products, apply special ordering
-				if (aStartsWithKenyaLaw && bStartsWithKenyaLaw) {
-					// Priority products should come after the first two alphabetical ones
-					// but before all other "Kenya Law" products
-					if (aIsPriority && !bIsPriority) {
-						// Check if 'b' is among the first two alphabetically
-						const firstTwoAlphabetical = allCategoryProducts
-							.filter(
-								(p) =>
-									p.name.toLowerCase().startsWith('kenya law') && !priorityProducts.includes(p.name.toLowerCase())
-							)
-							.sort((x, y) => x.name.localeCompare(y.name))
-							.slice(0, 2)
-							.map((p) => p.name.toLowerCase());
+			// 	// Priority products to come after first two
+			// 	const priorityProducts = [
+			// 		'kenya law reports (environment and land vol. 2)',
+			// 		'kenya law reports (employment & labour vol. 1)',
+			// 		'kenya law reports (family)',
+			// 		'kenya law reports (gender based violence)'
+			// 	];
+			// 	const aIsPriority = priorityProducts.includes(aName);
+			// 	const bIsPriority = priorityProducts.includes(bName);
 
-						return firstTwoAlphabetical.includes(bName) ? 1 : -1;
-					}
-					if (!aIsPriority && bIsPriority) {
-						// Check if 'a' is among the first two alphabetically
-						const firstTwoAlphabetical = allCategoryProducts
-							.filter(
-								(p) =>
-									p.name.toLowerCase().startsWith('kenya law') && !priorityProducts.includes(p.name.toLowerCase())
-							)
-							.sort((x, y) => x.name.localeCompare(y.name))
-							.slice(0, 2)
-							.map((p) => p.name.toLowerCase());
+			// 	// First: "Kenya Law" products come before non-"Kenya Law" products
+			// 	if (aStartsWithKenyaLaw && !bStartsWithKenyaLaw) return -1;
+			// 	if (!aStartsWithKenyaLaw && bStartsWithKenyaLaw) return 1;
 
-						return firstTwoAlphabetical.includes(aName) ? -1 : 1;
-					}
+			// 	// If both are "Kenya Law" products, apply special ordering
+			// 	if (aStartsWithKenyaLaw && bStartsWithKenyaLaw) {
+			// 		// Priority products should come after the first two alphabetical ones
+			// 		// but before all other "Kenya Law" products
+			// 		if (aIsPriority && !bIsPriority) {
+			// 			// Check if 'b' is among the first two alphabetically
+			// 			const firstTwoAlphabetical = allCategoryProducts
+			// 				.filter(
+			// 					(p) =>
+			// 						p.name.toLowerCase().startsWith('kenya law') && !priorityProducts.includes(p.name.toLowerCase())
+			// 				)
+			// 				.sort((x, y) => x.name.localeCompare(y.name))
+			// 				.slice(0, 2)
+			// 				.map((p) => p.name.toLowerCase());
 
-					// If both are priority or both are not priority, sort alphabetically
-					return a.name.localeCompare(b.name);
-				}
+			// 			return firstTwoAlphabetical.includes(bName) ? 1 : -1;
+			// 		}
+			// 		if (!aIsPriority && bIsPriority) {
+			// 			// Check if 'a' is among the first two alphabetically
+			// 			const firstTwoAlphabetical = allCategoryProducts
+			// 				.filter(
+			// 					(p) =>
+			// 						p.name.toLowerCase().startsWith('kenya law') && !priorityProducts.includes(p.name.toLowerCase())
+			// 				)
+			// 				.sort((x, y) => x.name.localeCompare(y.name))
+			// 				.slice(0, 2)
+			// 				.map((p) => p.name.toLowerCase());
 
-				// If neither starts with "Kenya Law", sort alphabetically
-				return a.name.localeCompare(b.name);
-			});
+			// 			return firstTwoAlphabetical.includes(aName) ? -1 : 1;
+			// 		}
 
-			// Apply pagination
-			products = sortedProducts.slice(skip, skip + ITEMS_PER_PAGE);
-			total = sortedProducts.length;
+			// 		// If both are priority or both are not priority, sort alphabetically
+			// 		return a.name.localeCompare(b.name);
+			// 	}
+
+			// 	// If neither starts with "Kenya Law", sort alphabetically
+			// 	return a.name.localeCompare(b.name);
+			// });
+
+			// // Apply pagination
+			// products = sortedProducts.slice(skip, skip + ITEMS_PER_PAGE);
+			// total = sortedProducts.length;
 		} else {
 			// Normal query for other categories
 			[products, total] = await Promise.all([
