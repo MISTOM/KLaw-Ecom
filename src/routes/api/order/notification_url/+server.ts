@@ -76,6 +76,7 @@ async function processPayment(payload: any, url: URL) {
 			// Update inventory
 			await updateInventory(tx, cart.CartItem);
 
+			// Send confirmation email to user
 			sendEmail(cart.user.email, 'Order Confirmation - Kenya Law', 'order-confirmation', {
 				username: cart.user.name || cart.user.email,
 				order: {
@@ -86,7 +87,21 @@ async function processPayment(payload: any, url: URL) {
 					}))
 				},
 				origin: url.origin
-			});
+			}).catch(error => console.error('Failed to send customer confirmation email:', error));
+
+			// Send email to admin
+			sendEmail('thomas.kigarde@bsl.co.ke', 'New Order Received - Kenya Law', 'new-order-notification', {
+				order: {
+					...order,
+					ProductOnOrder: order.ProductOnOrder.map((item: any) => ({
+						...item,
+						product: cart.CartItem.find((cartItem) => cartItem.productId === item.productId)?.product
+					}))
+				},
+				origin: url.origin
+			}).catch(error => console.error('Failed to send admin notification email:', error));
+
+
 			// Clear cart
 			await tx.cart.delete({ where: { id: cart.id } });
 

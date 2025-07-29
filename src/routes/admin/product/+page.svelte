@@ -151,6 +151,7 @@
 								<div>
 									<h3 class="font-semibold">{product.name}</h3>
 									<p class="text-sm text-gray-600">Code: {product.serviceCode}</p>
+									<p class="text-xs text-gray-500">Sort order: {product.sortOrder}</p>
 								</div>
 								<div class="flex gap-2">
 									{#if product.isPublished}

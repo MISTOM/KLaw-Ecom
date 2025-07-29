@@ -20,7 +20,7 @@
 
 <style>
 	.loginbg {
-		background-image: url('/theJudiciary.jpeg');
+		background-image: url('/kl-books-bg.webp');
 		background-position: center;
 		background-repeat: no-repeat;
 		background-size: cover;
