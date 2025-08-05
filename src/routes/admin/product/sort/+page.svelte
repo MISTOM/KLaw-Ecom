@@ -243,7 +243,7 @@
 			id="category-filter"
 			bind:value={selectedCategory}
 			onchange={() => handleCategoryChange(selectedCategory)}
-			class="w-full max-w-xs rounded-lg border border-gray-200 bg-white px-4 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-hidden"
+			class="w-full max-w-xs rounded-lg border border-gray-200 bg-white px-4 py-2 focus:border-primary focus:ring-5 focus:ring-primary/30 focus:outline-hidden"
 		>
 			<option value="all">All Categories</option>
 			{#each categories as category}

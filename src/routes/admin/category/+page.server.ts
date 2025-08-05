@@ -41,6 +41,22 @@ export const actions: Actions = {
 		if (isNaN(categoryId)) return fail(400, { errors: 'Invalid category id' });
 
 		try {
+			// Check if the category has any products
+			const categoryWithProducts = await prisma.category.findUnique({
+				where: { id: categoryId },
+				include: { Products: true }
+			});
+
+			if (!categoryWithProducts) {
+				return fail(400, { errors: 'Category not found' });
+			}
+
+			if (categoryWithProducts.Products.length > 0) {
+				return fail(400, {
+					errors: 'Cannot delete category that contains products.'
+				});
+			}
+
 			await prisma.category.delete({
 				where: { id: categoryId }
 			});

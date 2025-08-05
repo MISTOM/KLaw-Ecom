@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { getToastState } from '$lib/Toast.svelte.js';
 	import { slide } from 'svelte/transition';
+	const toast = getToastState();
 
 	let { data } = $props();
 	let categories = $derived(data.categories || []);
@@ -44,6 +46,7 @@
 					return async ({ update, result }) => {
 						if (result.type === 'success') {
 							toggleAddForm();
+							toast.add('Success', 'Category added successfully', 'success');
 						} else if (result.type === 'failure') {
 							formErrors = result?.data?.errors ? result.data.errors : 'Error adding category';
 						}
@@ -107,6 +110,15 @@
 												if (!confirm('Are you sure you want to delete this category?')) {
 													cancel();
 												}
+												return async ({ update, result }) => {
+													if (result.type === 'failure') {
+														const errorMessage = (result?.data?.errors as string) || 'Error deleting category';
+														toast.add('Error', errorMessage, 'error');
+													} else if (result.type === 'success') {
+														toast.add('Success', 'Category deleted successfully', 'success');
+													}
+													await update();
+												};
 											}}
 										>
 											<input type="hidden" name="id" value={category.id} />

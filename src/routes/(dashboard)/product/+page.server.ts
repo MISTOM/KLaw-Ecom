@@ -3,29 +3,40 @@ import { redirect } from '@sveltejs/kit';
 import auth from '$lib/server/auth';
 import prisma from '$lib/server/prisma';
 
-const ITEMS_PER_PAGE = 12;
+const DEFAULT_ITEMS_PER_PAGE = 12;
+const MAX_ITEMS_PER_PAGE = 1000;
 
 export const load = (async ({ locals: { user }, url }) => {
 	if (await auth.isAdmin(user)) return redirect(303, '/admin/product');
 
 	try {
 		const page = Math.max(1, parseInt(url.searchParams.get('page') || '1'));
-		const categoryId = url.searchParams.get('category') || 'all';
+		const categoriesParam = url.searchParams.get('categories') || '';
+		const selectedCategories = categoriesParam ? categoriesParam.split(',').map(id => parseInt(id)).filter(id => !isNaN(id)) : [];
 		const year = url.searchParams.get('year') || 'all';
-		const skip = (page - 1) * ITEMS_PER_PAGE;
+		const search = url.searchParams.get('search') || '';
+		const limit = Math.min(MAX_ITEMS_PER_PAGE, Math.max(1, parseInt(url.searchParams.get('limit') || DEFAULT_ITEMS_PER_PAGE.toString())));
+		const skip = (page - 1) * limit;
 
-		// Validate categoryId exists if not 'all'
+		// Build where clause for multiple categories
 		let where: any = { isPublished: true };
-		if (categoryId !== 'all') {
-			const category = await prisma.category.findUnique({
-				where: { id: parseInt(categoryId) }
-			});
-			if (category) {
-				where = {
-					...where,
-					categories: { some: { id: parseInt(categoryId) } }
-				};
-			}
+		if (selectedCategories.length > 0) {
+			where = {
+				...where,
+				categories: { some: { id: { in: selectedCategories } } }
+			};
+		}
+
+		// Add search filter if specified
+		if (search) {
+			where = {
+				...where,
+				OR: [
+					{ name: { contains: search, mode: 'insensitive' } },
+					{ description: { contains: search, mode: 'insensitive' } },
+					{ citation: { contains: search, mode: 'insensitive' } }
+				]
+			};
 		}
 
 		// Add year filter if specified
@@ -43,8 +54,8 @@ export const load = (async ({ locals: { user }, url }) => {
 		// For category 16, use a different approach to prioritize "Kenya Law" products
 		let products, total;
 
-		if (categoryId === '16') {
-			// Sort using sortOrder and publicationDate
+		if (selectedCategories.includes(16) && selectedCategories.length === 1) {
+			// Sort using sortOrder and publicationDate for category 16 only
 			[products, total] = await Promise.all([
 				prisma.product.findMany({
 					where,
@@ -57,12 +68,12 @@ export const load = (async ({ locals: { user }, url }) => {
 						{ publicationDate: 'desc' }, // Then by publicationDate	
 					],
 					skip,
-					take: ITEMS_PER_PAGE
+					take: limit
 				}),
 				prisma.product.count({ where })
 			]);
 
-			
+
 
 			// // Get all products for category 16
 			// const allCategoryProducts = await prisma.product.findMany({
@@ -140,7 +151,7 @@ export const load = (async ({ locals: { user }, url }) => {
 			// });
 
 			// // Apply pagination
-			// products = sortedProducts.slice(skip, skip + ITEMS_PER_PAGE);
+			// products = sortedProducts.slice(skip, skip + limit);
 			// total = sortedProducts.length;
 		} else {
 			// Normal query for other categories
@@ -156,7 +167,7 @@ export const load = (async ({ locals: { user }, url }) => {
 						{ name: 'asc' } // Then by name
 					],
 					skip,
-					take: ITEMS_PER_PAGE
+					take: limit
 				}),
 				prisma.product.count({ where })
 			]);
@@ -164,18 +175,48 @@ export const load = (async ({ locals: { user }, url }) => {
 
 		const categories = await prisma.category.findMany({ orderBy: { sortOrder: 'asc' } });
 
-		const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+		// Get category counts for each category
+		const categoryCounts = await Promise.all(
+			categories.map(async (category) => {
+				const count = await prisma.product.count({
+					where: {
+						isPublished: true,
+						categories: { some: { id: category.id } },
+						...(year !== 'all' && {
+							publicationDate: {
+								gte: new Date(`${parseInt(year)}-01-01`),
+								lt: new Date(`${parseInt(year) + 1}-01-01`)
+							}
+						}),
+						...(search && {
+							OR: [
+								{ name: { contains: search, mode: 'insensitive' } },
+								{ description: { contains: search, mode: 'insensitive' } },
+								{ citation: { contains: search, mode: 'insensitive' } }
+							]
+						})
+					}
+				});
+				return { ...category, count };
+			})
+		);
+
+		const totalPages = Math.ceil(total / limit);
 
 		// Redirect if page is out of bounds
 		if (page > totalPages && total > 0) {
-			return redirect(302, `?page=${totalPages}&category=${categoryId}&year=${year}`);
+			const categoriesQuery = selectedCategories.length > 0 ? selectedCategories.join(',') : '';
+			const searchQuery = search ? encodeURIComponent(search) : '';
+			return redirect(302, `?page=${totalPages}&categories=${categoriesQuery}&year=${year}&limit=${limit}&search=${searchQuery}`);
 		}
 
 		return {
 			products,
-			categories,
+			categories: categoryCounts,
 			page,
-			totalPages
+			totalPages,
+			totalResults: total,
+			selectedCategories
 		};
 	} catch (e) {
 		console.error('getPublishedProducts: ', e);
