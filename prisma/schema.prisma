@@ -38,6 +38,8 @@ model Product {
   author          String
   citation        String?
   pageCount       Int
+  ISBN            String?
+  
   publicationDate DateTime
   serviceCode     String           @unique
   isPublished     Boolean          @default(false)

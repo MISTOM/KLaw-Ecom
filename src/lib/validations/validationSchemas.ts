@@ -144,6 +144,11 @@ export const productSchema = z.object({
 		.optional()
 		.or(z.literal('').transform(() => undefined)),
 
+	isbn: z
+		.string()
+		.optional()
+		.or(z.literal('').transform(() => undefined)),
+
 	pageCount: z
 		.number({
 			required_error: 'Page count is required',
@@ -153,10 +158,13 @@ export const productSchema = z.object({
 		.positive('Page count must be positive'),
 
 	publicationDate: z
-		.string({
-			required_error: 'Publication date is required'
+		.number({
+			required_error: 'Publication year is required',
+			invalid_type_error: 'Publication year must be a number'
 		})
-		.regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
+		.int('Publication year must be a whole number')
+		.min(1900, 'Publication year must be 1900 or later')
+		.max(new Date().getFullYear() + 5, 'Publication year cannot be in the far future'),
 
 	categoryIds: z
 		.array(
@@ -166,16 +174,6 @@ export const productSchema = z.object({
 			})
 		)
 		.min(1, 'At least one category is required')
-
-	// serviceCode: z
-	// 	.string({
-	// 		required_error: 'Service code is required'
-	// 	})
-	// 	.min(1, 'Service code is required'),
-
-	// isPublished: z
-	// 	.boolean()
-	// 	.default(false)
 });
 
 export type LoginCredentials = z.infer<typeof loginSchema>;

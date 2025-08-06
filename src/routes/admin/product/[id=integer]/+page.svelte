@@ -20,7 +20,8 @@
 	let quantity = $state(data.product?.quantity);
 	let serviceCode = $state(data.product?.serviceCode);
 	let author = $state(data.product?.author);
-	let citation = $state(data.product?.citation);
+	let citation = $state(data.product?.citation || '');
+	let isbn = $state(data.product?.ISBN || '');
 	let publicationDateISO = $state(data.product?.publicationDate);
 	let pageCount = $state(data.product?.pageCount);
 	let imageUrl = $state(data.product?.Image[0]?.url);
@@ -29,8 +30,9 @@
 
 	let selectedCategories = $state(data.product?.categories || []);
 
-	// Format publication date to bind to date input
-	let publicationDate = $state(publicationDateISO ? new Date(publicationDateISO).toISOString().split('T')[0] : '');
+	console.log('Product data:', data.product);
+	// Format publication date to bind to year input
+	let publicationDate = $state(publicationDateISO ? new Date(publicationDateISO).getFullYear().toString() : '');
 
 	let isEditMode = $state(false);
 	let loading = $state(false);
@@ -134,7 +136,11 @@
 			quantity: data.quantity ? parseInt(data.quantity as string) : undefined,
 			pageCount: data.pageCount ? parseInt(data.pageCount as string) : undefined,
 			categoryIds: selectedCategories.map((c) => c.id),
-			citation: data.citation || undefined
+			citation: data.citation || undefined,
+			isbn: data.isbn || undefined,
+			publicationDate: data.publicationDate
+				? parseInt(data.publicationDate as string)
+				: undefined,
 		};
 		const result = productSchema.safeParse(parsedData);
 		if (!result.success) {
@@ -408,6 +414,7 @@
 										onkeyup={(e) => validateField('name', e.currentTarget.value)}
 										aria-invalid={!!getFieldError('name')}
 										class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
+										placeholder="e.g., The Constitution of Kenya"
 									/>
 									{#if getFieldError('name')}
 										<p class="mt-1 text-xs text-red-600">{getFieldError('name')}</p>
@@ -436,6 +443,7 @@
 											onkeyup={(e) => validateField('price', parseFloat(e.currentTarget.value))}
 											aria-invalid={!!getFieldError('price')}
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
+											placeholder="1500"
 										/>
 										{#if getFieldError('price')}
 											<p class="mt-1 text-xs text-red-600">{getFieldError('price')}</p>
@@ -452,6 +460,7 @@
 											onkeyup={(e) => validateField('quantity', parseInt(e.currentTarget.value))}
 											aria-invalid={!!getFieldError('quantity')}
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
+											placeholder="e.g., 100"
 										/>
 										{#if getFieldError('quantity')}
 											<p class="mt-1 text-xs text-red-600">{getFieldError('quantity')}</p>
@@ -467,6 +476,7 @@
 											onkeyup={(e) => validateField('author', e.currentTarget.value)}
 											aria-invalid={!!getFieldError('author')}
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
+											placeholder="National Council for Law Reporting (Kenya Law)."
 										/>
 										{#if getFieldError('author')}
 											<p class="mt-1 text-xs text-red-600">{getFieldError('author')}</p>
@@ -474,7 +484,9 @@
 									</div>
 
 									<div>
-										<label for="citation" class="text-sm font-medium text-gray-700">Citation (Optional)</label>
+										<label for="citation" class="text-sm font-medium text-gray-700"
+											>Citation <span class="text-gray-500">(optional)</span></label
+										>
 										<input
 											id="citation"
 											type="text"
@@ -483,7 +495,7 @@
 											onkeyup={(e) => validateField('citation', e.currentTarget.value)}
 											aria-invalid={!!getFieldError('citation')}
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
-											placeholder="Enter citation..."
+											
 										/>
 										{#if getFieldError('citation')}
 											<p class="mt-1 text-xs text-red-600">{getFieldError('citation')}</p>
@@ -491,15 +503,37 @@
 									</div>
 
 									<div>
-										<label for="publicationDate" class="text-sm font-medium text-gray-700">Publication Date</label>
+										<label for="isbn" class="text-sm font-medium text-gray-700"
+											>ISBN <span class="text-gray-500">(optional)</span></label
+										>
+										<input
+											id="isbn"
+											type="text"
+											name="isbn"
+											bind:value={isbn}
+											onkeyup={(e) => validateField('isbn', e.currentTarget.value)}
+											aria-invalid={!!getFieldError('isbn')}
+											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
+											placeholder="978-0-123456-78-9"
+										/>
+										{#if getFieldError('isbn')}
+											<p class="mt-1 text-xs text-red-600">{getFieldError('isbn')}</p>
+										{/if}
+									</div>
+
+									<div>
+										<label for="publicationDate" class="text-sm font-medium text-gray-700">Publication Year</label>
 										<input
 											id="publicationDate"
-											type="date"
+											type="number"
 											name="publicationDate"
 											bind:value={publicationDate}
-											onchange={(e) => validateField('publicationDate', e.currentTarget.value)}
+											onkeyup={(e) => validateField('publicationDate', parseInt(e.currentTarget.value))}
 											aria-invalid={!!getFieldError('publicationDate')}
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
+											placeholder="e.g., 2024"
+											min="1900"
+											max="{new Date().getFullYear() + 5}"
 										/>
 										{#if getFieldError('publicationDate')}
 											<p class="mt-1 text-xs text-red-600">{getFieldError('publicationDate')}</p>
@@ -583,6 +617,7 @@
 											onkeyup={(e) => validateField('pageCount', parseInt(e.currentTarget.value))}
 											aria-invalid={!!getFieldError('pageCount')}
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
+											placeholder="e.g., 250"
 										/>
 										{#if getFieldError('pageCount')}
 											<p class="mt-1 text-xs text-red-600">{getFieldError('pageCount')}</p>
@@ -599,6 +634,7 @@
 											onkeyup={(e) => validateField('description', e.currentTarget.value)}
 											aria-invalid={!!getFieldError('description')}
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
+											placeholder="Enter a detailed description of the book, including key topics, target audience, and any special features..."
 										></textarea>
 										{#if getFieldError('description')}
 											<p class="mt-1 text-xs text-red-600">{getFieldError('description')}</p>

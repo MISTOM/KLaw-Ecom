@@ -25,12 +25,14 @@
 	let quantity = $state(form?.data?.quantity);
 	let serviceCode = $state(form?.data?.serviceCode);
 	let author = $state(form?.data?.author);
+	let citation = $state(form?.data?.citation || '');
+	let isbn = $state(form?.data?.isbn || '');
 	let pageCount = $state(form?.data?.pageCount);
 	let publicationDateISO = $state(form?.data?.publicationDate);
 	let selectedCategories = $state<{ id: number; name: string }[]>([]);
 	const categoryIds = $derived(selectedCategories.map((c) => c.id));
 	let publicationDate = $state(
-		publicationDateISO ? new Date(publicationDateISO.toString()).toISOString().split('T')[0] : ''
+		publicationDateISO ? new Date(publicationDateISO.toString()).getFullYear().toString() : ''
 	);
 
 	let formErrors = $state<FormErrors<ProductData>>(form?.errors || {});
@@ -39,7 +41,6 @@
 
 	// Validate a single field
 	const validateField = <K extends keyof ProductData>(field: K, value: ProductData[K]) => {
-		// pick the field from the schema
 		const fieldSchema = productSchema.shape[field];
 		const result = fieldSchema.safeParse(value);
 		formErrors[field] = result.success ? [] : result.error?.flatten().formErrors || [];
@@ -54,7 +55,10 @@
 			price: data.price ? parseFloat(data.price as string) : undefined,
 			quantity: data.quantity ? parseInt(data.quantity as string) : undefined,
 			pageCount: data.pageCount ? parseInt(data.pageCount as string) : undefined,
-			categoryIds: selectedCategories.map((c) => c.id)
+			citation: data.citation ? data.citation : undefined,
+			isbn: data.isbn ? data.isbn : undefined,
+			categoryIds: selectedCategories.map((c) => c.id),
+			publicationDate: data.publicationDate ? parseInt(data.publicationDate as string) : undefined,
 		};
 		const result = productSchema.safeParse(parsedData);
 		if (!result.success) {
@@ -62,6 +66,7 @@
 			formErrors = errors;
 			return false;
 		}
+		
 		return true;
 	};
 
@@ -239,6 +244,8 @@
 					showAddModal = false;
 					await update({ reset: true });
 					selectedCategories = [];
+					citation = '';
+					isbn = '';
 				} else if (result.type === 'failure') {
 					formErrors = result.data?.errors || { _errors: ['Error adding product'] };
 				}
@@ -269,6 +276,7 @@
 					aria-invalid={!!getFieldError('name')}
 					aria-describedby={getFieldError('name') ? 'name-error' : undefined}
 					onkeyup={(e) => validateField('name', e.currentTarget.value)}
+					placeholder="e.g., The Constitution of Kenya"
 				/>
 				{#if getFieldError('name')}
 					<p id="name-error" class="mt-1 text-xs text-red-600" transition:fade>
@@ -294,6 +302,7 @@
 					aria-describedby={getFieldError('price') ? 'price-error' : undefined}
 					onkeyup={(e) => validateField('price', parseFloat(e.currentTarget.value))}
 					min="0"
+					placeholder="1500"
 					required
 				/>
 				{#if getFieldError('price')}
@@ -320,6 +329,7 @@
 					aria-describedby={getFieldError('quantity') ? 'quantity-error' : undefined}
 					onkeyup={(e) => validateField('quantity', parseInt(e.currentTarget.value))}
 					min="0"
+					placeholder="e.g., 100"
 					required
 				/>
 				{#if getFieldError('quantity')}
@@ -345,11 +355,66 @@
 					aria-invalid={!!getFieldError('author')}
 					aria-describedby={getFieldError('author') ? 'author-error' : undefined}
 					onkeyup={(e) => validateField('author', e.currentTarget.value)}
+					placeholder="National Council for Law Reporting (Kenya Law)."
 					required
 				/>
 				{#if getFieldError('author')}
 					<p id="author-error" class="mt-1 text-xs text-red-600" transition:fade>
 						{getFieldError('author')}
+					</p>
+				{/if}
+			</div>
+
+			<!-- Citation -->
+			<div class="space-y-2">
+				<label for="citation" class="text-sm font-medium text-gray-700"
+					>Citation <span class="text-gray-500">(optional)</span></label
+				>
+				<input
+					type="text"
+					id="citation"
+					name="citation"
+					class={{
+						'w-full rounded-sm border-2 p-2': true,
+						'border-red-500': !!getFieldError('citation'),
+						'focus:border-primary focus:ring-primary focus:ring-1 focus:outline-hidden': true
+					}}
+					bind:value={citation}
+					aria-invalid={!!getFieldError('citation')}
+					aria-describedby={getFieldError('citation') ? 'citation-error' : undefined}
+					onkeyup={(e) => validateField('citation', e.currentTarget.value)}
+					placeholder=""
+				/>
+				{#if getFieldError('citation')}
+					<p id="citation-error" class="mt-1 text-xs text-red-600" transition:fade>
+						{getFieldError('citation')}
+					</p>
+				{/if}
+			</div>
+
+			<!-- ISBN -->
+			<div class="space-y-2">
+				<label for="isbn" class="text-sm font-medium text-gray-700"
+					>ISBN <span class="text-gray-500">(optional)</span></label
+				>
+				<input
+					type="text"
+					id="isbn"
+					name="isbn"
+					class={{
+						'w-full rounded-sm border-2 p-2': true,
+						'border-red-500': !!getFieldError('isbn'),
+						'focus:border-primary focus:ring-primary focus:ring-1 focus:outline-hidden': true
+					}}
+					bind:value={isbn}
+					aria-invalid={!!getFieldError('isbn')}
+					aria-describedby={getFieldError('isbn') ? 'isbn-error' : undefined}
+					onkeyup={(e) => validateField('isbn', e.currentTarget.value)}
+					placeholder="978-0-123456-78-9"
+				/>
+				{#if getFieldError('isbn')}
+					<p id="isbn-error" class="mt-1 text-xs text-red-600" transition:fade>
+						{getFieldError('isbn')}
 					</p>
 				{/if}
 			</div>
@@ -371,6 +436,7 @@
 					aria-describedby={getFieldError('pageCount') ? 'pageCount-error' : undefined}
 					onkeyup={(e) => validateField('pageCount', parseInt(e.currentTarget.value))}
 					min="0"
+					placeholder="e.g., 250"
 					required
 				/>
 				{#if getFieldError('pageCount')}
@@ -382,9 +448,9 @@
 
 			<!-- Publication Date -->
 			<div class="space-y-2">
-				<label for="publicationDate" class="text-sm font-medium text-gray-700">Publication Date</label>
+				<label for="publicationDate" class="text-sm font-medium text-gray-700">Publication Year</label>
 				<input
-					type="date"
+					type="number"
 					id="publicationDate"
 					name="publicationDate"
 					class={{
@@ -395,7 +461,11 @@
 					bind:value={publicationDate}
 					aria-invalid={!!getFieldError('publicationDate')}
 					aria-describedby={getFieldError('publicationDate') ? 'publicationDate-error' : undefined}
-					onchange={(e) => validateField('publicationDate', e.currentTarget.value)}
+					onkeyup={({currentTarget: {value}}) => validateField('publicationDate', parseInt(value))}
+
+					placeholder="e.g., 2024"
+					min="1900"
+					max="2030"
 					required
 				/>
 				{#if getFieldError('publicationDate')}
@@ -421,6 +491,7 @@
 				aria-invalid={!!getFieldError('description')}
 				aria-describedby={getFieldError('description') ? 'description-error' : undefined}
 				onkeyup={(e) => validateField('description', e.currentTarget.value)}
+				placeholder="Enter a detailed description of the book"
 				required
 				rows="3"
 			></textarea>

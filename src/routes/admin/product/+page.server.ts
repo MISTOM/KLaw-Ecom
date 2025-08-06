@@ -47,7 +47,10 @@ export const actions: Actions = {
 			price: formObj.price ? parseFloat(formObj.price as string) : undefined,
 			quantity: formObj.quantity ? parseInt(formObj.quantity as string) : undefined,
 			pageCount: formObj.pageCount ? parseInt(formObj.pageCount as string) : undefined,
-			categoryIds: formData.getAll('categoryIds').map((id) => parseInt(id as string))
+			publicationDate: formObj.publicationDate ? parseInt(formObj.publicationDate as string) : undefined,
+			categoryIds: formData.getAll('categoryIds').map((id) => parseInt(id as string)),
+			isbn: formObj.isbn || undefined,
+			citation: formObj.citation || undefined
 		};
 		const validation = validateProduct(parsedData);
 
@@ -69,6 +72,8 @@ export const actions: Actions = {
 			price,
 			quantity,
 			author,
+			isbn,
+			citation,
 			publicationDate: publicationDateData,
 			pageCount,
 			categoryIds
@@ -133,6 +138,8 @@ export const actions: Actions = {
 					quantity,
 					serviceCode,
 					author,
+					ISBN: isbn,
+					citation,
 					publicationDate,
 					pageCount,
 					Image: imageUrl ? { create: { url: imageUrl } } : undefined,

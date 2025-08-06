@@ -94,7 +94,7 @@
 	}
 
 	function clearFilters() {
-		updateURL([], 'all', 1, itemsPerPage, '');
+		updateURL([], 'all', 1, '20', '');
 	}
 
 	function handleSearch() {
@@ -143,7 +143,7 @@
 							type="text"
 							placeholder="Search products..."
 							bind:value={searchQuery}
-							class="w-full rounded-lg border border-gray-300 px-4 py-2 pl-10 focus:border-primary focus:ring-5 focus:ring-primary/30 focus:outline-hidden"
+							class="focus:border-primary focus:ring-primary/30 w-full rounded-lg border border-gray-300 px-4 py-2 pl-10 focus:ring-5 focus:outline-hidden"
 						/>
 						<i class="bi bi-search absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
 					</div>
@@ -158,6 +158,7 @@
 							type="button"
 							onclick={() => {
 								searchQuery = '';
+								updateURL(selectedCategories, selectedYear, currentPage, '20', '');
 							}}
 							class="rounded-lg bg-gray-100 px-4 py-2 text-gray-600 transition-colors hover:bg-gray-200"
 						>
@@ -179,7 +180,7 @@
 						<i class="bi bi-funnel text-sm"></i>
 					</button>
 					<span class="text-sm text-gray-600">{totalResults} results</span>
-					{#if selectedCategories.length > 0 || selectedYear !== 'all' || searchQuery}
+					{#if selectedCategories.length > 0 || selectedYear !== 'all' || page.url.searchParams.get('search')} 
 						<button class="text-primary hover:text-primary/80 text-sm underline" onclick={clearFilters}>
 							Clear All Filters
 						</button>
@@ -192,7 +193,7 @@
 						id="items-per-page"
 						bind:value={itemsPerPage}
 						onchange={() => handleItemsPerPageChange(itemsPerPage)}
-						class="rounded border border-gray-200 px-2 py-1 text-sm focus:border-primary focus:ring-5 focus:ring-primary/30 focus:outline-hidden"
+						class="focus:border-primary focus:ring-primary/30 rounded border border-gray-200 px-2 py-1 text-sm focus:ring-5 focus:outline-hidden"
 					>
 						{#each itemsPerPageOptions as option}
 							<option value={option.value}>{option.label}</option>
@@ -202,13 +203,13 @@
 			</div>
 
 			<!-- Products Grid -->
-			<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
 				{#if products.length === 0}
 					<div class="col-span-full text-center text-gray-600">No products found</div>
 				{:else}
 					{#each products as product (product.id)}
 						<div
-							class="group flex flex-col justify-between overflow-hidden rounded-sm border transition-all hover:shadow-lg"
+							class="group flex flex-col justify-between overflow-hidden rounded-sm border transition-all hover:shadow-md"
 						>
 							<div>
 								<a
@@ -225,12 +226,12 @@
 											class="h-full bg-gray-100 object-cover transition-transform group-hover:scale-105"
 										/>
 									</div>
-								</a>
 
-								<div class="p-4">
-									<h3 class="line-clamp-2 text-lg font-semibold">{product.name}</h3>
-									<p class="mt-2 line-clamp-1 text-sm text-gray-600">{product.description}</p>
-								</div>
+									<div class="p-4">
+										<h3 class="line-clamp-2 text-lg font-semibold">{product.name}</h3>
+										<p class="mt-2 line-clamp-1 text-sm text-gray-600">{product.description}</p>
+									</div>
+								</a>
 							</div>
 
 							<div class="flex items-center justify-between p-4">

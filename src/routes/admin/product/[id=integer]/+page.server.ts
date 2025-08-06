@@ -45,7 +45,9 @@ export const actions = {
 			quantity: formObj.quantity ? parseInt(formObj.quantity as string) : undefined,
 			pageCount: formObj.pageCount ? parseInt(formObj.pageCount as string) : undefined,
 			categoryIds: formData.getAll('categoryIds').map((id) => parseInt(id as string)),
-			citation: formObj.citation || undefined
+			publicationDate: formObj.publicationDate ? parseInt(formObj.publicationDate as string) : undefined,
+			citation: formObj.citation || undefined,
+			isbn: formObj.isbn || undefined
 		};
 
 		const validation = validateProduct(parsedData);
@@ -62,6 +64,7 @@ export const actions = {
 			quantity,
 			author,
 			citation,
+			isbn,
 			publicationDate: publicationDateData,
 			pageCount,
 			categoryIds
@@ -135,6 +138,7 @@ export const actions = {
 					serviceCode,
 					author,
 					citation,
+					ISBN: isbn,
 					publicationDate,
 					pageCount,
 					categories: { set: categoryIds.map((id) => ({ id })) },

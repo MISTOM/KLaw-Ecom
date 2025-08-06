@@ -12,6 +12,7 @@
 	let selectedYear = $derived.by(() => page.url.searchParams.get('year') || 'all');
 	let currentPage = $derived.by(() => parseInt(page.url.searchParams.get('page') || '1', 10));
 	let itemsPerPage = $derived.by(() => parseInt(page.url.searchParams.get('limit') || '12', 10));
+	let searchQuery = $derived.by(() => page.url.searchParams.get('search') || '');
 
 	let showMoreDetails = $state(false);
 </script>
@@ -20,7 +21,7 @@
 	<!-- Back Navigation -->
 	<div class="mb-6">
 		<a
-			href="/product/?categories={categoriesParam}&year={selectedYear}&page={currentPage}&limit={itemsPerPage}"
+			href="/product/?categories={categoriesParam}&year={selectedYear}&page={currentPage}&limit={itemsPerPage}&search={searchQuery}"
 			class="inline-flex items-center gap-2 rounded-md bg-gray-100 px-4 py-2 text-sm transition-colors hover:bg-gray-200"
 		>
 			<i class="bi bi-arrow-left"></i>
@@ -97,13 +98,13 @@
 
 				<!-- Description -->
 				<div class="border-b pb-4">
-					<h3 class="mb-3 text-lg font-semibold text-gray-900">Description</h3>
+					<h3 class="mb-3 text-lg font-semibold text-gray-900">Product Description</h3>
 					<p class="leading-relaxed text-gray-700">{product.description}</p>
 				</div>
 
 				<!-- Basic Product Details -->
 				<div class="space-y-3">
-					<h3 class="text-lg font-semibold text-gray-900">Product Details</h3>
+					<!-- <h3 class="text-lg font-semibold text-gray-900">Product Details</h3> -->
 					<div class="grid gap-3 sm:grid-cols-2">
 						<div class="flex items-center gap-3">
 							<i class="bi bi-person text-gray-500"></i>
@@ -115,18 +116,16 @@
 							<i class="bi bi-calendar3 text-gray-500"></i>
 							<span class="text-sm font-medium text-gray-600">Publication Date:</span>
 							<span class="text-sm text-gray-900">
-								{product.publicationDate?.toLocaleDateString('en-GB', {
-									year: 'numeric',
-									month: 'long',
-									day: 'numeric'
+								{product.publicationDate?.toLocaleDateString('en-KE', {
+									year: 'numeric'
 								})}
 							</span>
 						</div>
 
 						<div class="flex items-center gap-3">
 							<i class="bi bi-file-text text-gray-500"></i>
-							<span class="text-sm font-medium text-gray-600">Pages:</span>
-							<span class="text-sm text-gray-900">{product.pageCount}</span>
+							<span class="text-sm font-medium text-gray-600">Citation:</span>
+							<span class="text-sm text-gray-900">{product.citation || '_'}</span>
 						</div>
 
 						<div class="flex items-start gap-3">
@@ -141,6 +140,14 @@
 									</span>
 								{/each}
 							</div>
+						</div>
+
+						<!-- ISBN -->
+
+						<div class="flex items-center gap-3">
+							<i class="bi bi-upc text-gray-500"></i>
+							<span class="text-sm font-medium text-gray-600">ISBN:</span>
+							<span class="text-sm text-gray-900">{product.ISBN || 'ISBN'}</span>
 						</div>
 					</div>
 				</div>
@@ -161,24 +168,24 @@
 						<div class="mt-4 space-y-3 border-t pt-4">
 							<div class="grid gap-3 sm:grid-cols-2">
 								<div class="flex items-center gap-3">
-									<i class="bi bi-upc-scan text-gray-500"></i>
-									<span class="text-sm font-medium text-gray-600">Service Code:</span>
-									<span class="font-mono text-sm text-gray-900">{product.serviceCode}</span>
-								</div>
-
-								<div class="flex items-center gap-3">
 									<i class="bi bi-calendar-plus text-gray-500"></i>
 									<span class="text-sm font-medium text-gray-600">Date Created:</span>
 									<span class="text-sm text-gray-900">
-										{product.createdAt?.toLocaleDateString('en-GB', {
+										{product.createdAt?.toLocaleDateString('en-KE', {
 											year: 'numeric',
 											month: 'long',
 											day: 'numeric'
 										})}
 									</span>
 								</div>
-
 								<div class="flex items-center gap-3">
+									<i class="bi bi-upc-scan text-gray-500"></i>
+									<span class="text-sm font-medium text-gray-600">Service Code:</span>
+									<span class="font-mono text-sm text-gray-900">{product.serviceCode}</span>
+								</div>
+
+
+								<!-- <div class="flex items-center gap-3">
 									<i class="bi bi-calendar-check text-gray-500"></i>
 									<span class="text-sm font-medium text-gray-600">Last Updated:</span>
 									<span class="text-sm text-gray-900">
@@ -188,9 +195,9 @@
 											day: 'numeric'
 										})}
 									</span>
-								</div>
+								</div> -->
 
-								<div class="flex items-center gap-3">
+								<!-- <div class="flex items-center gap-3">
 									<i class="bi bi-eye text-gray-500"></i>
 									<span class="text-sm font-medium text-gray-600">Publication Status:</span>
 									<span
@@ -201,7 +208,7 @@
 										<i class="bi {product.isPublished ? 'bi-check-circle' : 'bi-clock'} mr-1"></i>
 										{product.isPublished ? 'Published' : 'Draft'}
 									</span>
-								</div>
+								</div> -->
 							</div>
 						</div>
 					{/if}
