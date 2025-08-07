@@ -3,7 +3,7 @@ import { redirect } from '@sveltejs/kit';
 import auth from '$lib/server/auth';
 import prisma from '$lib/server/prisma';
 
-const DEFAULT_ITEMS_PER_PAGE = 12;
+const DEFAULT_ITEMS_PER_PAGE = 10;
 const MAX_ITEMS_PER_PAGE = 1000;
 
 export const load = (async ({ locals: { user }, url }) => {
@@ -75,84 +75,6 @@ export const load = (async ({ locals: { user }, url }) => {
 
 
 
-			// // Get all products for category 16
-			// const allCategoryProducts = await prisma.product.findMany({
-			// 	where,
-			// 	include: {
-			// 		Image: { select: { url: true } },
-			// 		categories: true
-			// 	},
-			// 	orderBy: [
-			// 		{ publicationDate: 'desc' }, // First sort by publicationDate
-			// 		{ name: 'asc' } // Then by name
-			// 	]
-			// });
-
-			// // Custom sorting for category 16
-			// const sortedProducts = allCategoryProducts.sort((a, b) => {
-			// 	const aName = a.name.toLowerCase();
-			// 	const bName = b.name.toLowerCase();
-
-			// 	// Check if products start with "kenya law"
-			// 	const aStartsWithKenyaLaw = aName.startsWith('kenya law');
-			// 	const bStartsWithKenyaLaw = bName.startsWith('kenya law');
-
-			// 	// Priority products to come after first two
-			// 	const priorityProducts = [
-			// 		'kenya law reports (environment and land vol. 2)',
-			// 		'kenya law reports (employment & labour vol. 1)',
-			// 		'kenya law reports (family)',
-			// 		'kenya law reports (gender based violence)'
-			// 	];
-			// 	const aIsPriority = priorityProducts.includes(aName);
-			// 	const bIsPriority = priorityProducts.includes(bName);
-
-			// 	// First: "Kenya Law" products come before non-"Kenya Law" products
-			// 	if (aStartsWithKenyaLaw && !bStartsWithKenyaLaw) return -1;
-			// 	if (!aStartsWithKenyaLaw && bStartsWithKenyaLaw) return 1;
-
-			// 	// If both are "Kenya Law" products, apply special ordering
-			// 	if (aStartsWithKenyaLaw && bStartsWithKenyaLaw) {
-			// 		// Priority products should come after the first two alphabetical ones
-			// 		// but before all other "Kenya Law" products
-			// 		if (aIsPriority && !bIsPriority) {
-			// 			// Check if 'b' is among the first two alphabetically
-			// 			const firstTwoAlphabetical = allCategoryProducts
-			// 				.filter(
-			// 					(p) =>
-			// 						p.name.toLowerCase().startsWith('kenya law') && !priorityProducts.includes(p.name.toLowerCase())
-			// 				)
-			// 				.sort((x, y) => x.name.localeCompare(y.name))
-			// 				.slice(0, 2)
-			// 				.map((p) => p.name.toLowerCase());
-
-			// 			return firstTwoAlphabetical.includes(bName) ? 1 : -1;
-			// 		}
-			// 		if (!aIsPriority && bIsPriority) {
-			// 			// Check if 'a' is among the first two alphabetically
-			// 			const firstTwoAlphabetical = allCategoryProducts
-			// 				.filter(
-			// 					(p) =>
-			// 						p.name.toLowerCase().startsWith('kenya law') && !priorityProducts.includes(p.name.toLowerCase())
-			// 				)
-			// 				.sort((x, y) => x.name.localeCompare(y.name))
-			// 				.slice(0, 2)
-			// 				.map((p) => p.name.toLowerCase());
-
-			// 			return firstTwoAlphabetical.includes(aName) ? -1 : 1;
-			// 		}
-
-			// 		// If both are priority or both are not priority, sort alphabetically
-			// 		return a.name.localeCompare(b.name);
-			// 	}
-
-			// 	// If neither starts with "Kenya Law", sort alphabetically
-			// 	return a.name.localeCompare(b.name);
-			// });
-
-			// // Apply pagination
-			// products = sortedProducts.slice(skip, skip + limit);
-			// total = sortedProducts.length;
 		} else {
 			// Normal query for other categories
 			[products, total] = await Promise.all([
@@ -173,33 +95,41 @@ export const load = (async ({ locals: { user }, url }) => {
 			]);
 		}
 
-		const categories = await prisma.category.findMany({ orderBy: { sortOrder: 'asc' } });
+		const productFilterForCounts: any = {
+			isPublished: true
+		};
 
-		// Get category counts for each category
-		const categoryCounts = await Promise.all(
-			categories.map(async (category) => {
-				const count = await prisma.product.count({
-					where: {
-						isPublished: true,
-						categories: { some: { id: category.id } },
-						...(year !== 'all' && {
-							publicationDate: {
-								gte: new Date(`${parseInt(year)}-01-01`),
-								lt: new Date(`${parseInt(year) + 1}-01-01`)
-							}
-						}),
-						...(search && {
-							OR: [
-								{ name: { contains: search, mode: 'insensitive' } },
-								{ description: { contains: search, mode: 'insensitive' } },
-								{ citation: { contains: search, mode: 'insensitive' } }
-							]
-						})
+		if (year !== 'all') {
+			const yearInt = parseInt(year);
+			productFilterForCounts.publicationDate = {
+				gte: new Date(`${yearInt}-01-01`),
+				lt: new Date(`${yearInt + 1}-01-01`)
+			};
+		}
+
+		if (search) {
+			productFilterForCounts.OR = [
+				{ name: { contains: search, mode: 'insensitive' } },
+				{ description: { contains: search, mode: 'insensitive' } },
+				{ citation: { contains: search, mode: 'insensitive' } }
+			];
+		}
+
+		const categoriesWithCounts = await prisma.category.findMany({
+			orderBy: { sortOrder: 'asc' },
+			include: {
+				_count: {
+					select: {
+						Products: { where: productFilterForCounts }
 					}
-				});
-				return { ...category, count };
-			})
-		);
+				}
+			}
+		});
+
+		const categoryCounts = categoriesWithCounts.map(({ _count, ...category }) => ({
+			...category,
+			count: _count.Products
+		}));
 
 		const totalPages = Math.ceil(total / limit);
 

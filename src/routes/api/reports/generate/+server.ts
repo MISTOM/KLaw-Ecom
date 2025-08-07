@@ -610,10 +610,7 @@ function generateReportHtml(orders: any[], reportConfig: ReportRequest, origin: 
                 <div class="header-top">
                     <div class="logo-container">
                         <img src="${origin}/kenyaLawLogo.png" alt="Kenya Law Logo" class="logo" />
-                        <div class="company-info">
-                            <h1 class="company-name">Kenya Law</h1>
-                            <p class="company-tagline">Where Legal Information is Public Knowledge</p>
-                        </div>
+                       
                     </div>
                     <div class="report-date">
                         <div>Generated: ${generatedDate}</div>

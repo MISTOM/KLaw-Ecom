@@ -6,6 +6,7 @@
 	import { getToastState } from '$lib/Toast.svelte';
 	import { slide } from 'svelte/transition';
 	import ProductFilterSidebar from '$lib/components/ProductFilterSidebar.svelte';
+	import Pagination from '$lib/components/Pagination.svelte';
 
 	const { data } = $props();
 	const products = $derived(data.products || []);
@@ -16,7 +17,7 @@
 
 	let selectedCategories = $state<number[]>([]);
 	let selectedYear = $state('all');
-	let itemsPerPage = $state('12');
+	let itemsPerPage = $state('10');
 	let searchQuery = $state('');
 	let isMobileFiltersOpen = $state(false);
 	const cart = getCartState();
@@ -29,7 +30,6 @@
 	// Items per page options
 	const itemsPerPageOptions = [
 		{ value: '10', label: '10 records' },
-		{ value: '12', label: '12 records' },
 		{ value: '20', label: '20 records' },
 		{ value: '50', label: '50 records' },
 		{ value: '100', label: '100 records' },
@@ -46,7 +46,7 @@
 					.filter((id) => !isNaN(id))
 			: [];
 		const newSelectedYear = page.url.searchParams.get('year') || 'all';
-		const newItemsPerPage = page.url.searchParams.get('limit') || '12';
+		const newItemsPerPage = page.url.searchParams.get('limit') || '10';
 		const newSearchQuery = page.url.searchParams.get('search') || '';
 
 		selectedCategories = newSelectedCategories;
@@ -59,7 +59,7 @@
 		categories: number[] = [],
 		year: string = 'all',
 		page: number = 1,
-		limit: string = '12',
+		limit: string = '10',
 		search: string = ''
 	) {
 		const url = new URL(window.location.href);
@@ -180,7 +180,7 @@
 						<i class="bi bi-funnel text-sm"></i>
 					</button>
 					<span class="text-sm text-gray-600">{totalResults} results</span>
-					{#if selectedCategories.length > 0 || selectedYear !== 'all' || page.url.searchParams.get('search')} 
+					{#if selectedCategories.length > 0 || selectedYear !== 'all' || page.url.searchParams.get('search')}
 						<button class="text-primary hover:text-primary/80 text-sm underline" onclick={clearFilters}>
 							Clear All Filters
 						</button>
@@ -203,7 +203,7 @@
 			</div>
 
 			<!-- Products Grid -->
-			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+			<div class="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
 				{#if products.length === 0}
 					<div class="col-span-full text-center text-gray-600">No products found</div>
 				{:else}
@@ -227,19 +227,20 @@
 										/>
 									</div>
 
-									<div class="p-4">
-										<h3 class="line-clamp-2 text-lg font-semibold">{product.name}</h3>
-										<p class="mt-2 line-clamp-1 text-sm text-gray-600">{product.description}</p>
+									<div class="p-2 sm:p-4">
+										<h3 class="line-clamp-2 text-sm font-semibold sm:text-lg">{product.name}</h3>
+										<p class="mt-1 line-clamp-1 text-xs text-gray-600 sm:mt-2 sm:text-sm">{product.description}</p>
 									</div>
 								</a>
 							</div>
 
-							<div class="flex items-center justify-between p-4">
-								<span class="text-lg font-bold">
+							<div class="flex items-center justify-between p-2 sm:p-4">
+								<span class="text-sm font-bold sm:text-lg">
 									KES {product.price.toLocaleString()}
 								</span>
 								<button
-									class="rounded-md px-3 py-2 text-sm text-white transition-colors {product.quantity > 0
+									class="rounded-md px-2 py-1 text-xs text-white transition-colors sm:px-3 sm:py-2 sm:text-sm {product.quantity >
+									0
 										? 'bg-primary hover:bg-primary/90'
 										: 'cursor-not-allowed bg-gray-400'}"
 									onclick={async () => {
@@ -267,36 +268,9 @@
 			</div>
 
 			<!-- Pagination -->
-			{#if totalPages > 1}
-				<div class="mt-8 flex justify-center gap-2">
-					<button
-						class="rounded-md bg-gray-100 px-4 py-2 text-sm disabled:opacity-50"
-						disabled={currentPage === 1}
-						onclick={() => handlePageChange(currentPage - 1)}
-					>
-						Previous
-					</button>
-
-					{#each Array(totalPages) as _, i}
-						<button
-							class="rounded-md px-4 py-2 text-sm {currentPage === i + 1
-								? 'bg-primary text-white'
-								: 'bg-gray-100'}"
-							onclick={() => handlePageChange(i + 1)}
-						>
-							{i + 1}
-						</button>
-					{/each}
-
-					<button
-						class="rounded-md bg-gray-100 px-4 py-2 text-sm disabled:opacity-50"
-						disabled={currentPage === totalPages}
-						onclick={() => handlePageChange(currentPage + 1)}
-					>
-						Next
-					</button>
-				</div>
-			{/if}
+			<div class="mt-8">
+				<Pagination {currentPage} {totalPages} onPageChange={handlePageChange} />
+			</div>
 		</main>
 	</div>
 </div>
