@@ -8,38 +8,40 @@ datasource db {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
+  id           Int            @id @default(autoincrement())
   name         String
-  email        String   @unique
+  email        String         @unique
   password     String
   idNumber     Int?
   phoneNumber  String?
   address      String?
   postalCode   String? // Added field
   refreshToken String?
-  isVerified   Boolean  @default(false)
+  isVerified   Boolean        @default(false)
   imageId      Int?
-  profileImage Image?   @relation(fields: [imageId], references: [id])
+  profileImage Image?         @relation(fields: [imageId], references: [id])
   roleId       Int
-  role         Role     @relation(fields: [roleId], references: [id])
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  role         Role           @relation(fields: [roleId], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
   Order        Order[]
   Cart         Cart[]
+  Entitlement  Entitlement[]
+  DocAccessLog DocAccessLog[]
 }
 
 model Product {
-  id              Int              @id @default(autoincrement())
-  name            String
-  sortOrder       Int              @default(999) // Lower number appears first
-  description     String
-  price           Float
-  quantity        Int
-  author          String
-  citation        String?
-  pageCount       Int
-  ISBN            String?
-  
+  id          Int     @id @default(autoincrement())
+  name        String
+  sortOrder   Int     @default(999) // Lower number appears first
+  description String
+  price       Float
+  quantity    Int
+  author      String
+  citation    String?
+  pageCount   Int
+  ISBN        String?
+
   publicationDate DateTime
   serviceCode     String           @unique
   isPublished     Boolean          @default(false)
@@ -165,4 +167,53 @@ enum OrderStatus {
 enum Roles {
   ADMIN
   USER
+}
+
+/// Secure document metadata (Iteration 1)
+/// Reason: Stores per-document wrapped AES content key so raw key never resides in DB.
+model Document {
+  id           Int            @id @default(autoincrement())
+  title        String
+  pageCount    Int
+  wrappedKey   String // Base64: iv(16)||tag(16)||ciphertext of content key encrypted with APP_MASTER_KEY
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Entitlement  Entitlement[]
+  DocAccessLog DocAccessLog[]
+}
+
+/// User entitlement to view a document
+/// Reason: Ties a user to a document with an optional expiry window.
+model Entitlement {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  documentId Int
+  grantedAt  DateTime  @default(now())
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, documentId])
+  @@index([documentId])
+}
+
+/// Per-page access log (minimal PII) for auditing/rate limiting
+/// Reason: Track access patterns and detect scraping attempts while minimizing PII stored.
+model DocAccessLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  documentId Int
+  page       Int
+  ip         String?
+  userAgent  String?
+  timestamp  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([documentId, page])
 }

@@ -8,206 +8,202 @@ import { v4 as uuid } from 'uuid';
 
 // Define the report request type
 type ReportRequest = {
-    dateRange: {
-        startDate: string;
-        endDate: string;
-    };
-    reportType: 'all' | 'pending' | 'completed' | 'cancelled';
-    groupBy: 'none' | 'day' | 'week' | 'month';
-    includeUserDetails: boolean;
-    includeProductDetails: boolean;
-    sortBy: 'date' | 'price' | 'customer';
-    sortOrder: 'asc' | 'desc';
+	dateRange: {
+		startDate: string;
+		endDate: string;
+	};
+	reportType: 'all' | 'pending' | 'completed' | 'cancelled';
+	groupBy: 'none' | 'day' | 'week' | 'month';
+	includeUserDetails: boolean;
+	includeProductDetails: boolean;
+	sortBy: 'date' | 'price' | 'customer';
+	sortOrder: 'asc' | 'desc';
 };
 
 // Map string enum values to Prisma enum values
 const statusMap = {
-    'all': undefined,
-    'pending': 'PENDING',
-    'completed': 'COMPLETED',
-    'cancelled': 'CANCELLED'
+	all: undefined,
+	pending: 'PENDING',
+	completed: 'COMPLETED',
+	cancelled: 'CANCELLED'
 } as const;
 
 const sortFieldMap = {
-    'date': 'createdAt',
-    'price': 'totalPrice',
-    'customer': 'user.name'
+	date: 'createdAt',
+	price: 'totalPrice',
+	customer: 'user.name'
 } as const;
 
 export const POST: RequestHandler = async ({ request, url: { origin } }) => {
-    try {
-        // Parse the request body
-        const reportConfig: ReportRequest = await request.json();
+	try {
+		// Parse the request body
+		const reportConfig: ReportRequest = await request.json();
 
-        // Convert string dates to Date objects
-        const startDate = new Date(reportConfig.dateRange.startDate);
-        const endDate = new Date(reportConfig.dateRange.endDate);
-        endDate.setHours(23, 59, 59, 999); // Set to end of day
+		// Convert string dates to Date objects
+		const startDate = new Date(reportConfig.dateRange.startDate);
+		const endDate = new Date(reportConfig.dateRange.endDate);
+		endDate.setHours(23, 59, 59, 999); // Set to end of day
 
-        // Determine the order status filter based on reportType
-        const statusFilter = statusMap[reportConfig.reportType];
+		// Determine the order status filter based on reportType
+		const statusFilter = statusMap[reportConfig.reportType];
 
-        // Build the query
-        const whereClause: any = {
-            createdAt: {
-                gte: startDate,
-                lte: endDate
-            }
-        };
+		// Build the query
+		const whereClause: any = {
+			createdAt: {
+				gte: startDate,
+				lte: endDate
+			}
+		};
 
-        if (statusFilter) {
-            whereClause.status = statusFilter;
-        }
+		if (statusFilter) {
+			whereClause.status = statusFilter;
+		}
 
-        // Determine ordering
-        const sortField = sortFieldMap[reportConfig.sortBy];
-        let orderBy: any = {};
+		// Determine ordering
+		const sortField = sortFieldMap[reportConfig.sortBy];
+		let orderBy: any = {};
 
-        // Handle special case for user.name sorting
-        if (sortField === 'user.name') {
-            orderBy = {
-                user: {
-                    name: reportConfig.sortOrder.toLowerCase()
-                }
-            };
-        } else {
-            orderBy[sortField] = reportConfig.sortOrder.toLowerCase();
-        }
+		// Handle special case for user.name sorting
+		if (sortField === 'user.name') {
+			orderBy = {
+				user: {
+					name: reportConfig.sortOrder.toLowerCase()
+				}
+			};
+		} else {
+			orderBy[sortField] = reportConfig.sortOrder.toLowerCase();
+		}
 
-        // Query the database
-        const orders = await prisma.order.findMany({
-            where: whereClause,
-            include: {
-                ProductOnOrder: reportConfig.includeProductDetails ? {
-                    include: {
-                        product: true
-                    }
-                } : true,
-                user: reportConfig.includeUserDetails
-            },
-            orderBy
-        });
+		// Query the database
+		const orders = await prisma.order.findMany({
+			where: whereClause,
+			include: {
+				ProductOnOrder: reportConfig.includeProductDetails
+					? {
+							include: {
+								product: true
+							}
+						}
+					: true,
+				user: reportConfig.includeUserDetails
+			},
+			orderBy
+		});
 
-        // Process data for grouping if needed
-        let groupedOrders = orders;
-        if (reportConfig.groupBy !== 'none') {
-            // Implement grouping logic based on reportConfig.groupBy
-            // This would organize orders by day, week, or month
-            // For simplicity, we'll skip the implementation here
-        }
+		// Process data for grouping if needed
+		let groupedOrders = orders;
+		if (reportConfig.groupBy !== 'none') {
+			// Implement grouping logic based on reportConfig.groupBy
+			// This would organize orders by day, week, or month
+			// For simplicity, we'll skip the implementation here
+		}
 
-        // Generate PDF using Puppeteer
-        const pdfFileName = `order-report-${uuid()}.pdf`;
-        const pdfPath = path.join(process.cwd(), 'static', 'reports', pdfFileName);
+		// Generate PDF using Puppeteer
+		const pdfFileName = `order-report-${uuid()}.pdf`;
+		const pdfPath = path.join(process.cwd(), 'static', 'reports', pdfFileName);
 
-        // Make sure the directory exists
-        const dir = path.dirname(pdfPath);
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
+		// Make sure the directory exists
+		const dir = path.dirname(pdfPath);
+		if (!fs.existsSync(dir)) {
+			fs.mkdirSync(dir, { recursive: true });
+		}
 
-        // Generate HTML content for the PDF
-        const htmlContent = generateReportHtml(orders, reportConfig, origin);
+		// Generate HTML content for the PDF
+		const htmlContent = generateReportHtml(orders, reportConfig, origin);
 
-        try {
-            // Launch Puppeteer with more robust error handling
-            const browser = await puppeteer.launch({
-                headless: true, // Use boolean value instead of "new"
-                args: [
-                    '--no-sandbox',
-                    '--disable-setuid-sandbox',
-                    '--disable-dev-shm-usage',
-                    '--disable-gpu'
-                ]
-            });
+		try {
+			// Launch Puppeteer with more robust error handling
+			const browser = await puppeteer.launch({
+				headless: true, // Use boolean value instead of "new"
+				args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
+			});
 
-            const page = await browser.newPage();
-            await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+			const page = await browser.newPage();
+			await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
-            await page.pdf({
-                path: pdfPath,
-                format: 'A4',
-                printBackground: true,
-                margin: {
-                    top: '1cm',
-                    right: '1cm',
-                    bottom: '1cm',
-                    left: '1cm'
-                }
-            });
+			await page.pdf({
+				path: pdfPath,
+				format: 'A4',
+				printBackground: true,
+				margin: {
+					top: '1cm',
+					right: '1cm',
+					bottom: '1cm',
+					left: '1cm'
+				}
+			});
 
-            await browser.close();
+			await browser.close();
 
-            // Return the URL to the generated PDF
-            return json({
-                success: true,
-                pdfUrl: `/reports/${pdfFileName}`
-            });
-        } catch (puppeteerError) {
-            console.error('Puppeteer error:', puppeteerError);
+			// Return the URL to the generated PDF
+			return json({
+				success: true,
+				pdfUrl: `/reports/${pdfFileName}`
+			});
+		} catch (puppeteerError) {
+			console.error('Puppeteer error:', puppeteerError);
 
-            // Fallback to direct HTML rendering if Puppeteer fails
-            // Write the HTML directly as fallback
-            const htmlFileName = `order-report-${uuid()}.html`;
-            const htmlFilePath = path.join(process.cwd(), 'static', 'reports', htmlFileName);
+			// Fallback to direct HTML rendering if Puppeteer fails
+			// Write the HTML directly as fallback
+			const htmlFileName = `order-report-${uuid()}.html`;
+			const htmlFilePath = path.join(process.cwd(), 'static', 'reports', htmlFileName);
 
-            fs.writeFileSync(htmlFilePath, htmlContent);
+			fs.writeFileSync(htmlFilePath, htmlContent);
 
-            return json({
-                success: true,
-                pdfUrl: `/reports/${htmlFileName}`,
-                isHtml: true,
-                message: "PDF generation failed. Showing HTML version instead."
-            });
-        }
-
-    } catch (error) {
-        console.error('Error generating report:', error);
-        return json(
-            {
-                success: false,
-                error: 'Failed to generate report'
-            },
-            { status: 500 }
-        );
-    }
+			return json({
+				success: true,
+				pdfUrl: `/reports/${htmlFileName}`,
+				isHtml: true,
+				message: 'PDF generation failed. Showing HTML version instead.'
+			});
+		}
+	} catch (error) {
+		console.error('Error generating report:', error);
+		return json(
+			{
+				success: false,
+				error: 'Failed to generate report'
+			},
+			{ status: 500 }
+		);
+	}
 };
 
 function generateReportHtml(orders: any[], reportConfig: ReportRequest, origin: string): string {
-    const startDate = new Date(reportConfig.dateRange.startDate).toLocaleDateString('en-UK');
-    const endDate = new Date(reportConfig.dateRange.endDate).toLocaleDateString('en-UK');
+	const startDate = new Date(reportConfig.dateRange.startDate).toLocaleDateString('en-UK');
+	const endDate = new Date(reportConfig.dateRange.endDate).toLocaleDateString('en-UK');
 
-    // Calculate some summary statistics
-    const totalOrders = orders.length;
-    const totalAmount = orders.reduce((sum, order) => sum + order.totalPrice, 0);
-    const pendingOrders = orders.filter(order => order.status === 'PENDING').length;
-    const completedOrders = orders.filter(order => order.status === 'COMPLETED').length;
-    const cancelledOrders = orders.filter(order => order.status === 'CANCELLED').length;
+	// Calculate some summary statistics
+	const totalOrders = orders.length;
+	const totalAmount = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+	const pendingOrders = orders.filter((order) => order.status === 'PENDING').length;
+	const completedOrders = orders.filter((order) => order.status === 'COMPLETED').length;
+	const cancelledOrders = orders.filter((order) => order.status === 'CANCELLED').length;
 
-    // Helper function to format currency
-    const formatCurrency = (amount: number) => {
-        return `KES ${amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
-    };
+	// Helper function to format currency
+	const formatCurrency = (amount: number) => {
+		return `KES ${amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
+	};
 
-    // Format the current date in a readable format
-    const today = new Date();
-    const generatedDate = today.toLocaleDateString('en-UK', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+	// Format the current date in a readable format
+	const today = new Date();
+	const generatedDate = today.toLocaleDateString('en-UK', {
+		weekday: 'long',
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric'
+	});
 
-    // Build status filter description
-    const reportTypeLabel = {
-        'all': 'All Orders',
-        'pending': 'Pending Orders',
-        'completed': 'Completed Orders',
-        'cancelled': 'Cancelled Orders'
-    }[reportConfig.reportType];
+	// Build status filter description
+	const reportTypeLabel = {
+		all: 'All Orders',
+		pending: 'Pending Orders',
+		completed: 'Completed Orders',
+		cancelled: 'Cancelled Orders'
+	}[reportConfig.reportType];
 
-    // Generate HTML for the PDF with improved design and typography
-    return `
+	// Generate HTML for the PDF with improved design and typography
+	return `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -666,19 +662,25 @@ function generateReportHtml(orders: any[], reportConfig: ReportRequest, origin: 
                         </tr>
                     </thead>
                     <tbody>
-                        ${orders.map(order => `
+                        ${orders
+													.map(
+														(order) => `
                             <tr>
                                 <td>#${order.id}</td>
                                 <td>${new Date(order.createdAt).toLocaleDateString('en-UK', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-    })}</td>
-                                ${reportConfig.includeUserDetails ? `
+																	day: '2-digit',
+																	month: 'short',
+																	year: 'numeric'
+																})}</td>
+                                ${
+																	reportConfig.includeUserDetails
+																		? `
                                 <td>
                                     <div>${order.user.name}</div>
                                     ${order.user.email ? `<div style="font-size: 0.85rem; color: var(--text-light);">${order.user.email}</div>` : ''}
-                                </td>` : ''}
+                                </td>`
+																		: ''
+																}
                                 <td>${formatCurrency(order.totalPrice)}</td>
                                 <td>
                                     <span class="status-badge status-${order.status.toLowerCase()}">
@@ -687,11 +689,14 @@ function generateReportHtml(orders: any[], reportConfig: ReportRequest, origin: 
                                 </td>
                                 <td>${order.billRefNumber}</td>
                             </tr>
-                            ${reportConfig.includeProductDetails && order.ProductOnOrder.length > 0 ? `
+                            ${
+															reportConfig.includeProductDetails && order.ProductOnOrder.length > 0
+																? `
                                 <tr>
                                     <td colspan="${reportConfig.includeUserDetails ? '6' : '5'}">
                                         <div class="product-details">
-                                            ${order.ProductOnOrder.map((item: any) => `
+                                            ${order.ProductOnOrder.map(
+																							(item: any) => `
                                                 <div class="product-item">
                                                     <div class="product-name">${item.product.name}</div>
                                                     <div class="product-meta">
@@ -703,12 +708,17 @@ function generateReportHtml(orders: any[], reportConfig: ReportRequest, origin: 
                                                         ${item.isIssued ? 'Issued' : 'Pending issuance'}
                                                     </div>
                                                 </div>
-                                            `).join('')}
+                                            `
+																						).join('')}
                                         </div>
                                     </td>
                                 </tr>
-                            ` : ''}
-                        `).join('')}
+                            `
+																: ''
+														}
+                        `
+													)
+													.join('')}
                     </tbody>
                 </table>
             </div>

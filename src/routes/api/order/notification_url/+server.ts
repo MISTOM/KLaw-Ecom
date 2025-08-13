@@ -87,7 +87,7 @@ async function processPayment(payload: any, url: URL) {
 					}))
 				},
 				origin: url.origin
-			}).catch(error => console.error('Failed to send customer confirmation email:', error));
+			}).catch((error) => console.error('Failed to send customer confirmation email:', error));
 
 			// Send email to admin
 			sendEmail('thomas.kigarde@bsl.co.ke', 'New Order Received - Kenya Law', 'new-order-notification', {
@@ -99,8 +99,7 @@ async function processPayment(payload: any, url: URL) {
 					}))
 				},
 				origin: url.origin
-			}).catch(error => console.error('Failed to send admin notification email:', error));
-
+			}).catch((error) => console.error('Failed to send admin notification email:', error));
 
 			// Clear cart
 			await tx.cart.delete({ where: { id: cart.id } });

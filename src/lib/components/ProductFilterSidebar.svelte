@@ -24,7 +24,7 @@
 		years,
 		isMobileFiltersOpen,
 		onCategoryToggle,
-		onYearChange, 
+		onYearChange,
 		onClearFilters,
 		onToggleMobileFilters
 	}: Props = $props();
@@ -72,7 +72,7 @@
 						<div class="flex items-center">
 							<input
 								type="checkbox"
-								class="mr-3 h-4 w-4 rounded "	
+								class="mr-3 h-4 w-4 rounded"
 								checked={selectedCategories.includes(category.id)}
 								onchange={() => onCategoryToggle(category.id)}
 							/>
@@ -89,11 +89,11 @@
 		<!-- Year Filter -->
 		<div class="mb-6">
 			<h3 class="mb-4 text-lg font-semibold">Publication Year</h3>
-            {selectedYear}
+			{selectedYear}
 			<select
 				value={selectedYear}
-                onchange={(e) => onYearChange(e.currentTarget.value)}
-				class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-5 focus:ring-primary/30 focus:outline-hidden"
+				onchange={(e) => onYearChange(e.currentTarget.value)}
+				class="focus:border-primary focus:ring-primary/30 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:ring-5 focus:outline-hidden"
 			>
 				<option value="all">All Years</option>
 				{#each years as year}

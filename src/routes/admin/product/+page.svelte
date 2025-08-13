@@ -58,7 +58,7 @@
 			citation: data.citation ? data.citation : undefined,
 			isbn: data.isbn ? data.isbn : undefined,
 			categoryIds: selectedCategories.map((c) => c.id),
-			publicationDate: data.publicationDate ? parseInt(data.publicationDate as string) : undefined,
+			publicationDate: data.publicationDate ? parseInt(data.publicationDate as string) : undefined
 		};
 		const result = productSchema.safeParse(parsedData);
 		if (!result.success) {
@@ -66,7 +66,7 @@
 			formErrors = errors;
 			return false;
 		}
-		
+
 		return true;
 	};
 
@@ -461,8 +461,7 @@
 					bind:value={publicationDate}
 					aria-invalid={!!getFieldError('publicationDate')}
 					aria-describedby={getFieldError('publicationDate') ? 'publicationDate-error' : undefined}
-					onkeyup={({currentTarget: {value}}) => validateField('publicationDate', parseInt(value))}
-
+					onkeyup={({ currentTarget: { value } }) => validateField('publicationDate', parseInt(value))}
 					placeholder="e.g., 2024"
 					min="1900"
 					max="2030"

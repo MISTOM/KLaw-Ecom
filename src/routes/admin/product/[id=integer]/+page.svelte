@@ -138,9 +138,7 @@
 			categoryIds: selectedCategories.map((c) => c.id),
 			citation: data.citation || undefined,
 			isbn: data.isbn || undefined,
-			publicationDate: data.publicationDate
-				? parseInt(data.publicationDate as string)
-				: undefined,
+			publicationDate: data.publicationDate ? parseInt(data.publicationDate as string) : undefined
 		};
 		const result = productSchema.safeParse(parsedData);
 		if (!result.success) {
@@ -495,7 +493,6 @@
 											onkeyup={(e) => validateField('citation', e.currentTarget.value)}
 											aria-invalid={!!getFieldError('citation')}
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
-											
 										/>
 										{#if getFieldError('citation')}
 											<p class="mt-1 text-xs text-red-600">{getFieldError('citation')}</p>
@@ -533,7 +530,7 @@
 											class="focus:border-primary focus:ring-primary mt-1 w-full rounded-md border border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
 											placeholder="e.g., 2024"
 											min="1900"
-											max="{new Date().getFullYear() + 5}"
+											max={new Date().getFullYear() + 5}
 										/>
 										{#if getFieldError('publicationDate')}
 											<p class="mt-1 text-xs text-red-600">{getFieldError('publicationDate')}</p>

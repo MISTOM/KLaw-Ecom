@@ -78,7 +78,7 @@
 <!-- CART -->
 {#if cart.cartopen}
 	<div
-		class="absolute top-28 right-0 rounded-md bg-white shadow-lg z-10"
+		class="absolute top-28 right-0 z-10 rounded-md bg-white shadow-lg"
 		in:fade={{ duration: 200 }}
 		out:fade={{ duration: 100 }}
 	>

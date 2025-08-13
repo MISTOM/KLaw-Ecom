@@ -88,7 +88,7 @@
 					<div class="flex items-center gap-2">
 						{#if product.quantity > 0}
 							<i class="bi bi-check-circle text-green-600"></i>
-							<span class="font-medium text-green-600">In Stock ({product.quantity} available)</span>
+							<span class="font-medium text-green-600">In Stock</span>
 						{:else}
 							<i class="bi bi-x-circle text-red-600"></i>
 							<span class="font-medium text-red-600">Out of Stock</span>
@@ -183,7 +183,6 @@
 									<span class="text-sm font-medium text-gray-600">Service Code:</span>
 									<span class="font-mono text-sm text-gray-900">{product.serviceCode}</span>
 								</div>
-
 
 								<!-- <div class="flex items-center gap-3">
 									<i class="bi bi-calendar-check text-gray-500"></i>

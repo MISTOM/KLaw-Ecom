@@ -12,13 +12,20 @@ export const load = (async ({ locals: { user }, url }) => {
 	try {
 		const page = Math.max(1, parseInt(url.searchParams.get('page') || '1'));
 		const categoriesParam = url.searchParams.get('categories') || '';
-		const selectedCategories = categoriesParam ? categoriesParam.split(',').map(id => parseInt(id)).filter(id => !isNaN(id)) : [];
+		const selectedCategories = categoriesParam
+			? categoriesParam
+					.split(',')
+					.map((id) => parseInt(id))
+					.filter((id) => !isNaN(id))
+			: [];
 		const year = url.searchParams.get('year') || 'all';
 		const search = url.searchParams.get('search') || '';
-		const limit = Math.min(MAX_ITEMS_PER_PAGE, Math.max(1, parseInt(url.searchParams.get('limit') || DEFAULT_ITEMS_PER_PAGE.toString())));
+		const limit = Math.min(
+			MAX_ITEMS_PER_PAGE,
+			Math.max(1, parseInt(url.searchParams.get('limit') || DEFAULT_ITEMS_PER_PAGE.toString()))
+		);
 		const skip = (page - 1) * limit;
 
-		// Build where clause for multiple categories
 		let where: any = { isPublished: true };
 		if (selectedCategories.length > 0) {
 			where = {
@@ -61,20 +68,17 @@ export const load = (async ({ locals: { user }, url }) => {
 					where,
 					include: {
 						Image: { select: { url: true } },
-						categories: true,
+						categories: true
 					},
 					orderBy: [
 						{ sortOrder: 'asc' }, // First sort by sortOrder
-						{ publicationDate: 'desc' }, // Then by publicationDate	
+						{ publicationDate: 'desc' } // Then by publicationDate
 					],
 					skip,
 					take: limit
 				}),
 				prisma.product.count({ where })
 			]);
-
-
-
 		} else {
 			// Normal query for other categories
 			[products, total] = await Promise.all([
@@ -137,7 +141,10 @@ export const load = (async ({ locals: { user }, url }) => {
 		if (page > totalPages && total > 0) {
 			const categoriesQuery = selectedCategories.length > 0 ? selectedCategories.join(',') : '';
 			const searchQuery = search ? encodeURIComponent(search) : '';
-			return redirect(302, `?page=${totalPages}&categories=${categoriesQuery}&year=${year}&limit=${limit}&search=${searchQuery}`);
+			return redirect(
+				302,
+				`?page=${totalPages}&categories=${categoriesQuery}&year=${year}&limit=${limit}&search=${searchQuery}`
+			);
 		}
 
 		return {

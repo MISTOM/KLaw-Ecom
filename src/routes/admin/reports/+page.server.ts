@@ -5,13 +5,7 @@ import { OrderStatus } from '@prisma/client';
 export const load = (async () => {
 	try {
 		// Use prisma.$transaction for more efficient query execution
-		const [
-			orderCounts,
-			totalRevenue,
-			totalPublications,
-			categories,
-			topPublications
-		] = await prisma.$transaction([
+		const [orderCounts, totalRevenue, totalPublications, categories, topPublications] = await prisma.$transaction([
 			prisma.order.groupBy({
 				by: ['status'],
 				_count: true,
@@ -69,12 +63,12 @@ export const load = (async () => {
 			},
 			publicationStats: {
 				totalPublications,
-				categories: categories.map(cat => ({
+				categories: categories.map((cat) => ({
 					id: cat.id,
 					name: cat.name,
 					count: cat._count.Products
 				})),
-				topPublications: topPublications.map(pub => ({
+				topPublications: topPublications.map((pub) => ({
 					id: pub.id,
 					name: pub.name,
 					price: pub.price,

@@ -25,3 +25,4 @@ uploads/*
 file.json
 static/reports/*
 !static/reports/.gitkeep
+.github/

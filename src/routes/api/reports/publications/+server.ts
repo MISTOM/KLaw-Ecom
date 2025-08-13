@@ -8,219 +8,219 @@ import { v4 as uuid } from 'uuid';
 
 // Define the publication report request type
 type PublicationReportRequest = {
-    dateRange: {
-        startDate: string;
-        endDate: string;
-    };
-    categoryId?: number;
-    sortBy: 'name' | 'sales' | 'revenue' | 'date';
-    sortOrder: 'asc' | 'desc';
-    includeDetails: boolean;
+	dateRange: {
+		startDate: string;
+		endDate: string;
+	};
+	categoryId?: number;
+	sortBy: 'name' | 'sales' | 'revenue' | 'date';
+	sortOrder: 'asc' | 'desc';
+	includeDetails: boolean;
 };
 
 export const POST: RequestHandler = async ({ request, url: { origin } }) => {
-    try {
-        const reportConfig: PublicationReportRequest = await request.json();
+	try {
+		const reportConfig: PublicationReportRequest = await request.json();
 
-        // Convert string dates to Date objects
-        const startDate = new Date(reportConfig.dateRange.startDate);
-        const endDate = new Date(reportConfig.dateRange.endDate);
-        endDate.setHours(23, 59, 59, 999);
+		// Convert string dates to Date objects
+		const startDate = new Date(reportConfig.dateRange.startDate);
+		const endDate = new Date(reportConfig.dateRange.endDate);
+		endDate.setHours(23, 59, 59, 999);
 
-        // Build the query for products with their sales data
-        const whereClause: any = {
-            isPublished: true,
-            ProductOnOrder: {
-                some: {
-                    order: {
-                        createdAt: {
-                            gte: startDate,
-                            lte: endDate
-                        },
-                        status: 'COMPLETED'
-                    }
-                }
-            }
-        };
+		// Build the query for products with their sales data
+		const whereClause: any = {
+			isPublished: true,
+			ProductOnOrder: {
+				some: {
+					order: {
+						createdAt: {
+							gte: startDate,
+							lte: endDate
+						},
+						status: 'COMPLETED'
+					}
+				}
+			}
+		};
 
-        if (reportConfig.categoryId) {
-            whereClause.categories = {
-                some: {
-                    id: reportConfig.categoryId
-                }
-            };
-        }
+		if (reportConfig.categoryId) {
+			whereClause.categories = {
+				some: {
+					id: reportConfig.categoryId
+				}
+			};
+		}
 
-        // Build orderBy clause
-        let orderBy: any = {};
-        switch (reportConfig.sortBy) {
-            case 'name':
-                orderBy = { name: reportConfig.sortOrder };
-                break;
-            case 'sales':
-                orderBy = { ProductOnOrder: { _count: reportConfig.sortOrder } };
-                break;
-            case 'date':
-                orderBy = { publicationDate: reportConfig.sortOrder };
-                break;
-            case 'revenue':
-                // We'll sort this in JavaScript after calculating revenue
-                orderBy = { name: 'asc' };
-                break;
-            default:
-                orderBy = { name: 'asc' };
-        }
+		// Build orderBy clause
+		let orderBy: any = {};
+		switch (reportConfig.sortBy) {
+			case 'name':
+				orderBy = { name: reportConfig.sortOrder };
+				break;
+			case 'sales':
+				orderBy = { ProductOnOrder: { _count: reportConfig.sortOrder } };
+				break;
+			case 'date':
+				orderBy = { publicationDate: reportConfig.sortOrder };
+				break;
+			case 'revenue':
+				// We'll sort this in JavaScript after calculating revenue
+				orderBy = { name: 'asc' };
+				break;
+			default:
+				orderBy = { name: 'asc' };
+		}
 
-        // Query the database
-        const products = await prisma.product.findMany({
-            where: whereClause,
-            include: {
-                categories: true,
-                ProductOnOrder: {
-                    include: {
-                        order: {
-                            select: {
-                                id: true,
-                                createdAt: true,
-                                status: true,
-                                user: reportConfig.includeDetails ? {
-                                    select: {
-                                        name: true,
-                                        email: true
-                                    }
-                                } : false
-                            }
-                        }
-                    },
-                    where: {
-                        order: {
-                            createdAt: {
-                                gte: startDate,
-                                lte: endDate
-                            },
-                            status: 'COMPLETED'
-                        }
-                    }
-                }
-            },
-            orderBy: reportConfig.sortBy !== 'revenue' ? orderBy : undefined
-        });
+		// Query the database
+		const products = await prisma.product.findMany({
+			where: whereClause,
+			include: {
+				categories: true,
+				ProductOnOrder: {
+					include: {
+						order: {
+							select: {
+								id: true,
+								createdAt: true,
+								status: true,
+								user: reportConfig.includeDetails
+									? {
+											select: {
+												name: true,
+												email: true
+											}
+										}
+									: false
+							}
+						}
+					},
+					where: {
+						order: {
+							createdAt: {
+								gte: startDate,
+								lte: endDate
+							},
+							status: 'COMPLETED'
+						}
+					}
+				}
+			},
+			orderBy: reportConfig.sortBy !== 'revenue' ? orderBy : undefined
+		});
 
-        // Calculate additional metrics and sort by revenue if needed
-        const enrichedProducts = products.map(product => {
-            const totalSales = product.ProductOnOrder.reduce((sum, po) => sum + po.quantity, 0);
-            const totalRevenue = product.ProductOnOrder.reduce((sum, po) => sum + (po.quantity * product.price), 0);
+		// Calculate additional metrics and sort by revenue if needed
+		const enrichedProducts = products.map((product) => {
+			const totalSales = product.ProductOnOrder.reduce((sum, po) => sum + po.quantity, 0);
+			const totalRevenue = product.ProductOnOrder.reduce((sum, po) => sum + po.quantity * product.price, 0);
 
-            return {
-                ...product,
-                totalSales,
-                totalRevenue,
-                avgOrderValue: totalSales > 0 ? totalRevenue / totalSales : 0
-            };
-        });
+			return {
+				...product,
+				totalSales,
+				totalRevenue,
+				avgOrderValue: totalSales > 0 ? totalRevenue / totalSales : 0
+			};
+		});
 
-        // Sort by revenue if needed
-        if (reportConfig.sortBy === 'revenue') {
-            enrichedProducts.sort((a, b) => {
-                const aVal = a.totalRevenue;
-                const bVal = b.totalRevenue;
-                return reportConfig.sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
-            });
-        }
+		// Sort by revenue if needed
+		if (reportConfig.sortBy === 'revenue') {
+			enrichedProducts.sort((a, b) => {
+				const aVal = a.totalRevenue;
+				const bVal = b.totalRevenue;
+				return reportConfig.sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
+			});
+		}
 
-        // Generate PDF
-        const pdfFileName = `publication-report-${uuid()}.pdf`;
-        const pdfPath = path.join(process.cwd(), 'static', 'reports', pdfFileName);
+		// Generate PDF
+		const pdfFileName = `publication-report-${uuid()}.pdf`;
+		const pdfPath = path.join(process.cwd(), 'static', 'reports', pdfFileName);
 
-        const dir = path.dirname(pdfPath);
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
+		const dir = path.dirname(pdfPath);
+		if (!fs.existsSync(dir)) {
+			fs.mkdirSync(dir, { recursive: true });
+		}
 
-        const htmlContent = generatePublicationReportHtml(enrichedProducts, reportConfig, origin);
+		const htmlContent = generatePublicationReportHtml(enrichedProducts, reportConfig, origin);
 
-        try {
-            const browser = await puppeteer.launch({
-                headless: true,
-                args: [
-                    '--no-sandbox',
-                    '--disable-setuid-sandbox',
-                    '--disable-dev-shm-usage',
-                    '--disable-gpu'
-                ]
-            });
+		try {
+			const browser = await puppeteer.launch({
+				headless: true,
+				args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
+			});
 
-            const page = await browser.newPage();
-            await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+			const page = await browser.newPage();
+			await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
-            await page.pdf({
-                path: pdfPath,
-                format: 'A4',
-                printBackground: true,
-                margin: {
-                    top: '1cm',
-                    right: '1cm',
-                    bottom: '1cm',
-                    left: '1cm'
-                }
-            });
+			await page.pdf({
+				path: pdfPath,
+				format: 'A4',
+				printBackground: true,
+				margin: {
+					top: '1cm',
+					right: '1cm',
+					bottom: '1cm',
+					left: '1cm'
+				}
+			});
 
-            await browser.close();
+			await browser.close();
 
-            return json({
-                success: true,
-                pdfUrl: `/reports/${pdfFileName}`
-            });
-        } catch (puppeteerError) {
-            console.error('Puppeteer error:', puppeteerError);
+			return json({
+				success: true,
+				pdfUrl: `/reports/${pdfFileName}`
+			});
+		} catch (puppeteerError) {
+			console.error('Puppeteer error:', puppeteerError);
 
-            const htmlFileName = `publication-report-${uuid()}.html`;
-            const htmlFilePath = path.join(process.cwd(), 'static', 'reports', htmlFileName);
+			const htmlFileName = `publication-report-${uuid()}.html`;
+			const htmlFilePath = path.join(process.cwd(), 'static', 'reports', htmlFileName);
 
-            fs.writeFileSync(htmlFilePath, htmlContent);
+			fs.writeFileSync(htmlFilePath, htmlContent);
 
-            return json({
-                success: true,
-                pdfUrl: `/reports/${htmlFileName}`,
-                isHtml: true,
-                message: "PDF generation failed. Showing HTML version instead."
-            });
-        }
-
-    } catch (error) {
-        console.error('Error generating publication report:', error);
-        return json(
-            {
-                success: false,
-                error: 'Failed to generate publication report'
-            },
-            { status: 500 }
-        );
-    }
+			return json({
+				success: true,
+				pdfUrl: `/reports/${htmlFileName}`,
+				isHtml: true,
+				message: 'PDF generation failed. Showing HTML version instead.'
+			});
+		}
+	} catch (error) {
+		console.error('Error generating publication report:', error);
+		return json(
+			{
+				success: false,
+				error: 'Failed to generate publication report'
+			},
+			{ status: 500 }
+		);
+	}
 };
 
-function generatePublicationReportHtml(products: any[], reportConfig: PublicationReportRequest, origin: string): string {
-    const startDate = new Date(reportConfig.dateRange.startDate).toLocaleDateString('en-UK');
-    const endDate = new Date(reportConfig.dateRange.endDate).toLocaleDateString('en-UK');
+function generatePublicationReportHtml(
+	products: any[],
+	reportConfig: PublicationReportRequest,
+	origin: string
+): string {
+	const startDate = new Date(reportConfig.dateRange.startDate).toLocaleDateString('en-UK');
+	const endDate = new Date(reportConfig.dateRange.endDate).toLocaleDateString('en-UK');
 
-    const totalProducts = products.length;
-    const totalSales = products.reduce((sum, product) => sum + product.totalSales, 0);
-    const totalRevenue = products.reduce((sum, product) => sum + product.totalRevenue, 0);
-    const avgRevenue = totalProducts > 0 ? totalRevenue / totalProducts : 0;
+	const totalProducts = products.length;
+	const totalSales = products.reduce((sum, product) => sum + product.totalSales, 0);
+	const totalRevenue = products.reduce((sum, product) => sum + product.totalRevenue, 0);
+	const avgRevenue = totalProducts > 0 ? totalRevenue / totalProducts : 0;
 
-    const formatCurrency = (amount: number) => {
-        return `KES ${amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
-    };
+	const formatCurrency = (amount: number) => {
+		return `KES ${amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
+	};
 
-    const today = new Date();
-    const generatedDate = today.toLocaleDateString('en-UK', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+	const today = new Date();
+	const generatedDate = today.toLocaleDateString('en-UK', {
+		weekday: 'long',
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric'
+	});
 
-    return `
+	return `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -521,7 +521,9 @@ function generatePublicationReportHtml(products: any[], reportConfig: Publicatio
                         </tr>
                     </thead>
                     <tbody>
-                        ${products.map(product => `
+                        ${products
+													.map(
+														(product) => `
                             <tr>
                                 <td>
                                     <div style="font-weight: 600;">${product.name}</div>
@@ -531,16 +533,18 @@ function generatePublicationReportHtml(products: any[], reportConfig: Publicatio
                                 </td>
                                 <td>${product.author}</td>
                                 <td>
-                                    ${product.categories.map((cat: any) =>
-        `<span class="category-tag">${cat.name}</span>`
-    ).join('')}
+                                    ${product.categories
+																			.map((cat: any) => `<span class="category-tag">${cat.name}</span>`)
+																			.join('')}
                                 </td>
                                 <td>${formatCurrency(product.price)}</td>
                                 <td>${product.totalSales}</td>
                                 <td>${formatCurrency(product.totalRevenue)}</td>
                                 <td>${formatCurrency(product.avgOrderValue)}</td>
                             </tr>
-                        `).join('')}
+                        `
+													)
+													.join('')}
                     </tbody>
                 </table>
             </div>
