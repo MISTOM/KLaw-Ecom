@@ -27,10 +27,7 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!user) throw error(401, 'Unauthorized');
 
 	const xff = request.headers.get('x-forwarded-for');
-	const ip =
-		xff?.split(',')[0].trim() ||
-		request.headers.get('cf-connecting-ip') ||
-		'unknown';
+	const ip = xff?.split(',')[0].trim() || request.headers.get('cf-connecting-ip') || 'unknown';
 	limit(ip);
 
 	const docId = Number(url.searchParams.get('docId'));

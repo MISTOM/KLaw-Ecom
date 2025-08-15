@@ -307,13 +307,13 @@
 			</p>
 			<div class="flex justify-end gap-4">
 				<button
-					class="rounded-md bg-gray-100 px-4 py-2 text-gray-600 hover:bg-gray-200"
+					class="rounded-md bg-gray-100 px-4 py-2 text-gray-600 transition-colors hover:bg-gray-200"
 					onclick={() => (showDeleteModal = false)}
 				>
 					Cancel
 				</button>
 				<button
-					class="rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+					class="rounded-md bg-red-500 px-4 py-2 text-white transition-colors hover:bg-red-600"
 					onclick={async () => {
 						showDeleteModal = false;
 						await deleteProduct();
@@ -331,13 +331,13 @@
 			</p>
 			<div class="flex justify-end gap-4">
 				<button
-					class="cursor-pointer rounded-md bg-gray-200 px-4 py-2 text-gray-600 hover:bg-gray-200"
+					class="rounded-md bg-gray-100 px-4 py-2 text-gray-600 transition-colors hover:bg-gray-200"
 					onclick={() => (showPublishModal = false)}
 				>
 					Cancel
 				</button>
 				<button
-					class="bg-secondary hover:bg-secondary/90 flex w-36 cursor-pointer justify-center rounded-sm px-4 py-2 align-middle text-white transition-colors"
+					class="bg-secondary hover:bg-secondary/90 flex w-36 justify-center rounded-md px-4 py-2 text-white transition-colors"
 					onclick={async () => {
 						showPublishModal = false;
 						await togglePublish();
@@ -655,7 +655,7 @@
 										<button
 											type="button"
 											onclick={() => (showPublishModal = true)}
-											class="bg-secondary hover:bg-secondary/90 flex w-36 cursor-pointer justify-center rounded-sm px-4 py-2 align-middle text-white transition-colors"
+											class="bg-secondary hover:bg-secondary/90 flex w-36 justify-center rounded-md px-4 py-2 text-white transition-colors"
 										>
 											{data.product?.isPublished ? 'Unpublish' : 'Publish'}
 										</button>
@@ -663,7 +663,7 @@
 
 									<button
 										type="submit"
-										class="bg-primary hover:bg-primary/90 flex w-36 cursor-pointer justify-center rounded-sm px-4 py-2 align-middle text-white transition-colors"
+										class="bg-primary hover:bg-primary/90 flex w-36 justify-center rounded-md px-4 py-2 text-white transition-colors"
 									>
 										{#if loading}
 											<Spinner />
@@ -672,7 +672,7 @@
 									</button>
 									<button
 										type="button"
-										class="flex w-36 cursor-pointer justify-center rounded-sm bg-red-600 px-4 py-2 align-middle text-white transition-colors hover:bg-red-600/90"
+										class="flex w-36 justify-center rounded-md bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-600/90"
 										onclick={() => (showDeleteModal = true)}
 									>
 										<!-- <Trash2 size={16} /> -->

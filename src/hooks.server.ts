@@ -36,12 +36,43 @@ export const handle: Handle = async ({ event, resolve }) => {
 		console.error('Authentication error:', err);
 	}
 
+	if (event.locals.user) {
+		// Check for an active subscription
+		const subscription = await prisma.userSubscription.findFirst({
+			where: {
+				userId: event.locals.user.id,
+				status: 'ACTIVE',
+				endsAt: {
+					// Check if the subscription has not expired
+					gte: new Date()
+				}
+			}
+		});
+		// Make subscription status available throughout the app
+		event.locals.isSubscribed = !!subscription;
+		event.locals.subscription = subscription; // Optional: make full subscription details available
+	} else {
+		event.locals.isSubscribed = false;
+	}
+
 	// **Admin Route Protection**
 	if (event.url.pathname.startsWith('/admin')) {
 		if (!event.locals.user || !(await auth.isAdmin(event.locals.user))) {
 			throw redirect(303, '/login');
 		}
 	}
+
+	// **Protected Content Route Protection**
+	// // Example: protect a /dashboard route
+	// if (event.url.pathname.startsWith('/dashboard')) {
+	//     if (!event.locals.user) {
+	//         throw redirect(303, '/login?redirectTo=/dashboard');
+	//     }
+	//     if (!event.locals.isSubscribed) {
+	//         // You can redirect them to the pricing page if they aren't subscribed
+	//         throw redirect(303, '/pricing');
+	//     }
+	// }
 
 	return resolve(event);
 };

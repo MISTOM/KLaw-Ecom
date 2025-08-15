@@ -10,6 +10,8 @@ declare global {
 		// }
 		interface Locals {
 			user: { id; roleId } | JwtPayload | null;
+			isSubscribed: boolean;
+			subscription: import('@prisma/client').UserSubscription | null;
 		}
 		// interface PageData {}
 		// interface PageState {}

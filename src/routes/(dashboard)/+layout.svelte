@@ -41,6 +41,9 @@
 			<li class="hover:text-secondary mx-4 transition-colors">
 				<a href="/product">Products</a>
 			</li>
+			<li class="hover:text-secondary mx-4 transition-colors">
+				<a href="/subscription">Subscription</a>
+			</li>
 
 			{#if user}
 				<li class="hover:text-secondary mx-4 transition-colors">
@@ -100,11 +103,13 @@
 					<p class="font-semibold">Total: {cart.cartStats.total.toFixed(2)}</p>
 				</div>
 
-				<button
-					class="hover:bg-primary rounded-md border border-gray-300 px-2 py-1 transition-colors hover:text-white"
-				>
-					<a href={user ? '/checkout' : '/login'} onclick={() => (cart.cartopen = false)}>Proceed to checkout</a>
-				</button>
+				<a href={user ? '/checkout' : '/login'} onclick={() => (cart.cartopen = false)}>
+					<button
+						class="hover:bg-primary rounded-md border border-gray-300 px-2 py-1 transition-colors hover:text-white"
+					>
+						Proceed to checkout
+					</button>
+				</a>
 			{:else}
 				<div>
 					<i class="text-sm">Your cart is empty</i>

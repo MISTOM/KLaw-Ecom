@@ -32,6 +32,8 @@
 			<li class="hover:text-secondary transition-colors"><a href="/admin/reports">Reports</a></li>
 			<!-- <li class="transition-colors hover:text-secondary"><a href="/admin/users">Users</a></li> -->
 			<li class="hover:text-secondary transition-colors"><a href="/admin/category">Categories</a></li>
+			<li class="hover:text-secondary transition-colors"><a href="/admin/subscription">Subscription Plans</a></li>
+
 			<!-- <li class="hover:text-secondary transition-colors"><a href="/admin/convenienceFee">Convenience Fee</a></li> -->
 		</ul>
 	</nav>

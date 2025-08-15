@@ -69,6 +69,9 @@
 			>
 				Change Password
 			</button>
+			<a href="/profile/subscription" class="bg-fadeblack rounded-md px-3 py-2 text-white hover:bg-black">
+				My Subscription
+			</a>
 		</div>
 	</div>
 
