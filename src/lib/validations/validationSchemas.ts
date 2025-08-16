@@ -176,6 +176,42 @@ export const productSchema = z.object({
 		.min(1, 'At least one category is required')
 });
 
+export const subscriptionPlanSchema = z.object({
+	name: z
+		.string({
+			required_error: 'Plan name is required',
+			invalid_type_error: 'Plan name must be a string'
+		})
+		.min(2, 'Plan name must be at least 2 characters')
+		.max(100, 'Plan name is too long'),
+
+	description: z
+		.string()
+		.max(500, 'Description is too long')
+		.optional()
+		.nullable(),
+
+	price: z
+		.number({
+			required_error: 'Price is required',
+			invalid_type_error: 'Price must be a number'
+		})
+		.min(0, 'Price cannot be negative')
+		.max(1000000, 'Price is too high'),
+
+	duration: z
+		.number({
+			required_error: 'Duration is required',
+			invalid_type_error: 'Duration must be a number'
+		})
+		.int('Duration must be a whole number')
+		.min(1, 'Duration must be at least 1 day')
+		.max(3650, 'Duration cannot exceed 10 years'),
+
+	isActive: z.boolean().default(true)
+});
+
 export type LoginCredentials = z.infer<typeof loginSchema>;
 export type UserRegistration = z.infer<typeof userSchema>;
 export type ProductData = z.infer<typeof productSchema>;
+export type SubscriptionPlanData = z.infer<typeof subscriptionPlanSchema>;

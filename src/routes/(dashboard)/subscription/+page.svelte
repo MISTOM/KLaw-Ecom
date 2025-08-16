@@ -69,6 +69,11 @@
 
 			if (!response.ok) {
 				const error = await response.json();
+				// Reason: Redirect to login page if user is not authenticated
+				if (response.status === 401) {
+					window.location.href = `/login?redirectTo=${encodeURIComponent('/subscription')}`;
+					return;
+				}
 				throw error;
 			}
 
@@ -113,6 +118,39 @@
 		window.addEventListener('message', handlePaymentMessage);
 		return () => window.removeEventListener('message', handlePaymentMessage);
 	});
+
+	// Development function to directly subscribe a user
+	const devDirectSubscribe = async (plan: plan) => {
+		try {
+			const response = await fetch('/api/subscription/direct', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					planId: plan.id
+				})
+			});
+
+			if (!response.ok) {
+				const error = await response.json();
+				// Reason: Redirect to login page if user is not authenticated
+				if (response.status === 401) {
+					window.location.href = `/login?redirectTo=${encodeURIComponent('/subscription')}`;
+					return;
+				}
+				throw error;
+			}
+
+			const result = await response.json();
+			if (result.success) {
+				toast.add('Success', 'Subscription activated successfully!', 'success');
+				setTimeout(() => {
+					window.location.href = '/profile?subscription=success';
+				}, 1000);
+			}
+		} catch (err: any) {
+			toast.add('Error', err?.message || 'Failed to activate subscription', 'error');
+		}
+	};
 </script>
 
 <svelte:head>
@@ -129,8 +167,8 @@
 		<!-- Header Section -->
 		<div class="text-center">
 			<h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
-				Choose Your
-				<span class="from-primary bg-gradient-to-r to-gray-900 bg-clip-text text-transparent"> Perfect Plan </span>
+				Choose Your Perfect Plan
+				<!-- <span class="from-primary bg-gradient-to-r to-gray-900 bg-clip-text text-transparent"> Perfect Plan </span> -->
 			</h1>
 			<p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600 sm:text-xl">
 				Get unlimited access to Kenya's most comprehensive legal document library. Choose the plan that fits your
@@ -158,7 +196,7 @@
 		<div class="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-6">
 			{#each data.plans as plan, index}
 				<div
-					class="hover:ring-primary/50 relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-gray-200 transition-all duration-150 hover:shadow-xl hover:ring-2 {isPopularPlan(
+					class="hover:ring-primary relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-gray-200 transition-all duration-150 hover:shadow-xl hover:ring-2 {isPopularPlan(
 						plan
 					)
 						? 'ring-primary scale-105 ring-2'
@@ -214,7 +252,7 @@
 							{/each}
 						</ul>
 
-						<!-- Value proposition for longer plans -->
+						<!-- Value proposition for longer plans
 						{#if plan.duration >= 365}
 							<div class="mt-6 rounded-lg bg-green-50 p-4">
 								<div class="flex items-center">
@@ -227,11 +265,22 @@
 									</span>
 								</div>
 							</div>
-						{/if}
+						{/if} -->
 					</div>
 
 					<!-- CTA Button -->
 					<div class="px-8 pb-8">
+						<!-- Development link for direct subscription -->
+						<div class="mb-2 text-center">
+							<button
+								onclick={() => devDirectSubscribe(plan)}
+								class="text-xs text-gray-400 underline hover:text-gray-600"
+								title="Development: Direct subscribe without payment"
+							>
+								sub
+							</button>
+						</div>
+
 						<button
 							onclick={() => selectPlan(plan)}
 							class="block w-full rounded-lg px-4 py-3 text-center text-base font-semibold transition-all duration-200 {isPopularPlan(
@@ -261,7 +310,7 @@
 			{/each}
 		</div>
 
-		<!-- FAQ or Additional Info Section -->
+		<!-- FAQ or Additional Info Section
 		<div class="mt-20">
 			<div class="text-center">
 				<h2 class="text-3xl font-bold text-gray-900">Frequently Asked Questions</h2>
@@ -301,7 +350,7 @@
 			</div>
 		</div>
 
-		<!-- Contact Section -->
+		<!-- Contact Section --
 		<div class="from-primary to-secondary mt-20 rounded-2xl bg-gradient-to-r p-8 text-center text-white">
 			<h2 class="text-3xl font-bold">Need a Custom Plan?</h2>
 			<p class="mt-4 text-lg opacity-90">
@@ -316,7 +365,7 @@
 					Contact Sales
 				</a>
 			</div>
-		</div>
+		</div> -->
 	</div>
 </main>
 

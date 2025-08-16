@@ -10,6 +10,7 @@
 	const cart = setCartState(data.cartItems || []);
 
 	const user = $derived(data.user);
+	const isSubscribed = $derived(data.isSubscribed || false);
 
 	// const UserState = getUserState();
 	// const { user, name } = UserState;
@@ -41,6 +42,11 @@
 			<li class="hover:text-secondary mx-4 transition-colors">
 				<a href="/product">Products</a>
 			</li>
+			{#if user && isSubscribed}
+				<li class="hover:text-secondary mx-4 transition-colors">
+					<a href="/subscribed/products">Premium</a>
+				</li>
+			{/if}
 			<li class="hover:text-secondary mx-4 transition-colors">
 				<a href="/subscription">Subscription</a>
 			</li>

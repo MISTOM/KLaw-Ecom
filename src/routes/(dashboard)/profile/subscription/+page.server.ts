@@ -9,21 +9,30 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const subscription = await prisma.userSubscription.findFirst({
 		where: {
-			userId: locals.user.id
+			userId: locals.user.id,
+			status: 'ACTIVE',
+			isActive: true,
+			endsAt: {
+				// Reason: Only show subscriptions that haven't expired
+				gte: new Date()
+			}
 		},
 		include: {
 			plan: true
+		},
+		orderBy: {
+			createdAt: 'desc'
 		}
 	});
 
 	const serializedSubscription = subscription
 		? {
-				...subscription,
-				plan: {
-					...subscription.plan,
-					price: Number(subscription.plan.price)
-				}
+			...subscription,
+			plan: {
+				...subscription.plan,
+				price: Number(subscription.plan.price)
 			}
+		}
 		: null;
 
 	return {
