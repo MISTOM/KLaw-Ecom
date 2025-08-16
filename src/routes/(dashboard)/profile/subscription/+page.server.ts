@@ -13,8 +13,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 			status: 'ACTIVE',
 			isActive: true,
 			endsAt: {
-				// Reason: Only show subscriptions that haven't expired
-				gte: new Date()
+				// Reason: Only show subscriptions that haven't expired (including those ending today)
+				gte: new Date(new Date().setHours(0, 0, 0, 0))
 			}
 		},
 		include: {
