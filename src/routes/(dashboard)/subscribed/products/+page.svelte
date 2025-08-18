@@ -76,7 +76,7 @@
 						<img
 							src={product.Image[0]?.url || '/coat-of-arms.jpg'}
 							alt={product.name}
-							class="h-full w-full object-cover transition-transform group-hover:scale-105"
+							class="h-full w-full object-cover transition-transform"
 							loading="lazy"
 						/>
 					</div>
@@ -100,10 +100,10 @@
 							</div>
 
 							<button
-								onclick={() => addToCart(product.id, product.name)}
+								
 								class="w-full rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
 							>
-								Add to Cart
+								View Document
 							</button>
 						</div>
 					</div>
