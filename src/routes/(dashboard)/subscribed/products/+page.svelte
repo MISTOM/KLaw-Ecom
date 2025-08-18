@@ -17,7 +17,7 @@
 			});
 
 			if (response.ok) {
-				await cart.refreshCart();
+				// await cart.refreshCart();
 				toast.add('Success', `${productName} added to cart`, 'success');
 			} else {
 				const error = await response.json();
@@ -57,11 +57,26 @@
 			</nav>
 
 			<!-- Header -->
-			<div>
-				<h1 class="text-3xl font-bold text-gray-900">Premium Legal Resources</h1>
-				<p class="mt-2 text-gray-600">
-					Exclusive access to advanced legal documents and specialized content
-				</p>
+			<div class="flex justify-between items-center space-x-4">
+				<div>
+					<h1 class="text-3xl font-bold text-gray-900">Premium Legal Resources</h1>
+					<p class="mt-2 text-gray-600">Exclusive access to advanced legal documents and specialized content</p>
+				</div>
+				<div class="relative flex-1">
+						<input
+							type="text"
+							placeholder="Search Content..."
+							
+							class="focus:border-primary focus:ring-primary/30 w-full rounded-lg border border-gray-300 px-4 py-2 pl-10 focus:ring-5 focus:outline-hidden"
+						/>
+						<i class="bi bi-search absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+					</div>
+					<button
+						type="submit"
+						class="bg-primary hover:bg-primary/90 rounded-lg px-6 py-2 text-white transition-colors"
+					>
+						Search
+					</button>
 			</div>
 		</div>
 
@@ -93,15 +108,8 @@
 
 						<!-- Price and Add to Cart -->
 						<div class="mt-auto space-y-3">
-							<div class="flex items-baseline justify-between">
-								<span class="text-lg font-bold text-gray-900">
-									KES {product.price.toLocaleString()}
-								</span>
-							</div>
-
 							<button
-								
-								class="w-full rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+								class="bg-primary hover:bg-primary/90 w-full rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors"
 							>
 								View Document
 							</button>
