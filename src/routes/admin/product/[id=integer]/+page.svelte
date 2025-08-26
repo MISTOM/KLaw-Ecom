@@ -43,6 +43,52 @@
 
 	const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
 
+	// Product documents: pre-fetched on server load so they are immediately visible.
+	let existingDocuments = $state<{ id: number; originalName: string; sizeBytes?: number }[]>(
+		(data as any).productDocuments || []
+	);
+
+	async function uploadSelectedPDFs(files: FileList | null) {
+		if (!files || !data.product?.id) return;
+		for (const file of Array.from(files)) {
+			if (file.type !== 'application/pdf') continue;
+			const fd = new FormData();
+			fd.append('file', file, file.name);
+			try {
+				const res = await fetch(`/api/product/${data.product.id}/documents`, { method: 'POST', body: fd });
+				if (res.ok) {
+					const json = await res.json();
+					// Replace or add
+					existingDocuments = [
+						...existingDocuments.filter(
+							(d) => d.id !== json.document.id && d.originalName !== json.document.originalName
+						),
+						json.document
+					].sort((a, b) => a.originalName.localeCompare(b.originalName));
+					toast.add('Uploaded', file.name, 'success');
+				} else {
+					toast.add('Upload failed', `${file.name}`, 'error');
+				}
+			} catch (e) {
+				toast.add('Upload error', file.name, 'error');
+			}
+		}
+	}
+
+	async function deleteDocument(id: number) {
+		if (!data.product?.id) return;
+		if (!confirm('Delete this document?')) return;
+		try {
+			const res = await fetch(`/api/product/${data.product.id}/documents/${id}`, { method: 'DELETE' });
+			if (res.ok) {
+				existingDocuments = existingDocuments.filter((d) => d.id !== id);
+				toast.add('Deleted', 'Document removed', 'success');
+			} else toast.add('Delete failed', '', 'error');
+		} catch (e) {
+			toast.add('Delete error', '', 'error');
+		}
+	}
+
 	const togglePublish = async () => {
 		console.log('Publishing product');
 		if (data?.product?.id) {
@@ -129,7 +175,9 @@
 		formErrors[field] = result.success ? [] : result.error?.flatten().formErrors || [];
 	};
 	const validateAll = (formData: FormData) => {
-		const data = Object.fromEntries(formData.entries());
+		const dataObj: Record<string, any> = {};
+		for (const [k, v] of formData as any as Iterable<[string, FormDataEntryValue]>) dataObj[k] = v;
+		const data = dataObj;
 		const parsedData = {
 			...data,
 			price: data.price ? parseFloat(data.price as string) : undefined,
@@ -681,6 +729,50 @@
 								</div>
 							</div>
 						</form>
+					</div>
+				</div>
+			</div>
+
+			<!-- Side panel: PDF Documents management -->
+			<div class="space-y-6">
+				<div class="rounded-lg border border-gray-200 bg-white p-6">
+					<h2 class="mb-4 text-lg font-semibold">PDF Documents</h2>
+					<p class="mb-4 text-xs text-gray-500">
+						Attach supplementary PDF documents (max 25MB each). Existing uploads can be replaced by uploading a
+						file with the same original filename.
+					</p>
+					<div class="space-y-3">
+						<div class="space-y-2">
+							<label for="pdfUpload" class="text-sm font-medium text-gray-700">Upload PDFs</label>
+							<input
+								id="pdfUpload"
+								type="file"
+								multiple
+								accept="application/pdf"
+								class="w-full cursor-pointer rounded-md border border-dashed border-gray-300 p-2 text-sm hover:border-gray-400"
+								onchange={(e) => uploadSelectedPDFs((e.currentTarget as HTMLInputElement).files)}
+							/>
+							<p class="text-xs text-gray-500">Select one or more PDF files to upload or replace.</p>
+						</div>
+
+						<ul class="divide-y rounded-md border border-gray-200 bg-white text-sm">
+							{#if existingDocuments.length === 0}
+								<li class="p-3 text-gray-500">No documents uploaded yet</li>
+							{:else}
+								{#each existingDocuments as doc (doc.id)}
+									<li class="flex items-center justify-between gap-2 p-3">
+										<span class="truncate" title={doc.originalName}>{doc.originalName}</span>
+										<button
+											type="button"
+											class="text-xs text-red-600 hover:underline"
+											onclick={() => deleteDocument(doc.id)}
+										>
+											Delete
+										</button>
+									</li>
+								{/each}
+							{/if}
+						</ul>
 					</div>
 				</div>
 			</div>

@@ -2,6 +2,7 @@ import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import auth from '$lib/server/auth';
 import prisma from '$lib/server/prisma';
+import { getActivePromotions, buildPromotionIndex, selectBestPromotionIndexed } from '$lib/server/promotionPricing';
 
 const DEFAULT_ITEMS_PER_PAGE = 10;
 const MAX_ITEMS_PER_PAGE = 1000;
@@ -14,9 +15,9 @@ export const load = (async ({ locals: { user }, url }) => {
 		const categoriesParam = url.searchParams.get('categories') || '';
 		const selectedCategories = categoriesParam
 			? categoriesParam
-					.split(',')
-					.map((id) => parseInt(id))
-					.filter((id) => !isNaN(id))
+				.split(',')
+				.map((id) => parseInt(id))
+				.filter((id) => !isNaN(id))
 			: [];
 		const year = url.searchParams.get('year') || 'all';
 		const search = url.searchParams.get('search') || '';
@@ -135,6 +136,26 @@ export const load = (async ({ locals: { user }, url }) => {
 			count: _count.Products
 		}));
 
+		// Centralized + indexed promotion application (refactor: remove duplicate logic & improve scalability)
+		// Limit active promotion fetch to only those touching displayed products/categories
+		const allCategoryIds = Array.from(new Set(products.flatMap((p: any) => p.categories.map((c: any) => c.id))));
+		const activePromotions = await getActivePromotions(new Date(), { productIds: products.map((p: any) => p.id), categoryIds: allCategoryIds });
+		const promoIndex = buildPromotionIndex(activePromotions);
+		const productsWithPricing = products.map((p) => {
+			const categoryIds = p.categories.map((c: any) => c.id);
+			const applied = selectBestPromotionIndexed(p.price, p.id, categoryIds, promoIndex);
+			return applied ? {
+				...p,
+				discountedPrice: applied.finalUnitPrice,
+				appliedPromotion: {
+					id: applied.promotionId,
+					name: applied.name,
+					discountType: applied.discountType,
+					discountValue: applied.discountValue
+				}
+			} : p;
+		});
+
 		const totalPages = Math.ceil(total / limit);
 
 		// Redirect if page is out of bounds
@@ -148,7 +169,8 @@ export const load = (async ({ locals: { user }, url }) => {
 		}
 
 		return {
-			products,
+			// Cast so page component can access discountedPrice; original price retained in price field
+			products: productsWithPricing as any,
 			categories: categoryCounts,
 			page,
 			totalPages,

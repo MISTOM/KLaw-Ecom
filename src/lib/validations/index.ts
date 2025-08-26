@@ -1,6 +1,6 @@
 import type { z } from 'zod';
-import { userSchema, loginSchema, productSchema } from './validationSchemas';
-import type { UserRegistration, LoginCredentials, ProductData } from './validationSchemas';
+import { userSchema, loginSchema, productSchema, legislationSchema } from './validationSchemas';
+import type { UserRegistration, LoginCredentials, ProductData, LegislationData } from './validationSchemas';
 
 export interface ValidationResponse<T> {
 	success: boolean;
@@ -70,3 +70,6 @@ export const validateLogin = (formData: unknown): ValidationResponse<LoginCreden
 
 export const validateProduct = (formData: unknown): ValidationResponse<ProductData> =>
 	validate<ProductData>(formData, productSchema);
+
+export const validateLegislation = (formData: unknown): ValidationResponse<LegislationData> =>
+	validate<LegislationData>(formData, legislationSchema);

@@ -203,64 +203,136 @@
 			</div>
 
 			<!-- Products Grid -->
-			<div class="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+			<div class="grid grid-cols-2 gap-4 sm:gap-7 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
 				{#if products.length === 0}
 					<div class="col-span-full text-center text-gray-600">No products found</div>
 				{:else}
 					{#each products as product (product.id)}
 						<div
-							class="group flex flex-col justify-between overflow-hidden rounded-sm border transition-all hover:shadow-md"
+							class="group relative overflow-visible rounded-sm border bg-white px-3 transition-all hover:shadow-md"
 						>
-							<div>
+							<!-- Mobile (original vertical) layout -->
+							<div class="flex h-full flex-col md:hidden">
 								<a
 									href="/product/{product.id}?categories={selectedCategories.join(
 										','
 									)}&year={selectedYear}&page={currentPage}&limit={itemsPerPage}&search={encodeURIComponent(
 										searchQuery
 									)}"
+									class="block flex-1"
 								>
-									<div class="flex aspect-square items-center justify-center overflow-hidden">
+									<div
+										class="flex aspect-square items-center justify-center overflow-hidden rounded-sm bg-gray-50"
+									>
 										<img
 											src={product.Image[0]?.url || '/coat-of-arms.jpg'}
 											alt={product.name}
-											class="h-full bg-gray-100 object-cover transition-transform group-hover:scale-105"
+											class="h-full w-full object-cover transition-transform group-hover:scale-105"
 										/>
 									</div>
-
-									<div class="p-2 sm:p-4">
-										<h3 class="line-clamp-2 text-sm font-semibold sm:text-lg">{product.name}</h3>
-										<p class="mt-1 line-clamp-1 text-xs text-gray-600 sm:mt-2 sm:text-sm">{product.description}</p>
+									<div class="pt-2">
+										<h3 class="line-clamp-2 text-sm font-semibold">{product.name}</h3>
+										<p class="mt-1 line-clamp-2 text-xs text-gray-600">{product.description}</p>
 									</div>
 								</a>
+								<div class="mt-auto flex items-center justify-between pt-2">
+									<span class="text-sm font-bold">
+										{#if product.discountedPrice}
+											<span class="mr-1 text-gray-500 line-through">KES {product.price.toLocaleString()}</span>
+											<span class="text-primary">KES {product.discountedPrice.toLocaleString()}</span>
+										{:else}
+											KES {product.price.toLocaleString()}
+										{/if}
+									</span>
+									<button
+										class="rounded-md px-2 py-1 text-xs text-white transition-colors {product.quantity > 0
+											? 'bg-primary hover:bg-primary/90'
+											: 'cursor-not-allowed bg-gray-400'}"
+										onclick={async () => {
+											if (product.quantity <= 0) {
+												toast.add('Error', 'Product is out of stock', 'warning');
+												return;
+											}
+											const result = await cart.addItem(product);
+											if (result.success) {
+												toast.add('Success', 'Product added to cart', 'success');
+											} else if (result.error) {
+												toast.add('Stock Limited', result.error, 'warning');
+											} else {
+												if (data.user) toast.add('Error', 'Failed to Save Cart', 'error');
+											}
+										}}
+									>
+										{product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+									</button>
+								</div>
 							</div>
 
-							<div class="flex items-center justify-between p-2 sm:p-4">
-								<span class="text-sm font-bold sm:text-lg">
-									KES {product.price.toLocaleString()}
-								</span>
-								<button
-									class="rounded-md px-2 py-1 text-xs text-white transition-colors sm:px-3 sm:py-2 sm:text-sm {product.quantity >
-									0
-										? 'bg-primary hover:bg-primary/90'
-										: 'cursor-not-allowed bg-gray-400'}"
-									onclick={async () => {
-										if (product.quantity <= 0) {
-											toast.add('Error', 'Product is out of stock', 'warning');
-											return;
-										}
-
-										const result = await cart.addItem(product);
-										if (result.success) {
-											toast.add('Success', 'Product added to cart', 'success');
-										} else if (result.error) {
-											toast.add('Stock Limited', result.error, 'warning');
-										} else {
-											if (data.user) toast.add('Error', 'Failed to Save Cart', 'error');
-										}
-									}}
+							<!-- Desktop / tablet horizontal layout -->
+							<div class="hidden gap-3 md:flex">
+								<a
+									href="/product/{product.id}?categories={selectedCategories.join(
+										','
+									)}&year={selectedYear}&page={currentPage}&limit={itemsPerPage}&search={encodeURIComponent(
+										searchQuery
+									)}"
+									class="relative block w-24 shrink-0"
 								>
-									{product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
-								</button>
+									<!-- Reason: keep layout height stable; use transform for visual lift instead of negative margin which collapsed column height -->
+									<span class="block h-36 -translate-y-6 rounded-sm bg-gray-50 ring-1 ring-gray-200">
+										<img
+											src={product.Image[0]?.url || '/coat-of-arms.jpg'}
+											alt={product.name}
+											class="h-36 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+										/>
+									</span>
+								</a>
+								<div class="flex h-32 min-h-32 flex-1 flex-col justify-between">
+									<a
+										href="/product/{product.id}?categories={selectedCategories.join(
+											','
+										)}&year={selectedYear}&page={currentPage}&limit={itemsPerPage}&search={encodeURIComponent(
+											searchQuery
+										)}"
+										class="block"
+									>
+										<h3 class="line-clamp-2 pr-1 text-sm leading-snug font-semibold md:text-base">
+											{product.name}
+										</h3>
+										<p class="mt-1 line-clamp-2 text-[11px] text-gray-600 md:text-xs">{product.description}</p>
+									</a>
+									<div class="flex items-center justify-between gap-2 pt-2">
+										<span class="text-sm font-bold md:text-base">
+											{#if product.discountedPrice}
+												<span class="mr-1 text-gray-500 line-through text-sm ">KES {product.price.toLocaleString()}</span>
+												<span class="text-primary">KES {product.discountedPrice.toLocaleString()}</span>
+											{:else}
+												KES {product.price.toLocaleString()}
+											{/if}
+										</span>
+										<button
+											class="rounded-md px-3 py-2 text-sm text-white transition-colors {product.quantity > 0
+												? 'bg-primary hover:bg-primary/90'
+												: 'cursor-not-allowed bg-gray-400'}"
+											onclick={async () => {
+												if (product.quantity <= 0) {
+													toast.add('Error', 'Product is out of stock', 'warning');
+													return;
+												}
+												const result = await cart.addItem(product);
+												if (result.success) {
+													toast.add('Success', 'Product added to cart', 'success');
+												} else if (result.error) {
+													toast.add('Stock Limited', result.error, 'warning');
+												} else {
+													if (data.user) toast.add('Error', 'Failed to Save Cart', 'error');
+												}
+											}}
+										>
+											{product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+										</button>
+									</div>
+								</div>
 							</div>
 						</div>
 					{/each}

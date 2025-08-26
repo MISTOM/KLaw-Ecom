@@ -211,7 +211,185 @@ export const subscriptionPlanSchema = z.object({
 	isActive: z.boolean().default(true)
 });
 
+export const legislationSchema = z.object({
+	year: z
+		.number({
+			required_error: 'Year is required',
+			invalid_type_error: 'Year must be a number'
+		})
+		.int('Year must be a whole number')
+		.min(1900, 'Year must be 1900 or later')
+		.max(new Date().getFullYear() + 5, 'Year cannot be in the far future'),
+
+	type: z.enum(['ACT', 'SUBLEG', 'CORRIGENDA'], {
+		required_error: 'Legislation type is required'
+	}),
+
+	number: z
+		.string()
+		.max(50, 'Number is too long')
+		.optional()
+		.nullable(),
+
+	title: z
+		.string()
+		.max(500, 'Title is too long')
+		.optional()
+		.nullable(),
+
+	dateGazetted: z
+		.date({
+			invalid_type_error: 'Invalid date format'
+		})
+		.optional()
+		.nullable(),
+
+	gazetteDetails: z
+		.string()
+		.max(200, 'Gazette details are too long')
+		.optional()
+		.nullable(),
+
+	availabilityAt: z
+		.date({
+			invalid_type_error: 'Invalid date format'
+		})
+		.optional()
+		.nullable(),
+
+	uploadedAt: z
+		.date({
+			invalid_type_error: 'Invalid date format'
+		})
+		.optional()
+		.nullable(),
+
+	kgsPublicationAt: z
+		.date({
+			invalid_type_error: 'Invalid date format'
+		})
+		.optional()
+		.nullable(),
+
+	commencementAt: z
+		.date({
+			invalid_type_error: 'Invalid date format'
+		})
+		.optional()
+		.nullable(),
+
+	pagination: z
+		.string()
+		.max(50, 'Pagination is too long')
+		.optional()
+		.nullable(),
+
+	statusOnDatabase: z
+		.string()
+		.max(100, 'Status is too long')
+		.optional()
+		.nullable(),
+
+	legislativeUpdates: z
+		.string()
+		.max(1000, 'Legislative updates are too long')
+		.optional()
+		.nullable(),
+
+	comments: z
+		.string()
+		.max(1000, 'Comments are too long')
+		.optional()
+		.nullable(),
+
+	kenyaGazetteSuppNo: z
+		.string()
+		.max(50, 'Kenya Gazette Supplement Number is too long')
+		.optional()
+		.nullable(),
+
+	revocationsAmendments: z
+		.string()
+		.max(1000, 'Revocations/Amendments are too long')
+		.optional()
+		.nullable(),
+
+	assentAt: z
+		.date({
+			invalid_type_error: 'Invalid date format'
+		})
+		.optional()
+		.nullable(),
+
+	dateAvailedAt: z
+		.date({
+			invalid_type_error: 'Invalid date format'
+		})
+		.optional()
+		.nullable(),
+
+	availability: z
+		.string()
+		.max(100, 'Availability is too long')
+		.optional()
+		.nullable()
+});
+
 export type LoginCredentials = z.infer<typeof loginSchema>;
 export type UserRegistration = z.infer<typeof userSchema>;
 export type ProductData = z.infer<typeof productSchema>;
 export type SubscriptionPlanData = z.infer<typeof subscriptionPlanSchema>;
+export type LegislationData = z.infer<typeof legislationSchema>;
+
+// Promotion schema
+// Reason: Keep a separate core object so UI can access .shape without losing type due to refine returning ZodEffects.
+export const promotionCoreSchema = z.object({
+	name: z
+		.string({ required_error: 'Name is required' })
+		.min(2, 'Name must be at least 2 characters')
+		.max(120, 'Name too long'),
+	description: z
+		.string()
+		.max(1000, 'Description too long')
+		.optional()
+		.or(z.literal('').transform(() => undefined)),
+	discountType: z.enum(['PERCENT', 'AMOUNT'], { required_error: 'Discount type is required' }),
+	discountValue: z
+		.number({ required_error: 'Discount value is required', invalid_type_error: 'Discount value must be a number' })
+		.positive('Discount must be positive')
+		.max(1000000, 'Discount value too large'),
+	code: z
+		.string()
+		.min(3, 'Code must be at least 3 chars')
+		.max(30, 'Code too long')
+		.regex(/^[A-Z0-9_-]+$/, 'Only A-Z, 0-9, underscore, dash allowed')
+		.optional()
+		.or(z.literal('').transform(() => undefined)),
+	startsAt: z.date({ required_error: 'Start date is required' }),
+	endsAt: z.date({ required_error: 'End date is required' }),
+	isActive: z.boolean().default(true),
+	priority: z
+		.number({ required_error: 'Priority is required', invalid_type_error: 'Priority must be a number' })
+		.int('Priority must be an integer')
+		.min(0, 'Priority must be >= 0')
+		.max(10000, 'Priority too large')
+		.default(100),
+	productIds: z.array(z.number().int().positive()).optional().default([]),
+	categoryIds: z.array(z.number().int().positive()).optional().default([])
+});
+
+export const promotionSchema = promotionCoreSchema
+	.refine((d) => d.productIds.length + d.categoryIds.length > 0, {
+		message: 'Select at least one product or category',
+		path: ['productIds']
+	})
+	.refine((d) => d.discountType === 'AMOUNT' || (d.discountType === 'PERCENT' && d.discountValue <= 100), {
+		message: 'Percent discount cannot exceed 100',
+		path: ['discountValue']
+	})
+	.refine((d) => d.endsAt > d.startsAt, {
+		message: 'End date must be after start date',
+		path: ['endsAt']
+	});
+
+export type PromotionData = z.infer<typeof promotionCoreSchema>;

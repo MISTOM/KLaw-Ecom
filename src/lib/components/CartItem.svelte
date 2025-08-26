@@ -7,6 +7,20 @@
 
 	const cart = getCartState();
 	const toast = getToastState();
+
+	// Promotion-aware derived values
+	// Reason: Cart item may have a discountedPrice injected at load time; keep UI logic local & resilient.
+	const hasDiscount = $derived(!!(item.product as any).discountedPrice);
+	const finalUnit = $derived((hasDiscount ? (item.product as any).discountedPrice : item.product.price) as number);
+	const appliedPromotion = $derived((item.product as any).appliedPromotion || null);
+	const discountBadge = $derived.by(() => {
+		if (!appliedPromotion) return '';
+		if (appliedPromotion.discountType === 'PERCENT') return `${appliedPromotion.discountValue}% off`;
+		// Amount discount – compute percent for user clarity if possible
+		const amt = appliedPromotion.discountValue;
+		const pct = Math.round((amt / item.product.price) * 100);
+		return `Save KES ${amt.toLocaleString()}${pct ? ` (${pct}% )` : ''}`;
+	});
 </script>
 
 <div
@@ -22,7 +36,20 @@
 		/>
 		<div>
 			<h4>{item.product.name}</h4>
-			<span class="text-sm">KES {item.product.price} each</span>
+			{#if hasDiscount}
+				<div class="text-sm">
+					<span class="mr-1 text-gray-400 line-through">KES {item.product.price.toLocaleString()}</span>
+					<span class="text-primary font-semibold">KES {finalUnit.toLocaleString()}</span>
+				</div>
+				{#if discountBadge}
+					<span class="bg-primary/10 text-primary mt-0.5 inline-block rounded px-2 py-0.5 text-[11px] font-medium"
+						>{discountBadge}</span
+					>
+				{/if}
+			{:else}
+				<span class="text-sm">KES {item.product.price.toLocaleString()} each</span>
+			{/if}
+			<div class="mt-0.5 text-xs text-gray-500">Subtotal: KES {(finalUnit * item.quantity).toLocaleString()}</div>
 		</div>
 	</div>
 

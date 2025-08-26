@@ -5,6 +5,8 @@
 
 	const { data } = $props();
 	const product = $derived(data.product);
+	const productDocuments = $derived(data.productDocuments || []);
+	const isSubscribed = $derived(!!data.isSubscribed);
 	const cart = getCartState();
 	const toast = getToastState();
 
@@ -53,11 +55,26 @@
 				</div>
 
 				<!-- Price -->
-				<div class="border-b pb-4">
-					<span class="text-primary text-3xl font-bold">KES {product.price.toLocaleString()}</span>
+				<div class="space-y-2 border-b pb-4">
+					{#if product.discountedPrice}
+						<div class="flex items-end gap-3">
+							<span class="text-gray-500 line-through">KES {product.price.toLocaleString()}</span>
+							<span class="text-primary text-3xl font-bold">KES {product.discountedPrice.toLocaleString()}</span>
+						</div>
+						{#if product.appliedPromotion}
+							<span
+								class="bg-secondary/30 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium text-amber-800"
+							>
+								<i class="bi bi-stars"></i>
+								Promo: {product.appliedPromotion.name}
+							</span>
+						{/if}
+					{:else}
+						<span class="text-primary text-3xl font-bold">KES {product.price.toLocaleString()}</span>
+					{/if}
 				</div>
 
-				<!-- Add to Cart Button -->
+				<!-- Add to Cart Button & Document Access -->
 				<div class="space-y-3">
 					<button
 						class="cursor-pointer rounded-lg px-6 py-3 text-lg font-medium text-white transition-colors {product.quantity >
@@ -83,6 +100,28 @@
 						<i class="bi {product.quantity > 0 ? 'bi-cart-plus' : 'bi-exclamation-triangle'} mr-2"></i>
 						{product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
 					</button>
+
+					<!-- Read Document (for subscribed users) -->
+					{#if isSubscribed && productDocuments.length > 0}
+						<div>
+							<h4 class="mb-1 text-sm font-semibold text-gray-800">Documents</h4>
+							<ul class="space-y-1 text-sm">
+								{#each productDocuments as doc}
+									<li>
+										<a
+											href="/product/{product.id}/document/{doc.id}"
+											class="text-primary inline-flex items-center gap-1 underline-offset-2 hover:underline"
+										>
+											<i class="bi bi-file-earmark-pdf"></i>
+											Read {doc.originalName}
+										</a>
+									</li>
+								{/each}
+							</ul>
+						</div>
+					{:else if productDocuments.length > 0}
+						<p class="text-sm text-gray-600">Subscribe to read attached document(s).</p>
+					{/if}
 
 					<!-- Stock Status -->
 					<div class="flex items-center gap-2">

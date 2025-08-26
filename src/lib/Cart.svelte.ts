@@ -28,7 +28,10 @@ class Cart {
 
 		for (let item of this.cartItems) {
 			quantity += item.quantity;
-			total += item.product.price * item.quantity;
+			// Reason: Prefer discountedPrice snapshot if present to reflect active promotion pricing in cart totals.
+			// @ts-ignore - discountedPrice injected at runtime from listing/promotion logic
+			const unit = (item.product as any).discountedPrice ?? item.product.price;
+			total += unit * item.quantity;
 		}
 
 		return {

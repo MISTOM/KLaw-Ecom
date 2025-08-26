@@ -29,7 +29,9 @@
 				<a href="/admin/product">Products</a>
 			</li>
 			<li class="hover:text-secondary transition-colors"><a href="/admin/order">Orders</a></li>
+			<li class="hover:text-secondary transition-colors"><a href="/admin/promotions">Promotions</a></li>
 			<li class="hover:text-secondary transition-colors"><a href="/admin/reports">Reports</a></li>
+			<li class="hover:text-secondary transition-colors"><a href="/admin/legislation">Legislation</a></li>
 			<!-- <li class="transition-colors hover:text-secondary"><a href="/admin/users">Users</a></li> -->
 			<li class="hover:text-secondary transition-colors"><a href="/admin/category">Categories</a></li>
 			<li class="hover:text-secondary transition-colors"><a href="/admin/subscription">Subscription Plans</a></li>

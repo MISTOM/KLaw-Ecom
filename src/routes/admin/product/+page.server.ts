@@ -151,12 +151,8 @@ export const actions: Actions = {
 			const [newProduct] = await Promise.all([newProductPromise, imageUrl ? writeFilePromise : Promise.resolve()]);
 			console.log('newProduct:', newProduct);
 
-			return {
-				status: 200,
-				body: {
-					product: newProduct
-				}
-			};
+			// Return product directly so SvelteKit action result contains it in result.data.product
+			return { product: newProduct };
 		} catch (e) {
 			console.log('addProduct error: ', e);
 

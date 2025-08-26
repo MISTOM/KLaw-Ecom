@@ -1,6 +1,7 @@
 import { error, json, redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import prisma from '$lib/server/prisma';
+import { getActivePromotions, selectBestPromotion } from '$lib/server/promotionPricing';
 
 // export const POST: RequestHandler = async ({ locals: { user }, request }) => {
 //     if (!user) return error(401, 'Unauthorized saving cart: No user logged in');
@@ -18,7 +19,6 @@ import prisma from '$lib/server/prisma';
 //                 id: { in: orderedItems.map((item) => item.productId) }
 //             }
 //         });
-
 //         if (products.length !== orderedItems.length) {
 //             return error(400, 'some Products not found');
 //         }
@@ -111,7 +111,8 @@ export const POST: RequestHandler = async ({ locals: { user }, request }) => {
 						id: true,
 						name: true,
 						price: true,
-						quantity: true
+						quantity: true,
+						categories: { select: { id: true } }
 					}
 				});
 
@@ -132,11 +133,29 @@ export const POST: RequestHandler = async ({ locals: { user }, request }) => {
 				if (productsNotInStock.length > 0)
 					throw error(400, `Products out of stock: ${productsNotInStock.join(', ')}`);
 
-				// Calculate total price using the product map
-				const totalPrice = orderedItems.reduce((total, item) => {
+				// Promotions snapshot (only promotions relevant to ordered products/categories)
+				const productIdsForPromos = products.map(p => p.id);
+				const categoryIdsForPromos = Array.from(new Set(products.flatMap(p => p.categories.map(c => c.id))));
+				const activePromotions = await getActivePromotions(new Date(), { productIds: productIdsForPromos, categoryIds: categoryIdsForPromos });
+
+				// Calculate total price using promotion-adjusted pricing
+				let totalPrice = 0;
+				const orderLinesData: any[] = [];
+				for (const item of orderedItems) {
 					const product = productMap.get(item.productId)!;
-					return total + product.price * item.quantity;
-				}, 0);
+					const categoryIds = product.categories.map((c) => c.id);
+					const applied = selectBestPromotion(product.price, product.id, categoryIds, activePromotions);
+					const finalUnit = applied ? applied.finalUnitPrice : product.price;
+					const discountAmount = applied ? applied.discountAmount : 0;
+					totalPrice += finalUnit * item.quantity;
+					orderLinesData.push({
+						productId: product.id,
+						quantity: item.quantity,
+						unitPrice: product.price,
+						discountAmount,
+						promotionId: applied?.promotionId
+					});
+				}
 
 				// Update product quantities in bulk
 				const updatePromises = orderedItems.map((item) =>
@@ -147,14 +166,14 @@ export const POST: RequestHandler = async ({ locals: { user }, request }) => {
 				);
 				await Promise.all(updatePromises);
 
-				// Create order with all related data in a single operation
+				// Create order with snapshot pricing data
 				const newOrder = await tx.order.create({
 					data: {
 						userId: user.id,
 						totalPrice,
 						billRefNumber: req?.billRefNumber,
 						ProductOnOrder: {
-							createMany: { data: orderedItems }
+							createMany: { data: orderLinesData }
 						}
 					},
 					include: {

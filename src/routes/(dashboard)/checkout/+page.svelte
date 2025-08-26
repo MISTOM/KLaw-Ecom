@@ -24,7 +24,18 @@
 	let paymentStatus = $state('initial'); // 'initial' | 'processing' | 'failed'
 	let paymentError = $state('');
 
-	let totalPrice = $derived(cart.cartStats.total + (convenienceFee?.amount || 0));
+	// Pricing derivations (promotion aware)
+	// Reason: discountedPrice/appliedPromotion are injected dynamically; create typed accessors to satisfy TS.
+	function getDiscounted(p: any): number | null {
+		return typeof p?.discountedPrice === 'number' ? p.discountedPrice : null;
+	}
+	function getPromo(p: any): any | null {
+		return p?.appliedPromotion || null;
+	}
+	let originalSubtotal = $derived(cart.cartItems.reduce((acc, ci) => acc + ci.product.price * ci.quantity, 0));
+	let discountedSubtotal = $derived(cart.cartStats.total); // cartStats.total already uses discounted price if available
+	let totalSavings = $derived(Math.max(0, originalSubtotal - discountedSubtotal));
+	let totalPrice = $derived(discountedSubtotal + (convenienceFee?.amount || 0));
 
 	const initiatePayment = async () => {
 		showConfirmModal = false;
@@ -163,23 +174,60 @@
 												by {item.product.author}
 											{/if}
 										</p>
-										<div
-											class="mt-2 flex flex-col space-y-1 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4"
-										>
-											<span class="text-base font-semibold text-gray-900 sm:text-lg">
-												KES {item.product.price.toLocaleString()}
-											</span>
-											<span class="text-xs text-gray-500 sm:text-sm">
-												Qty: {item.quantity}
-											</span>
+										<div class="mt-2 space-y-1">
+											{#if getDiscounted(item.product) !== null}
+												<div class="flex flex-wrap items-center gap-2">
+													<span class="text-primary text-base font-semibold sm:text-lg"
+														>KES {getDiscounted(item.product)?.toLocaleString()}</span
+													>
+													<span class="text-xs text-gray-400 line-through sm:text-sm"
+														>KES {item.product.price.toLocaleString()}</span
+													>
+													{#if getPromo(item.product)}
+														<span class="bg-primary/10 text-primary rounded px-2 py-0.5 text-[10px] font-medium">
+															{#if getPromo(item.product).discountType === 'PERCENT'}
+																{getPromo(item.product).discountValue}% off
+															{:else}
+																Save KES {getPromo(item.product).discountValue.toLocaleString()}
+															{/if}
+														</span>
+													{/if}
+													<span class="text-xs text-gray-500 sm:text-sm">Qty: {item.quantity}</span>
+												</div>
+												<p class="text-xs text-gray-500">
+													Line subtotal: KES {(getDiscounted(item.product)! * item.quantity).toLocaleString()}
+												</p>
+												<p class="text-[11px] text-green-600">
+													Saved KES {(
+														(item.product.price - getDiscounted(item.product)!) *
+														item.quantity
+													).toLocaleString()}
+												</p>
+											{:else}
+												<div class="flex flex-wrap items-center gap-2">
+													<span class="text-base font-semibold text-gray-900 sm:text-lg"
+														>KES {item.product.price.toLocaleString()}</span
+													>
+													<span class="text-xs text-gray-500 sm:text-sm">Qty: {item.quantity}</span>
+												</div>
+												<p class="text-xs text-gray-500">
+													Line subtotal: KES {(item.product.price * item.quantity).toLocaleString()}
+												</p>
+											{/if}
 										</div>
 									</div>
 
 									<!-- Total Price and Remove Button -->
 									<div class="flex flex-col items-end space-y-2">
-										<p class="text-sm font-semibold text-gray-900 sm:text-lg">
-											KES {(item.product.price * item.quantity).toLocaleString()}
-										</p>
+										{#if getDiscounted(item.product) !== null}
+											<p class="text-sm font-semibold text-gray-900 sm:text-lg">
+												KES {(getDiscounted(item.product)! * item.quantity).toLocaleString()}
+											</p>
+										{:else}
+											<p class="text-sm font-semibold text-gray-900 sm:text-lg">
+												KES {(item.product.price * item.quantity).toLocaleString()}
+											</p>
+										{/if}
 										<button
 											aria-label="Remove item"
 											class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"

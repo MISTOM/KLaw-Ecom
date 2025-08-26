@@ -13,21 +13,28 @@ export const load = (async ({ params, depends }) => {
 		const productPromise = prisma.product.findUnique({
 			where: { id },
 			include: {
-				Image: {
-					select: { url: true }
-				},
-				categories: {
-					select: { id: true, name: true }
-				}
+				Image: { select: { url: true } },
+				categories: { select: { id: true, name: true } }
 			}
 		});
 		const categoriesPromise = prisma.category.findMany({ orderBy: { sortOrder: 'asc' } });
+		// Fetch product documents separately (not gated by published status) so admin can always manage them.
+		// Reason: Admins need visibility of attached PDFs even before a product is published.
+		const productDocumentsPromise = prisma.productDocument.findMany({
+			where: { productId: id },
+			select: { id: true, originalName: true, sizeBytes: true },
+			orderBy: { sortOrder: 'asc' }
+		});
 
-		const [product, categories] = await Promise.all([productPromise, categoriesPromise]);
+		const [product, categories, productDocuments] = await Promise.all([
+			productPromise,
+			categoriesPromise,
+			productDocumentsPromise
+		]);
 
 		if (!product) return { status: 404, error: 'Product not found' };
 
-		return { success: true, product, categories };
+		return { success: true, product, categories, productDocuments };
 	} catch (e) {
 		console.log('getProduct:', e);
 		return { status: 500, error: 'Internal server error getting product details' };
@@ -38,7 +45,12 @@ export const actions = {
 	default: async ({ request, params }) => {
 		const id = Number(params.id);
 		const formData = await request.formData();
-		const formObj = Object.fromEntries(formData);
+		// Convert FormData to a plain object (manual loop for TS compatibility in this environment)
+		const formObj: Record<string, FormDataEntryValue> = {};
+		for (const pair of formData as any as Iterable<[string, FormDataEntryValue]>) {
+			const [k, v] = pair;
+			formObj[k] = v;
+		}
 		const parsedData = {
 			...formObj,
 			price: formObj.price ? parseFloat(formObj.price as string) : undefined,
@@ -144,10 +156,10 @@ export const actions = {
 					categories: { set: categoryIds.map((id) => ({ id })) },
 					...(imageUrl
 						? {
-								Image: {
-									create: { url: imageUrl }
-								}
+							Image: {
+								create: { url: imageUrl }
 							}
+						}
 						: {})
 				}
 			});

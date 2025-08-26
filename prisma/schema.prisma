@@ -53,6 +53,7 @@ model Product {
   ProductOnOrder   ProductOnOrder[]
   ProductPromotion ProductPromotion[]
   categories       Category[]         @relation("ProductCategory")
+  ProductDocument  ProductDocument[] // Related PDF documents for this product
 }
 
 model Image {
@@ -113,12 +114,19 @@ model Order {
 }
 
 model ProductOnOrder {
-  orderId   Int
-  productId Int
-  quantity  Int
-  isIssued  Boolean @default(false)
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product   Product @relation(fields: [productId], references: [id])
+  orderId        Int
+  productId      Int
+  quantity       Int
+  isIssued       Boolean    @default(false)
+  order          Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product        Product    @relation(fields: [productId], references: [id])
+  /// Base unit price at time of order BEFORE discount (snapshot to preserve historical pricing)
+  unitPrice      Float      @default(0)
+  /// Absolute discount amount applied per unit (0 if none)
+  discountAmount Float      @default(0)
+  /// Optional promotion reference used to derive discount
+  promotionId    Int?
+  promotion      Promotion? @relation(fields: [promotionId], references: [id])
 
   @@id([orderId, productId])
 }
@@ -146,7 +154,7 @@ model Payment {
   subscriptionId Int?
   provider       String
   status         PaymentStatus     @default(PENDING)
-  amount         Decimal           @db.Decimal(10, 2)
+  amount         Int
   currency       String            @default("KES")
   providerRef    String?           @unique
   idempotencyKey String?           @unique
@@ -168,7 +176,7 @@ model Promotion {
   name          String
   description   String?
   discountType  DiscountType
-  discountValue Decimal             @db.Decimal(10, 2)
+  discountValue Int
   code          String?             @unique
   startsAt      DateTime
   endsAt        DateTime
@@ -178,6 +186,7 @@ model Promotion {
   updatedAt     DateTime            @updatedAt
   categories    CategoryPromotion[]
   products      ProductPromotion[]
+  orders        ProductOnOrder[]
 }
 
 model ProductPromotion {
@@ -245,7 +254,7 @@ model SubscriptionPlan {
   id               Int                @id @default(autoincrement())
   name             String             @unique
   description      String?
-  price            Decimal            @db.Decimal(10, 2)
+  price            Int
   duration         Int
   isActive         Boolean            @default(true)
   createdAt        DateTime           @default(now())
@@ -342,4 +351,26 @@ enum SubscriptionStatus {
   ACTIVE
   CANCELLED
   EXPIRED
+}
+
+/// PDF document associated with a product (non-DRM)
+/// Reason: Enables attaching one or more plain PDF files to a product which subscribed users can read.
+model ProductDocument {
+  id             Int      @id @default(autoincrement())
+  productId      Int
+  originalName   String // Original filename from the upload
+  storedName     String // Internal unique filename stored on disk (uuid.pdf)
+  mimeType       String   @default("application/pdf")
+  sizeBytes      Int // File size in bytes for display & validation
+  checksumSha256 String? // For replacement detection (nullable to allow backfill)
+  pageCount      Int? // Optional extracted page count (future enhancement)
+  sortOrder      Int      @default(999)
+  isPublished    Boolean  @default(true) // Can hide a document without deleting
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, storedName])
+  @@index([productId])
+  @@index([isPublished])
 }

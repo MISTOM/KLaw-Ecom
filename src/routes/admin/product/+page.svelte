@@ -24,11 +24,13 @@
 	let price = $state(form?.data?.price);
 	let quantity = $state(form?.data?.quantity);
 	let serviceCode = $state(form?.data?.serviceCode);
-	let author = $state(form?.data?.author);
-	let citation = $state(form?.data?.citation || '');
-	let isbn = $state(form?.data?.isbn || '');
-	let pageCount = $state(form?.data?.pageCount);
-	let publicationDateISO = $state(form?.data?.publicationDate);
+	// Cast form?.data to any for flexible property access (server action returns dynamic shape)
+	const formAny: any = form?.data || {};
+	let author = $state(formAny.author);
+	let citation = $state(formAny.citation || '');
+	let isbn = $state(formAny.isbn || '');
+	let pageCount = $state(formAny.pageCount);
+	let publicationDateISO = $state(formAny.publicationDate);
 	let selectedCategories = $state<{ id: number; name: string }[]>([]);
 	const categoryIds = $derived(selectedCategories.map((c) => c.id));
 	let publicationDate = $state(
@@ -240,6 +242,24 @@
 
 			return async ({ update, result }) => {
 				if (result.type === 'success') {
+					// After product core data saved, if PDFs selected perform sequential uploads
+					const productId = (result.data as any)?.product?.id;
+					const filesInput = document.getElementById('pdfDocuments') as HTMLInputElement | null;
+					if (productId && filesInput?.files && filesInput.files.length > 0) {
+						for (const file of Array.from(filesInput.files)) {
+							if (file.type !== 'application/pdf') continue; // extra safety
+							const fd = new FormData();
+							fd.append('file', file, file.name);
+							try {
+								const res = await fetch(`/api/product/${productId}/documents`, { method: 'POST', body: fd });
+								if (!res.ok) {
+									console.warn('PDF upload failed', await res.text());
+								}
+							} catch (e) {
+								console.warn('PDF upload error', e);
+							}
+						}
+					}
 					toast.add('Success', 'Product added successfully', 'success', 2000);
 					showAddModal = false;
 					await update({ reset: true });
@@ -564,6 +584,22 @@
 			<p class="text-xs text-gray-500">
 				Accepted formats: {allowedExtensions.join(', ')}
 			</p>
+		</div>
+
+		<!-- PDF Documents (optional) -->
+		<div class="space-y-2">
+			<label for="pdfDocuments" class="text-sm font-medium text-gray-700"
+				>Attach PDF Documents <span class="text-gray-500">(optional)</span></label
+			>
+			<input
+				id="pdfDocuments"
+				type="file"
+				multiple
+				accept="application/pdf"
+				class="focus:border-primary focus:ring-primary w-full rounded-md border border-dashed border-gray-300 p-2 focus:ring-1 focus:outline-hidden"
+				aria-describedby="pdf-help"
+			/>
+			<p id="pdf-help" class="text-xs text-gray-500">You may select multiple PDF files (max 25MB each).</p>
 		</div>
 
 		<button
